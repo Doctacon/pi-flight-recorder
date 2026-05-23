@@ -1,29 +1,32 @@
 # pi-flight-recorder
 
-Local-first flight recorder for Pi coding sessions.
+Local-first failure memory and reflection for Pi coding sessions.
 
-The first product slice is **Failure Memory**: parse Pi session JSONL, extract command/tool failures and eventual fixes, then answer “have I seen this before?” with evidence-backed links to prior sessions.
+The product goal is extension-first: install the Pi extension, keep working, and let the recorder quietly index failures, surface only high-confidence prior fixes, and periodically reflect on repeated failure patterns.
 
 ## Status
 
-MVP core plus opt-in live monitoring are implemented:
+Implemented:
 
-- strict TypeScript library + CLI;
+- strict TypeScript library + debug CLI;
 - Pi JSONL parser with source refs and branch ancestry;
 - local SQLite/FTS5 index using Node 24 `node:sqlite`;
 - failure/fix episode extraction with redaction;
-- incremental single-file sync that reports newly detected episode IDs;
-- polling session watch service with catch-up, debounce, local lock, stop request, and persisted status;
-- live suggestion engine with current-episode exclusion, cwd preference, confidence threshold, cooldown, and quiet modes;
-- `sync`, `query`, `seen-this-before`, `watch`, and `feedback` CLI commands;
-- Pi extension wrapper with `/flight-sync`, `/seen-this-before`, `/flight-mode`, `/flight-watch`, live `tool_result` suggestions, and `flight_seen_this_before` tool.
+- incremental single-file sync and foreground polling watcher;
+- Pi extension autostart on `session_start` with persisted local settings;
+- live failure occurrence ledger for quiet/no-match/suppressed failures;
+- high-confidence live suggestion gates with prior-resolution requirement, specificity gate, cooldown, and silence/snooze feedback;
+- local repeated-failure clustering and `/flight-reflect` pattern proposals;
+- optional model-assisted reflection only when explicitly requested and a provider is available;
+- Pi commands: `/flight-status`, `/flight-mode`, `/flight-feedback`, `/flight-reflect`, `/flight-sync`, `/seen-this-before`, `/flight-watch`;
+- debug CLI commands: `status`, `sync`, `query`, `seen-this-before`, `watch`, `reflect`, `feedback`.
 
 ## Requirements
 
 - Node.js 24+ with `node:sqlite` and FTS5.
 - Local Pi sessions under `~/.pi/agent/sessions/` and/or `~/.pi/agent/sessions-archive/`.
 
-Node currently prints an `ExperimentalWarning` when `node:sqlite` is first loaded. The project accepts that for the MVP to avoid a native SQLite dependency.
+Node currently prints an `ExperimentalWarning` when `node:sqlite` is first loaded. This is accepted to avoid a native SQLite dependency.
 
 ## Install for development
 
@@ -34,114 +37,93 @@ npm test
 npm run build
 ```
 
-## CLI usage
+## Normal Pi usage
 
-Index default Pi sessions:
-
-```sh
-npm run cli -- sync
-```
-
-Index a fixture or explicit source directory:
-
-```sh
-npm run cli -- sync --source /path/to/sessions --data-dir ./.pi-flight-recorder
-```
-
-Ask whether a failure has appeared before:
-
-```sh
-npm run cli -- seen-this-before --data-dir ./.pi-flight-recorder "Cannot find module src/config/app.ts"
-```
-
-Get machine-readable output:
-
-```sh
-npm run cli -- query --json "npm test Cannot find module"
-```
-
-Run opt-in live watching in the foreground:
-
-```sh
-npm run cli -- watch start --foreground --mode index-only
-npm run cli -- watch start --foreground --mode suggest-on-failure --min-confidence 0.7 --cooldown-ms 300000
-```
-
-Inspect or request stop from another shell:
-
-```sh
-npm run cli -- watch status
-npm run cli -- watch stop
-```
-
-Notes:
-
-- `watch start` intentionally requires `--foreground`; OS launch agents/daemons are not installed by this slice.
-- The watcher uses local polling plus debounce instead of a native watcher dependency, keeping install friction low.
-- `index-only` updates the local index quietly; `suggest-on-failure` prints evidence-backed suggestions when confidence/cooldown gates allow.
-
-See `docs/live-monitoring.md` for modes, Pi commands, status, stop requests, privacy, and limits.
-
-Record local feedback:
-
-```sh
-npm run cli -- feedback --episode ep_... --rating useful
-```
-
-Ratings currently supported:
+Build the package, install/enable it as a Pi extension, then work normally in Pi. The extension initializes local state on `session_start`, starts quiet local indexing/capture unless disabled, and keeps all derived state under:
 
 ```text
-useful | wrong-match | already-solved | not-useful | promote-later
+~/.pi/flight-recorder/
 ```
 
-## Pi extension
-
-The extension entry is:
+Useful Pi commands:
 
 ```text
-src/pi-extension.ts
-```
-
-After build, `package.json` exposes a Pi package manifest:
-
-```json
-"pi": { "extensions": ["./dist/pi-extension.js"] }
-```
-
-It registers:
-
-- `/flight-sync` - index local Pi sessions.
-- `/seen-this-before` - query failure memory from inside Pi.
-- `/flight-mode` - set live mode: `off`, `index-only`, or `suggest-on-failure`.
-- `/flight-watch` - start, stop, or inspect live session watching inside Pi.
-- `flight_seen_this_before` - tool-style query surface for agents.
-
-Example command inside Pi:
-
-```text
-/flight-sync --source ~/.pi/agent/sessions --data-dir ~/.pi/flight-recorder
+/flight-status
+/flight-mode status
+/flight-mode pause
+/flight-mode resume
+/flight-mode disable
+/flight-reflect
+/flight-feedback --action snooze --occurrence occ_...
 /seen-this-before --cwd current Cannot find module src/config/app.ts
-/flight-mode suggest-on-failure --data-dir ~/.pi/flight-recorder --min-confidence 0.7
-/flight-watch start --source ~/.pi/agent/sessions --mode index-only
 ```
 
-When live mode is `suggest-on-failure`, failed Pi `tool_result` events are searched immediately and the current session file is synced after a short delay so durable provenance can catch up. Pi `user_bash` is registered as an explicit future seam, but this slice does not wrap user shell execution because that could alter command semantics.
+Default behavior:
+
+- autostart is on after the extension is enabled;
+- mode defaults to `suggest-on-failure`, but live nudges require conservative gates;
+- no-match, low-confidence, cooldown, broad-match, and silenced failures are buffered quietly;
+- `/flight-reflect` groups repeated buffered failures into pattern-level proposals;
+- model-assisted reflection is disabled by default and only used for `/flight-reflect --model` when Pi provides a model completion surface.
+
+## Immediate suggestions
+
+A live nudge is shown only when a failed `tool_result` matches strong prior local evidence:
+
+- prior episode has an observed resolution;
+- match clears confidence and specificity gates;
+- same-cwd matches are preferred;
+- cooldown and max-window budgets allow another notification;
+- the signature is not snoozed or silenced.
+
+The extension does **not** mutate Pi tool results. `user_bash` remains disabled for result capture because Pi exposes it before execution; wrapping shell commands would risk changing semantics.
+
+## Reflection
+
+Repeated quiet failures are stored as local occurrences, mined into clusters, and summarized as pattern proposals:
+
+```text
+/flight-reflect --min-count 3
+/flight-reflect --model   # explicit, bounded/redacted model assistance if available
+```
+
+Reflection proposals include:
+
+- pattern summary;
+- affected tools/cwds/counts;
+- likely durable fix or next investigation step;
+- representative evidence refs;
+- confidence and limits;
+- actions: `useful`, `wrong-match`, `snooze`, `silence-pattern`, `promote-later`, `make-rule`.
+
+## Debug CLI usage
+
+The CLI is a development/debug/recovery harness, not the normal UX.
+
+```sh
+npm run cli -- status --json
+npm run cli -- sync
+npm run cli -- seen-this-before "Cannot find module src/config/app.ts"
+npm run cli -- reflect --min-count 2
+npm run cli -- watch start --foreground --mode index-only
+npm run cli -- feedback --action useful --episode ep_...
+```
+
+The foreground watcher intentionally does not install launchd/systemd services.
 
 ## Local-first privacy posture
 
-- No network calls are made by the MVP.
-- Raw Pi sessions stay as source files; derived state is rebuildable.
+- No network calls are made by default.
+- Raw Pi sessions stay as source files; derived indexes are rebuildable.
 - Derived snippets redact obvious token/password/key/private-key patterns.
-- Query answers cite session files, entry IDs, cwd, and limits so claims stay inspectable.
+- Model-assisted reflection is opt-in/manual and uses bounded redacted snippets.
+- Query/suggestion/reflection answers cite local evidence and limits.
 
 ## Loom records
 
-Planning lives under `.loom/`:
+Planning lives under `.loom/`, including:
 
-- `.loom/research/20260522-agent-session-memory-landscape.md`
-- `.loom/research/20260522-live-failure-watcher-inspiration.md`
-- `.loom/specs/failure-memory-mvp.md`
-- `.loom/specs/live-failure-monitoring.md`
-- `.loom/plans/20260522-pi-flight-recorder-mvp.md`
-- `.loom/plans/20260522-live-failure-monitoring.md`
-- `.loom/tickets/20260522-*.md`
+- `.loom/specs/seamless-failure-memory-ux.md`
+- `.loom/plans/20260523-seamless-failure-memory-ux.md`
+- `.loom/tickets/20260523-*.md`
+- `.loom/evidence/`

@@ -1,0 +1,49 @@
+{
+  "name": "pi-flight-recorder",
+  "version": "0.1.0",
+  "description": "Local-first flight recorder for Pi coding sessions.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "pi-flight-recorder": "./dist/cli.js"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./pi-extension": "./dist/pi-extension.js"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "README.md",
+    "CLAUDE.md"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cli": "tsx src/cli.ts"
+  },
+  "keywords": [
+    "pi",
+    "coding-agent",
+    "session-history",
+    "failure-memory",
+    "local-first",
+    "pi-package"
+  ],
+  "pi": {
+    "extensions": ["./dist/pi-extension.js"]
+  },
+  "author": "",
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}

@@ -1,0 +1,61 @@
+# Extension Feedback Controls
+
+ID: ticket:20260523-extension-feedback-controls
+Type: Ticket
+Status: open
+Created: 2026-05-23
+Updated: 2026-05-23
+Risk: medium - feedback state changes future suggestion/reflection behavior
+Priority: high - user needs control over noise and trust
+Depends On: ticket:20260523-high-confidence-suggestion-ux
+
+## Summary
+
+Add Pi-native feedback and control actions for live suggestions and future reflections: useful, wrong match, already solved, snooze, silence pattern, promote later, and make rule/remember. The closure claim is that the user can correct or steer the system from inside Pi without leaving the flow.
+
+## Related Records
+
+- `spec:seamless-failure-memory-ux` - REQ-013 and REQ-014 define feedback/control expectations.
+- `constitution:main` - human feedback gates promotion.
+- `plan:20260523-seamless-failure-memory-ux` - feedback controls are reused by reflection tickets.
+- `ticket:20260523-high-confidence-suggestion-ux` - suggestions need actions and suppression state.
+
+## Scope
+
+May change:
+
+- Feedback storage schema, Pi commands, suggestion/reflection action helpers, tests, docs.
+
+Must not change:
+
+- No automatic Loom promotion yet unless stored as `promote-later` intent only.
+- No autonomous rule enforcement beyond recording preferences/silence state.
+- No reflection digest UI yet except shared action primitives.
+
+Feedback should be local, inspectable, and tied to episode IDs, occurrence IDs, cluster IDs, and/or normalized signatures where applicable.
+
+## Acceptance
+
+- ACC-001: Pi commands or action-like commands record feedback for a suggestion/occurrence/signature.
+  - Evidence: Fake-Pi command tests and storage tests.
+  - Audit: Review invalid IDs/actions produce friendly messages.
+
+- ACC-002: Snooze and silence pattern affect future live suggestion decisions.
+  - Evidence: Test creates a silence/snooze record and asserts later matching failures do not notify.
+  - Audit: Review status explains suppression reason.
+
+- ACC-003: `promote-later` and `make-rule` are persisted as user intent without creating Loom records or durable rules automatically.
+  - Evidence: Storage tests and docs.
+  - Audit: Review no automatic promotion violates constitution feedback gate.
+
+- ACC-004: Status shows recent feedback/silence state enough to troubleshoot why a match did or did not appear.
+  - Evidence: Fake-Pi status snapshot test.
+  - Audit: Review output is concise and not privacy-leaky.
+
+## Current State
+
+Ready after high-confidence suggestion UX. Current MVP has CLI feedback for episodes only; it does not support Pi-native live actions, snooze, silence, or rule intent.
+
+## Journal
+
+- 2026-05-23: Created ticket to close the feedback/control loop for seamless UX.
