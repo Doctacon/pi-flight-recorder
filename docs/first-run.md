@@ -1,8 +1,8 @@
 # First Run
 
-`pi-flight-recorder` builds a local failure-memory index from Pi JSONL sessions.
+`pi-flight-recorder` builds local failure memory from Pi JSONL sessions and runs best as a Pi extension.
 
-## 1. Install and verify
+## 1. Build and install
 
 ```sh
 npm install
@@ -11,56 +11,56 @@ npm test
 npm run build
 ```
 
-## 2. Sync sessions
+Then install/enable the package as a Pi extension using Pi's package workflow. The package manifest exposes:
 
-Default sync reads:
+```json
+"pi": { "extensions": ["./dist/pi-extension.js"] }
+```
+
+After the extension is loaded, normal use happens inside Pi. You do not need to keep a separate CLI watcher running.
+
+## 2. Check extension status
+
+Inside Pi:
 
 ```text
-~/.pi/agent/sessions
-~/.pi/agent/sessions-archive
+/flight-status
 ```
 
-Run:
+Status reports:
 
-```sh
-npm run cli -- sync
-```
+- mode and autostart state;
+- data directory;
+- capture/index watcher state;
+- captured failure occurrence counts;
+- suggestion gates and last suppression reason;
+- reflection settings;
+- privacy/model status;
+- the `user_bash` capture limitation.
 
-For a project-local index or fixture corpus:
-
-```sh
-npm run cli -- sync --source /path/to/session-root --data-dir ./.pi-flight-recorder
-```
-
-Useful options:
+Default data directory:
 
 ```text
---source DIR    repeatable source directory or JSONL file root
---data-dir DIR  local index directory
---limit N       only process first N discovered JSONL files
---force         reparse even unchanged files
---json          machine-readable sync summary
+~/.pi/flight-recorder/
 ```
 
-## 3. Query failure memory
+## 3. Work normally
 
-```sh
-npm run cli -- seen-this-before "npm test Cannot find module src/config/app.ts"
+On Pi `session_start`, the extension initializes local settings and starts quiet local capture/indexing unless disabled. If another Pi TUI already owns the watcher lock for the same source set, the new session uses the shared watcher/index and still records its own live failed `tool_result` occurrences; `/flight-status` reports this as `shared watcher`, not an error.
+
+On failed Pi `tool_result` events:
+
+- high-confidence prior resolved matches may show a concise notification;
+- no-match, low-confidence, broad-match, cooldown, and silenced failures are stored quietly as occurrences;
+- the current session file is synced after a short delay so durable provenance can catch up.
+
+The extension does not wrap or mutate tool results.
+
+## 4. Ask directly when needed
+
+```text
+/seen-this-before --cwd current npm test Cannot find module src/config/app.ts
 ```
-
-Project-filtered query:
-
-```sh
-npm run cli -- seen-this-before --cwd /Users/me/project "Cannot find module"
-```
-
-JSON output:
-
-```sh
-npm run cli -- query --json "duckdb path error"
-```
-
-## 4. Interpret output
 
 A good match separates:
 
@@ -73,100 +73,78 @@ A good match separates:
 
 If no passing validation was detected after a failure, the episode is shown as unresolved instead of inventing a fix.
 
-## 5. Optional live monitoring
+## 5. Reflect on repeated failures
 
-Live monitoring is opt-in. Start with quiet indexing:
+Manual reflection:
+
+```text
+/flight-reflect
+/flight-reflect --min-count 3
+/flight-review
+/flight-reflect --interactive
+```
+
+Optional model-assisted reflection, only when requested and Pi exposes a model completion surface:
+
+```text
+/flight-reflect --model
+```
+
+Reflection groups repeated local failures and proposes one pattern-level next step with evidence, confidence, limits, and actions. Use `/flight-review` for a guided keyboard-driven review: pick a proposal, pick an action, and optionally draft/edit/approve a scoped Flight Rule.
+
+## 6. Give feedback
+
+Examples:
+
+```text
+/flight-feedback --action useful --proposal refl_...
+/flight-feedback --action wrong-match --occurrence occ_...
+/flight-feedback --action snooze --occurrence occ_...
+/flight-feedback --action silence-pattern --signature "npm test cannot find module paths"
+/flight-feedback --action promote-later --cluster cluster_...
+/flight-feedback --action make-rule --cluster cluster_...
+/flight-rules status
+```
+
+Feedback is local SQLite state. `promote-later` records user intent. `make-rule` creates a draft candidate; a Flight Rule affects future turns only after explicit approval, and `/flight-rules disable` turns it off.
+
+## 7. Control mode
+
+```text
+/flight-mode status
+/flight-mode pause
+/flight-mode resume
+/flight-mode disable
+/flight-mode index-only
+/flight-mode suggest-on-failure --min-confidence 0.8 --cooldown-ms 300000
+```
+
+Modes:
+
+```text
+off                 no live capture or suggestions
+index-only          local capture/indexing only
+suggest-on-failure  capture plus rare high-confidence suggestions
+```
+
+## Debug CLI
+
+The CLI is for development, recovery, and inspection:
 
 ```sh
+npm run cli -- status --json
+npm run cli -- sync --source /path/to/session-root --data-dir ./.pi-flight-recorder
+npm run cli -- seen-this-before --data-dir ./.pi-flight-recorder "Cannot find module"
+npm run cli -- reflect --data-dir ./.pi-flight-recorder --min-count 2
 npm run cli -- watch start --foreground --mode index-only
 ```
 
-For evidence-backed suggestions when new failures are detected:
-
-```sh
-npm run cli -- watch start --foreground --mode suggest-on-failure --min-confidence 0.7 --cooldown-ms 300000
-```
-
-Use explicit sources/data directory when testing fixtures:
-
-```sh
-npm run cli -- watch start --foreground --source /path/to/session-root --data-dir ./.pi-flight-recorder --mode suggest-on-failure
-```
-
-Inspect status or request stop from another shell:
-
-```sh
-npm run cli -- watch status --data-dir ./.pi-flight-recorder
-npm run cli -- watch stop --data-dir ./.pi-flight-recorder
-```
-
-Live monitor behavior:
-
-- catch-up sync runs before the watcher reports active;
-- only `.jsonl` files are considered;
-- file changes are debounced before incremental single-file sync;
-- duplicate watchers for the same source/data dir are blocked by a local lock;
-- malformed partial JSONL writes become warnings instead of crashing;
-- `index-only` suppresses suggestions while keeping the index fresh;
-- `suggest-on-failure` applies confidence, cooldown, and max-window controls before showing anything.
-
-This slice uses a foreground polling watcher. It does not install launchd/systemd services.
-
-## 6. Record feedback
-
-```sh
-npm run cli -- feedback --episode ep_... --rating useful
-```
-
-Allowed ratings:
-
-```text
-useful
-wrong-match
-already-solved
-not-useful
-promote-later
-```
-
-Feedback is local SQLite state only. It is not automatically promoted into Loom or any project memory.
-
-## 7. Pi extension use
-
-The source extension is `src/pi-extension.ts`. It registers:
-
-```text
-/flight-sync
-/seen-this-before
-/flight-mode
-/flight-watch
-flight_seen_this_before
-```
-
-Example inside Pi:
-
-```text
-/flight-sync --data-dir ~/.pi/flight-recorder
-/seen-this-before --cwd current Cannot find module src/config/app.ts
-/flight-mode suggest-on-failure --data-dir ~/.pi/flight-recorder
-/flight-watch start --source ~/.pi/agent/sessions --mode index-only
-/flight-watch status
-```
-
-Live Pi behavior:
-
-- `tool_result` failures are inspected without mutating the result;
-- high-confidence matches use Pi notifications with prior fix/evidence/limits;
-- low-confidence/no-match/cooldown cases are quiet;
-- the current session file is synced after a short delay because Pi persists final tool-result messages after the live event;
-- `user_bash` is registered as a future seam, but this slice does not wrap user shell commands.
-
-The wrapper calls the same core library used by the CLI.
+Foreground CLI watch is not an OS service.
 
 ## Notes and limits
 
-- Node 24 currently prints an `ExperimentalWarning` for `node:sqlite` on sync/query. This is expected for the MVP.
-- Extraction is heuristic. Treat “likely fix” as a pointer to inspect, not proof.
-- Obvious secret-looking values are redacted in derived snippets, but raw Pi session files remain local source of truth.
-- The MVP does not call embeddings, hosted APIs, or autonomous code fixers.
-- Live monitoring is opt-in and foreground-only in this slice.
-- Suggestions are heuristic pointers to prior evidence, not proof that the old fix applies.
+- Node 24 currently prints an `ExperimentalWarning` for `node:sqlite`; this is expected.
+- Extraction, suggestions, and reflection are heuristic pointers to inspect, not proof.
+- Obvious secret-looking values and user-home/session-file paths are redacted in derived snippets and live occurrence text; raw Pi session files remain local source of truth.
+- No embeddings, hosted APIs, or autonomous code fixers are used by default.
+- `user_bash` result capture remains disabled because Pi's event fires before command execution.

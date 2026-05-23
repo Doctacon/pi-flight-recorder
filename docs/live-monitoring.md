@@ -1,85 +1,126 @@
 # Live Failure Monitoring
 
-Live monitoring is an opt-in layer over the local Failure Memory index.
+Live monitoring is now extension-first.
 
 ```text
-Pi JSONL append or failed Pi tool result
-  -> incremental sync / live failure query
-  -> prior episode search excluding the current failure
-  -> suggestion only if mode, confidence, cooldown, and window gates allow
+Pi session_start
+  -> load local settings
+  -> start quiet local capture/indexing
+failed Pi tool_result
+  -> record redacted failure occurrence
+  -> search prior resolved evidence
+  -> notify only when high-confidence gates pass
+quiet failures
+  -> cluster for /flight-reflect
 ```
 
 ## Modes
 
 ```text
-off                 do nothing live
-index-only          keep the index fresh, no suggestions
-suggest-on-failure  show evidence-backed suggestions for confident matches
+off                 no live capture or suggestions
+index-only          keep local capture/index fresh, no suggestions
+suggest-on-failure  capture plus rare evidence-backed suggestions
 ```
 
-Default live mode is conservative. CLI watch defaults to `index-only`; the Pi extension defaults to `off` until `/flight-mode` or `/flight-watch` opts in.
+The Pi extension defaults to `suggest-on-failure` with conservative gates. Most failures stay quiet and become reflection input.
 
-## CLI
-
-Foreground watcher:
-
-```sh
-npm run cli -- watch start --foreground --mode index-only
-npm run cli -- watch start --foreground --mode suggest-on-failure --min-confidence 0.7 --cooldown-ms 300000
-```
-
-Status and stop request:
-
-```sh
-npm run cli -- watch status
-npm run cli -- watch stop
-```
-
-Useful options:
+## Pi commands
 
 ```text
---source DIR          repeatable Pi session source directory
---data-dir DIR        local flight-recorder data directory
---mode MODE           off | index-only | suggest-on-failure
---debounce-ms N       wait for JSONL write bursts before syncing
---poll-interval-ms N  foreground polling interval
---min-confidence N    minimum suggestion confidence
---cooldown-ms N       per-signature suggestion cooldown
---max-suggestions N   max suggestions per window
-```
-
-This slice intentionally does not install an OS daemon. Keep the foreground process running in a terminal/tmux pane, or use Pi `/flight-watch start` for a watcher owned by the Pi extension process.
-
-## Pi extension
-
-```text
-/flight-mode suggest-on-failure --data-dir ~/.pi/flight-recorder --min-confidence 0.7
-/flight-watch start --source ~/.pi/agent/sessions --mode index-only
+/flight-status
+/flight-mode status|pause|resume|disable|off|index-only|suggest-on-failure
+/flight-feedback --action snooze --occurrence occ_...
+/flight-reflect [--min-count N] [--limit N] [--model] [--interactive]
+/flight-review
+/flight-rules status|pending|show|approve|reject|disable|export
 /flight-watch status
 /flight-watch stop
 ```
 
-The live Pi hook inspects failed `tool_result` events and does not mutate the result. It searches immediately from the event content, then schedules a delayed current-session sync because Pi persists the final tool-result entry after the live event fires.
+`/flight-watch start` remains available as a manual/debug command inside Pi, but normal extension startup does not require it.
 
-`user_bash` is registered but not wrapped in this slice. Pi exposes user bash before execution; safely observing the result would require replacing/wrapping shell operations. That is deferred to avoid changing command semantics.
+## Multiple Pi sessions
 
-## Watcher behavior
+Multiple Pi TUIs can run in the same project/worktree. Only one process owns the polling watcher lock for a data dir + source set; later sessions enter a shared-watcher state instead of warning. Those sessions still record their own live failed `tool_result` occurrences and use the shared local index.
 
-- Catch-up sync runs before the watcher reports `active`.
-- Only `.jsonl` files are considered.
-- Changes are debounced before incremental sync.
-- A local lock prevents duplicate watchers for the same source set.
-- Status is persisted to `live-status.json` under the data dir.
-- `watch stop` writes a stop request that a foreground watcher observes on its next poll.
-- Malformed/partial JSONL lines are stored as parse warnings, not fatal errors.
+`/flight-status` reports this as:
 
-## Privacy
+```text
+Capture/index: shared watcher; another Pi session is indexing these sources
+```
 
-All live behavior is local. It uses the same SQLite/FTS5 index and redaction helpers as manual sync/query. No embeddings or network calls are made by default.
+This is normal, not degraded.
 
-## Limits
+## Suggestion gates
 
-- Suggestions are heuristic and evidence-backed, not autonomous fixes.
-- Cross-project matches are labeled in limits.
-- Low-confidence and cooldown-suppressed cases are intentionally quiet.
-- Foreground CLI watch is not an OS service; stopping a terminal stops the watcher.
+A failed `tool_result` may produce a notification only when:
+
+- live mode is `suggest-on-failure`;
+- the signature is not snoozed or silenced;
+- the per-window suggestion budget is available;
+- the signature is not cooling down;
+- a prior episode matches;
+- that prior episode has an observed resolution;
+- the match is specific enough for a live nudge;
+- confidence clears the configured threshold.
+
+Suppressed reasons are stored with occurrences, including `no-match`, `unresolved-match`, `broad-match`, `low-confidence`, `cooldown`, `max-suggestions`, and `silenced`.
+
+## Occurrence ledger
+
+Live failures are recorded separately from historical extracted episodes. Each occurrence stores redacted/bounded text plus metadata:
+
+- source (`tool_result`, `manual`, etc.);
+- tool and command when available;
+- cwd;
+- session file and entry/tool id when available;
+- normalized signature;
+- repeat count for duplicate events;
+- suggestion outcome or suppression reason.
+
+This ledger is the reflection buffer. Low-confidence/no-match failures are intentionally retained rather than shown immediately.
+
+## Reflection
+
+```text
+/flight-reflect
+/flight-reflect --min-count 3
+```
+
+Reflection mines local occurrence clusters and emits pattern-level proposals with evidence, likely durable fix or next investigation step, confidence, limits, and actions.
+
+`/flight-reflect --model` is explicit. It uses bounded redacted snippets only when Pi exposes a model provider; otherwise deterministic local reflection is used and labeled.
+
+## Feedback
+
+```text
+/flight-feedback --action useful --proposal refl_...
+/flight-feedback --action wrong-match --occurrence occ_...
+/flight-feedback --action snooze --occurrence occ_...
+/flight-feedback --action silence-pattern --signature "..."
+/flight-feedback --action promote-later --cluster cluster_...
+/flight-feedback --action make-rule --cluster cluster_...
+```
+
+Snooze and silence affect future live suggestions/reflection. `promote-later` stores user intent. `make-rule` creates a draft Flight Rule candidate; only explicit approval through the guided review flow or `/flight-rules approve` activates a rule for future turns.
+
+## Debug CLI
+
+The CLI is a debug/manual/recovery harness:
+
+```sh
+npm run cli -- status --json
+npm run cli -- watch start --foreground --mode index-only
+npm run cli -- reflect --min-count 2
+```
+
+Foreground CLI watch still uses local polling, debounce, a local lock, and stop-request files. It intentionally does not install an OS daemon.
+
+## Privacy and limits
+
+- All capture, search, clustering, and local reflection are local SQLite by default.
+- Stored live occurrence text redacts obvious secrets and user-home/session-file paths before persistence.
+- No network/model calls happen automatically.
+- Raw Pi sessions remain the source of truth.
+- `user_bash` is registered but not wrapped. Pi exposes it before execution, and result capture would require replacing shell semantics.
+- Suggestions/reflections are heuristic evidence pointers, not autonomous fixes.

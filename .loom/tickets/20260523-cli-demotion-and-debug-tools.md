@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-cli-demotion-and-debug-tools
 Type: Ticket
-Status: open
+Status: review
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: low - primarily docs/help and debug affordance alignment
@@ -48,8 +48,13 @@ Docs should make clear that `npm run cli` is for development from the repo, whil
 
 ## Current State
 
-Ready after no-CLI path is proven. Current docs still include CLI-first setup because that was the developer harness.
+Implementation is complete and in review. README/first-run/live-monitoring now lead with extension-first usage; CLI help labels the CLI as debug/manual/recovery; `status --json` exposes machine-readable state without starting behavior. Evidence: `evidence:20260523-seamless-ux-validation` OBS-001, OBS-002, OBS-003.
+
+Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`; FIND-002 addressed enough for docs to continue presenting extension-first flow because live Pi TUI smoke now exists for status/capture/reflection. Evidence: `evidence:20260523-live-pi-tui-smoke`; high-confidence notification remains a residual untested scenario. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope; remaining residual gaps are tracked as non-blocking follow-up/tuning unless this ticket explicitly covers high-confidence notification smoke or long-run corpus evaluation.
 
 ## Journal
 
 - 2026-05-23: Created ticket to correct product-facing documentation after seamless extension behavior lands.
+- 2026-05-23: Implemented seamless UX slice for this ticket and moved to review with validation evidence in `evidence:20260523-seamless-ux-validation`.
+- 2026-05-23: Review run recorded `audit:20260523-seamless-ux-review` with verdict `changes-needed`; pending disposition: FIND-002.
+- 2026-05-23: Dispositioned review finding(s) for this ticket with `evidence:20260523-live-pi-tui-smoke` and/or `evidence:20260523-findings-fix-validation`; follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` in the inspected scope; residual high-confidence notification/model-provider/long-run tuning gaps remain as follow-up where applicable.

@@ -6,6 +6,7 @@ coverage/
 .env.*
 !.env.example
 .pi-flight-recorder/
+.pi/
 *.db
 *.db-shm
 *.db-wal

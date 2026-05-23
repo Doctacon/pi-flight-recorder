@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-seamless-install-and-real-pi-smoke
 Type: Ticket
-Status: open
+Status: review
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: medium - validates actual Pi package lifecycle instead of fake harness only
@@ -54,8 +54,13 @@ This ticket should use a real Pi run if possible. If a live Pi TUI smoke cannot 
 
 ## Current State
 
-Ready after extension feedback controls. Current validation is fake-Pi plus CLI; this ticket exists specifically to close that gap.
+Implementation/package validation is partially complete and in review. Build, package dry-run, and `pi install . -l` project-local install succeeded. Interactive Pi TUI smoke for `/flight-status`, live notification rendering, and live no-CLI capture remains unverified in this harness. Evidence: `evidence:20260523-seamless-ux-validation` OBS-003, OBS-004.
+
+Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`; FIND-002 addressed for `/flight-status`, live failed `tool_result` capture, and `/flight-reflect` in a real Pi TUI session. Evidence: `evidence:20260523-live-pi-tui-smoke`. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope; remaining residual gaps are tracked as non-blocking follow-up/tuning unless this ticket explicitly covers high-confidence notification smoke or long-run corpus evaluation.
 
 ## Journal
 
 - 2026-05-23: Created ticket to prove the seamless install UX in real Pi.
+- 2026-05-23: Implemented seamless UX slice for this ticket and moved to review with validation evidence in `evidence:20260523-seamless-ux-validation`.
+- 2026-05-23: Review run recorded `audit:20260523-seamless-ux-review` with verdict `changes-needed`; pending disposition: FIND-002.
+- 2026-05-23: Dispositioned review finding(s) for this ticket with `evidence:20260523-live-pi-tui-smoke` and/or `evidence:20260523-findings-fix-validation`; follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` in the inspected scope; residual high-confidence notification/model-provider/long-run tuning gaps remain as follow-up where applicable.

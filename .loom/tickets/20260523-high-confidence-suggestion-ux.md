@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-high-confidence-suggestion-ux
 Type: Ticket
-Status: open
+Status: review
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: medium - user trust depends on not spamming weak or generic suggestions
@@ -54,8 +54,13 @@ Default gates should likely require a prior resolved episode or exact-signature 
 
 ## Current State
 
-Ready after occurrence ledger. Current suggestion engine has threshold/cooldown, but defaults and UX still allow low-confidence CLI query noise and do not yet persist suppression into a reflection buffer.
+Implementation is complete and in review. Live suggestions now require prior resolved evidence, confidence/specificity gates, cooldown/window controls, and active snooze/silence checks; broad and unresolved matches are buffered quietly. Live Pi TUI rendering remains unverified outside fake-Pi tests and is tracked by `ticket:20260523-seamless-install-and-real-pi-smoke`. Evidence: `evidence:20260523-seamless-ux-validation` OBS-001, OBS-002.
+
+Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`; FIND-002 partly addressed by live Pi TUI smoke showing live capture/suppression status; high-confidence resolved suggestion notification remains not exercised in real TUI. Evidence: `evidence:20260523-live-pi-tui-smoke`. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope; remaining residual gaps are tracked as non-blocking follow-up/tuning unless this ticket explicitly covers high-confidence notification smoke or long-run corpus evaluation.
 
 ## Journal
 
 - 2026-05-23: Created ticket to convert the current suggestion engine into a trust-preserving live UX.
+- 2026-05-23: Implemented seamless UX slice for this ticket and moved to review with validation evidence in `evidence:20260523-seamless-ux-validation`.
+- 2026-05-23: Review run recorded `audit:20260523-seamless-ux-review` with verdict `changes-needed`; pending disposition: FIND-002.
+- 2026-05-23: Dispositioned review finding(s) for this ticket with `evidence:20260523-live-pi-tui-smoke` and/or `evidence:20260523-findings-fix-validation`; follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` in the inspected scope; residual high-confidence notification/model-provider/long-run tuning gaps remain as follow-up where applicable.

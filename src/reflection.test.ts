@@ -39,14 +39,27 @@ describe("reflection", () => {
     expect(result.proposals).toHaveLength(1);
     expect(result.proposals[0]?.mode).toBe("local");
     expect(result.proposals[0]?.likelyFix).toContain("Prior local resolution observed");
-    expect(formatReflectionDigest(result)).toContain("Actions: useful | wrong-match | snooze | silence-pattern | promote-later | make-rule");
+    expect(formatReflectionDigest(result)).toContain("review interactively: /flight-review");
+  });
+
+  it("allows expired snooze feedback to become eligible again", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-reflect-expired-snooze-"));
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    const occurrence = store.recordFailureOccurrence({ source: "tool_result", query: "Edit failed: oldText not found", toolName: "edit", cwd: "/repo", entryId: "s1" });
+    store.recordFailureOccurrence({ source: "tool_result", query: "Edit failed: oldText not found", toolName: "edit", cwd: "/repo", entryId: "s2" });
+    store.recordFeedbackAction({ targetType: "occurrence", targetId: occurrence.id, action: "snooze", signature: occurrence.signature, expiresAt: "2026-05-22T00:00:00.000Z" });
+    store.close();
+
+    const result = await runReflection({ dataDir, trigger: "manual", minCount: 2, now: "2026-05-23T00:00:00.000Z" });
+
+    expect(result.proposals).toHaveLength(1);
   });
 
   it("uses bounded redacted model context only when explicitly requested", async () => {
     const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-reflect-model-"));
     const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
-    store.recordFailureOccurrence({ source: "tool_result", query: "Edit failed: oldText not found SECRET_TOKEN=abc123", toolName: "edit", cwd: "/repo", entryId: "m1" });
-    store.recordFailureOccurrence({ source: "tool_result", query: "Edit failed: oldText not found SECRET_TOKEN=def456", toolName: "edit", cwd: "/repo", entryId: "m2" });
+    store.recordFailureOccurrence({ source: "tool_result", query: "Edit failed: oldText not found SECRET_TOKEN=abc123 at /Users/alice/private/project/src/app.ts", toolName: "edit", cwd: "/Users/alice/private/project", sessionFile: "/Users/alice/.pi/agent/sessions/--private-project--/session.jsonl", entryId: "m1" });
+    store.recordFailureOccurrence({ source: "tool_result", query: "Edit failed: oldText not found SECRET_TOKEN=def456 at /Users/alice/private/project/src/app.ts", toolName: "edit", cwd: "/Users/alice/private/project", sessionFile: "/Users/alice/.pi/agent/sessions/--private-project--/session.jsonl", entryId: "m2" });
     store.close();
 
     let capturedPrompt = "";
@@ -67,6 +80,15 @@ describe("reflection", () => {
     expect(result.proposals[0]?.mode).toBe("model-assisted");
     expect(result.proposals[0]?.likelyFix).toContain("Always read");
     expect(capturedPrompt).not.toContain("abc123");
+    expect(capturedPrompt).not.toContain("/Users/alice");
+    expect(capturedPrompt).toContain("/Users/<user>");
+    const rawPrompt = buildModelReflectionPrompt({
+      ...result.mining.clusters[0]!,
+      title: "raw /Users/alice/private cluster",
+      cwdSummary: ["/Users/alice/private/project"],
+    }, result.proposals[0]!.evidence);
+    expect(rawPrompt).not.toContain("/Users/alice");
+    expect(rawPrompt).toContain("/Users/<user>");
     expect(buildModelReflectionPrompt(result.mining.clusters[0]!, result.proposals[0]!.evidence)).toContain("redacted evidence");
   });
 });

@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-extension-feedback-controls
 Type: Ticket
-Status: open
+Status: review
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: medium - feedback state changes future suggestion/reflection behavior
@@ -54,8 +54,13 @@ Feedback should be local, inspectable, and tied to episode IDs, occurrence IDs, 
 
 ## Current State
 
-Ready after high-confidence suggestion UX. Current MVP has CLI feedback for episodes only; it does not support Pi-native live actions, snooze, silence, or rule intent.
+Implementation is complete and in review. `/flight-feedback` records Pi-native feedback for occurrences, signatures, clusters, proposals, and episodes; snooze/silence affect future suggestions, and promote/make-rule persist intent only. Evidence: `evidence:20260523-seamless-ux-validation` OBS-001, OBS-002.
+
+Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`; FIND-003 addressed by target validation, signature/cluster suppression propagation, and regression tests. Evidence: `evidence:20260523-findings-fix-validation` OBS-004. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope; remaining residual gaps are tracked as non-blocking follow-up/tuning unless this ticket explicitly covers high-confidence notification smoke or long-run corpus evaluation.
 
 ## Journal
 
 - 2026-05-23: Created ticket to close the feedback/control loop for seamless UX.
+- 2026-05-23: Implemented seamless UX slice for this ticket and moved to review with validation evidence in `evidence:20260523-seamless-ux-validation`.
+- 2026-05-23: Review run recorded `audit:20260523-seamless-ux-review` with verdict `changes-needed`; pending disposition: FIND-003.
+- 2026-05-23: Dispositioned review finding(s) for this ticket with `evidence:20260523-live-pi-tui-smoke` and/or `evidence:20260523-findings-fix-validation`; follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` in the inspected scope; residual high-confidence notification/model-provider/long-run tuning gaps remain as follow-up where applicable.

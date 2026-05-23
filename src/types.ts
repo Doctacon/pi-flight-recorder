@@ -208,3 +208,43 @@ export interface ReflectionProposal {
   limits: string[];
   actions: FeedbackAction[];
 }
+
+export type FlightRuleScope = "global" | "project";
+export type RuleCandidateStatus = "draft" | "approved" | "rejected";
+export type FlightRuleStatus = "active" | "disabled";
+
+export interface FlightRuleCandidate {
+  id: string;
+  sourceType: "proposal";
+  sourceId: string;
+  clusterId: string | null;
+  status: RuleCandidateStatus;
+  draftText: string;
+  proposedScope: FlightRuleScope;
+  projectRoot: string | null;
+  projectRootDisplay: string | null;
+  evidenceJson: ClusterEvidenceRef[];
+  evidenceCount: number;
+  ruleId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  approvedAt: string | null;
+  rejectedAt: string | null;
+}
+
+export interface FlightRule {
+  id: string;
+  candidateId: string;
+  sourceProposalId: string;
+  clusterId: string | null;
+  scope: FlightRuleScope;
+  projectRoot: string | null;
+  projectRootDisplay: string | null;
+  text: string;
+  status: FlightRuleStatus;
+  createdAt: string;
+  updatedAt: string;
+  disabledAt: string | null;
+  lastInjectedAt: string | null;
+  injectionCount: number;
+}

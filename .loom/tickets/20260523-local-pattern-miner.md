@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-local-pattern-miner
 Type: Ticket
-Status: open
+Status: review
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: medium - bad grouping creates noisy or misleading reflection proposals
@@ -54,8 +54,13 @@ Clustering should combine exact normalized signatures with fallback buckets for 
 
 ## Current State
 
-Ready after cluster data model. Current search is FTS episode search; it does not mine repeated patterns.
+Implementation is complete and in review. Deterministic local mining groups exact signatures and conservative known failure classes, ranks by repetition/recency/cwd concentration, and can run incrementally/rebuild idempotently. Evidence: `evidence:20260523-seamless-ux-validation` OBS-001, OBS-002.
+
+Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`; The real-occurrence tuning gap is partly reduced by live Pi TUI smoke creating repeated occurrences and one reflection cluster; long-run precision tuning remains residual follow-up. Evidence: `evidence:20260523-live-pi-tui-smoke`. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope; remaining residual gaps are tracked as non-blocking follow-up/tuning unless this ticket explicitly covers high-confidence notification smoke or long-run corpus evaluation.
 
 ## Journal
 
 - 2026-05-23: Created ticket for deterministic local pattern mining before any reflection generation.
+- 2026-05-23: Implemented seamless UX slice for this ticket and moved to review with validation evidence in `evidence:20260523-seamless-ux-validation`.
+- 2026-05-23: Review run recorded `audit:20260523-seamless-ux-review` with verdict `changes-needed`; pending disposition: real-occurrence tuning gap.
+- 2026-05-23: Dispositioned review finding(s) for this ticket with `evidence:20260523-live-pi-tui-smoke` and/or `evidence:20260523-findings-fix-validation`; follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` in the inspected scope; residual high-confidence notification/model-provider/long-run tuning gaps remain as follow-up where applicable.

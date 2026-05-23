@@ -2,7 +2,7 @@
 
 ID: plan:20260523-seamless-failure-memory-ux
 Type: Plan
-Status: open
+Status: active
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: high - changes default extension behavior, background capture, user interruption policy, reflection cadence, and privacy/model boundaries
@@ -169,10 +169,39 @@ The user can review/refine reflection proposals in Pi, and real-corpus validatio
 
 ## Current State
 
-Plan is open. The current live-monitoring MVP remains in review and provides the parser/store/query/watch/suggestion/Pi-hook foundation. This plan and its child tickets define the remaining work to reach the seamless extension-first and reflective pattern workflow.
+Plan is active. All child tickets have implementation work completed and are now in `review` with validation evidence in `evidence:20260523-seamless-ux-validation`, `evidence:20260523-live-pi-tui-smoke`, and `evidence:20260523-findings-fix-validation`. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope.
 
-The next execution unit should be `ticket:20260523-extension-auto-bootstrap`.
+Implemented plan-level outcomes:
+
+- extension autostart and `/flight-status`;
+- persistent live failure occurrence ledger;
+- high-confidence suggestion gates and quiet buffering;
+- Pi-native feedback/snooze/silence controls;
+- local cluster model and deterministic pattern miner;
+- reflection trigger/proposal pipeline and `/flight-reflect`;
+- extension-first docs and debug CLI status/reflect commands;
+- build, package dry-run, and project-local `pi install . -l` validation.
+
+Review finding disposition:
+
+- `FIND-001`: addressed by redacted derived storage/model context and regression tests.
+- `FIND-002`: addressed for `/flight-status`, live failed `tool_result` capture, and `/flight-reflect` by live Pi TUI smoke.
+- `FIND-003`: addressed by feedback target validation plus signature/cluster suppression propagation and regression tests.
+- `FIND-004`: addressed by centralized command data-dir switching that stops watcher/engine state and regression test.
+- `FIND-005`: addressed by v2 migration compatibility logic and legacy DB fixture test.
+
+Remaining review risks before completion:
+
+- high-confidence prior resolved suggestion notification was not exercised in the real Pi TUI smoke;
+- model-assisted reflection was tested only with a fake provider;
+- long-run real-corpus reflection precision/noise tuning remains limited to the new smoke occurrences rather than a mature occurrence corpus;
+- follow-up audit is clear, but residual gaps remain intentionally open as follow-up/tuning evidence rather than blocking FIND-001 through FIND-005 closure.
 
 ## Journal
 
 - 2026-05-23: Created plan after operator clarified that CLI should be a debug harness, while the product should be seamless after Pi extension install and should combine high-confidence immediate fixes with clustered periodic reflection.
+- 2026-05-23: Executed the implementation route across all child tickets. Added extension autostart, occurrence ledger, feedback controls, pattern mining, reflection, docs, tests, build/package validation, project-local Pi install validation, and real default data-dir dry-run evidence. Moved child tickets to review pending interactive TUI smoke/audit/real occurrence tuning.
+- 2026-05-23: Ran Ralph-backed review and recorded `audit:20260523-seamless-ux-review`; verdict `changes-needed` with FIND-001 through FIND-005. Child tickets remain in review pending finding disposition.
+- 2026-05-23: Recorded live Pi TUI smoke in `evidence:20260523-live-pi-tui-smoke`, fixed/dispositioned FIND-001 through FIND-005, and recorded validation in `evidence:20260523-findings-fix-validation`.
+- 2026-05-23: Ran follow-up Ralph review `audit:20260523-seamless-ux-followup-review`; verdict `clear` in inspected scope. Residual gaps remain for high-confidence live suggestion smoke, real model-provider reflection, and long-run corpus tuning.
+- 2026-05-23: After real two-terminal use exposed watcher lock warning, changed duplicate autostart to shared-watcher behavior and recorded `evidence:20260523-shared-watcher-validation`.

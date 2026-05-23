@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { compactSnippet, redactSecrets } from "./redact.js";
+import { compactSnippet, redactLocalPaths, redactSecrets } from "./redact.js";
 import { mineFailurePatternsWithStore, type PatternMiningResult } from "./pattern-miner.js";
 import { defaultDatabasePath, FlightRecorderStore, getDefaultDataDir } from "./storage.js";
 import type { ClusterEvidenceRef, FailureCluster, FeedbackAction, ReflectionMode, ReflectionProposal } from "./types.js";
@@ -55,16 +55,20 @@ function parseTime(value: string | null): number | null {
 }
 
 function evidenceLabel(evidence: ClusterEvidenceRef): string {
-  const session = evidence.sessionFile ?? "session file unknown";
+  const session = evidence.sessionFile ? redactLocalPaths(evidence.sessionFile) : "session file unknown";
   const entry = evidence.entryId ? `entry ${evidence.entryId}` : "entry unknown";
-  const cwd = evidence.cwd ?? "cwd unknown";
+  const cwd = evidence.cwd ? redactLocalPaths(evidence.cwd) : "cwd unknown";
   return `${evidence.occurrenceId}: ${entry}, ${cwd}, ${session}`;
+}
+
+function safeText(value: string): string {
+  return redactLocalPaths(redactSecrets(value));
 }
 
 function summarizeAffected(cluster: FailureCluster): string[] {
   const affected: string[] = [];
-  if (cluster.tools.length > 0) affected.push(`tools: ${cluster.tools.join(", ")}`);
-  if (cluster.cwdSummary.length > 0) affected.push(`cwd: ${cluster.cwdSummary.join(", ")}`);
+  if (cluster.tools.length > 0) affected.push(`tools: ${cluster.tools.map(safeText).join(", ")}`);
+  if (cluster.cwdSummary.length > 0) affected.push(`cwd: ${cluster.cwdSummary.map(safeText).join(", ")}`);
   affected.push(`occurrences: ${cluster.count}`);
   return affected;
 }
@@ -83,7 +87,7 @@ function findPriorResolvedFix(store: FlightRecorderStore, evidence: ClusterEvide
   for (const item of evidence) {
     const candidates = store.searchEpisodes(item.snippet, item.cwd ? { cwd: item.cwd, limit: 5 } : { limit: 5 });
     const resolved = candidates.find((candidate) => candidate.episode.status === "resolved" && candidate.episode.resolution);
-    if (resolved?.episode.resolution) return resolved.episode.resolution.summary;
+    if (resolved?.episode.resolution) return safeText(resolved.episode.resolution.summary);
   }
   return null;
 }
@@ -99,14 +103,14 @@ export function buildModelReflectionPrompt(cluster: FailureCluster, evidence: Cl
   const lines = [
     "You are summarizing a local developer failure-memory cluster.",
     "Use only the redacted evidence below. Do not invent facts. If no durable fix is supported, suggest the next investigation step.",
-    `Cluster: ${cluster.title}`,
+    `Cluster: ${safeText(cluster.title)}`,
     `Seen: ${cluster.count} occurrence(s)` ,
-    `Tools: ${cluster.tools.join(", ") || "unknown"}`,
-    `CWDs: ${cluster.cwdSummary.join(", ") || "unknown"}`,
+    `Tools: ${cluster.tools.map(safeText).join(", ") || "unknown"}`,
+    `CWDs: ${cluster.cwdSummary.map(safeText).join(", ") || "unknown"}`,
     "Evidence:",
   ];
   for (const item of evidence.slice(0, 5)) {
-    lines.push(`- ${evidenceLabel(item)} :: ${compactSnippet(redactSecrets(item.snippet).replace(/\s+/g, " "), 420)}`);
+    lines.push(`- ${evidenceLabel(item)} :: ${compactSnippet(safeText(item.snippet).replace(/\s+/g, " "), 420)}`);
   }
   lines.push("Return a concise durable fix or investigation step in one paragraph.");
   return lines.join("\n");
@@ -124,6 +128,11 @@ export function selectReflectionJobsWithStore(store: FlightRecorderStore, option
   const skipped: Array<{ clusterId: string; reason: string }> = [];
 
   for (const cluster of candidates) {
+    const activeSuppression = store.hasActiveSignatureSuppression(cluster.representativeSignature, generatedAt);
+    if (activeSuppression) {
+      skipped.push({ clusterId: cluster.id, reason: activeSuppression.action });
+      continue;
+    }
     const lastReflected = parseTime(cluster.lastReflectedAt);
     if (lastReflected !== null && Number.isFinite(nowMs) && nowMs - lastReflected < cooldownMs) {
       skipped.push({ clusterId: cluster.id, reason: "cooldown" });
@@ -168,8 +177,8 @@ export async function generateReflectionProposal(store: FlightRecorderStore, clu
     clusterId: cluster.id,
     generatedAt,
     mode,
-    title: `Pattern: ${cluster.title}`,
-    summary: `Seen ${cluster.count} related failure${cluster.count === 1 ? "" : "s"}${cluster.cwdSummary.length > 0 ? ` in ${cluster.cwdSummary.join(", ")}` : ""}.`,
+    title: `Pattern: ${safeText(cluster.title)}`,
+    summary: `Seen ${cluster.count} related failure${cluster.count === 1 ? "" : "s"}${cluster.cwdSummary.length > 0 ? ` in ${cluster.cwdSummary.map(safeText).join(", ")}` : ""}.`,
     affected: summarizeAffected(cluster),
     likelyFix,
     confidence: localConfidence(cluster, hasFix),
@@ -221,7 +230,11 @@ export function formatReflectionDigest(result: RunReflectionResult): string {
     for (const item of proposal.evidence.slice(0, 3)) lines.push(`- ${evidenceLabel(item)}`);
     lines.push("Limits:");
     for (const limit of proposal.limits.slice(0, 3)) lines.push(`- ${limit}`);
-    lines.push(`Actions: ${proposal.actions.join(" | ")}`);
+    lines.push("Actions:");
+    lines.push(`- review interactively: /flight-review`);
+    lines.push(`- mark useful: /flight-feedback --action useful --proposal ${proposal.id}`);
+    lines.push(`- draft rule: /flight-feedback --action make-rule --proposal ${proposal.id}`);
+    lines.push(`- silence: /flight-feedback --action silence-pattern --proposal ${proposal.id}`);
     lines.push(`Proposal: ${proposal.id}`);
   }
   return lines.join("\n");

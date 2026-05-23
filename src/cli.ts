@@ -30,7 +30,7 @@ Usage:
   pi-flight-recorder watch status [--data-dir DIR] [--json]
   pi-flight-recorder watch stop [--data-dir DIR]
   pi-flight-recorder reflect [--data-dir DIR] [--min-count N] [--limit N] [--json]
-  pi-flight-recorder feedback --data-dir DIR --action useful|wrong-match|already-solved|not-useful|snooze|silence-pattern|promote-later|make-rule [--occurrence ID|--cluster ID|--proposal ID|--episode ID|--signature TEXT] [--note TEXT]
+  pi-flight-recorder feedback --data-dir DIR --action useful|wrong-match|already-solved|not-useful|snooze|silence-pattern|promote-later|make-rule [--occurrence ID|--cluster ID|--proposal ID|--episode ID|--signature TEXT] [--duration-ms N] [--note TEXT]
   pi-flight-recorder --version
   pi-flight-recorder --help
 
@@ -149,6 +149,7 @@ async function runFeedback(args: string[], io: CliIO): Promise<number> {
   const rating = readOption(args, "--rating");
   const action = readOption(args, "--action") ?? rating;
   const note = readOption(args, "--note");
+  const durationMs = parseNumber(readOption(args, "--duration-ms"));
   if (!action) {
     io.stderr("feedback requires --action VALUE (or legacy --rating VALUE).");
     return 2;
@@ -165,42 +166,64 @@ async function runFeedback(args: string[], io: CliIO): Promise<number> {
   }
   const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
   try {
-    if (episodeId && rating && !occurrenceId && !clusterId && !proposalId && !signatureText) {
-      store.recordFeedback(episodeId, action, note);
+    let targetType: "episode" | "occurrence" | "cluster" | "proposal" | "signature";
+    let targetId: string;
+    let signature: string | null = null;
+    let targetClusterId: string | null = null;
+    if (occurrenceId) {
+      const occurrence = store.getFailureOccurrence(occurrenceId);
+      if (!occurrence) {
+        io.stderr(`No failure occurrence found for ${occurrenceId}.`);
+        return 2;
+      }
+      targetType = "occurrence";
+      targetId = occurrenceId;
+      signature = occurrence.signature;
+    } else if (clusterId) {
+      const cluster = store.getFailureCluster(clusterId);
+      if (!cluster) {
+        io.stderr(`No failure cluster found for ${clusterId}.`);
+        return 2;
+      }
+      targetType = "cluster";
+      targetId = clusterId;
+      targetClusterId = clusterId;
+      signature = cluster.representativeSignature;
+    } else if (proposalId) {
+      const proposal = store.getReflectionProposal(proposalId);
+      if (!proposal) {
+        io.stderr(`No reflection proposal found for ${proposalId}.`);
+        return 2;
+      }
+      const cluster = store.getFailureCluster(proposal.clusterId);
+      if (!cluster) {
+        io.stderr(`Reflection proposal ${proposalId} points at missing cluster ${proposal.clusterId}.`);
+        return 2;
+      }
+      targetType = "proposal";
+      targetId = proposalId;
+      targetClusterId = cluster.id;
+      signature = cluster.representativeSignature;
+    } else if (signatureText) {
+      targetType = "signature";
+      signature = normalizeFailureSignature({ query: signatureText, signature: signatureText });
+      targetId = signature;
     } else {
-      let targetType: "episode" | "occurrence" | "cluster" | "proposal" | "signature";
-      let targetId: string;
-      let signature: string | null = null;
-      if (occurrenceId) {
-        targetType = "occurrence";
-        targetId = occurrenceId;
-        signature = store.getFailureOccurrence(occurrenceId)?.signature ?? null;
-      } else if (clusterId) {
-        targetType = "cluster";
-        targetId = clusterId;
-        signature = store.getFailureCluster(clusterId)?.representativeSignature ?? null;
-      } else if (proposalId) {
-        targetType = "proposal";
-        targetId = proposalId;
-        const proposal = store.getReflectionProposal(proposalId);
-        signature = proposal ? store.getFailureCluster(proposal.clusterId)?.representativeSignature ?? null : null;
-      } else if (signatureText) {
-        targetType = "signature";
-        signature = normalizeFailureSignature({ query: signatureText, signature: signatureText });
-        targetId = signature;
-      } else {
-        targetType = "episode";
-        targetId = episodeId ?? "";
+      if (!episodeId || !store.getEpisode(episodeId)) {
+        io.stderr(`No failure episode found for ${episodeId ?? ""}.`);
+        return 2;
       }
-      store.recordFeedbackAction({ targetType, targetId, action: action as FeedbackAction, signature, note });
-      if (targetType === "cluster" && clusterId) {
-        if (action === "snooze") store.updateClusterStatus(clusterId, "snoozed");
-        if (action === "silence-pattern") store.updateClusterStatus(clusterId, "silenced");
-        if (action === "dismiss") store.updateClusterStatus(clusterId, "dismissed");
-        if (action === "promote-later") store.updateClusterStatus(clusterId, "promoted-later");
-        if (action === "make-rule") store.updateClusterStatus(clusterId, "make-rule");
-      }
+      targetType = "episode";
+      targetId = episodeId;
     }
+
+    const expiresAt = action === "snooze" ? new Date(Date.now() + (durationMs ?? 24 * 60 * 60 * 1000)).toISOString() : null;
+    if (targetType === "episode" && rating && action !== "snooze" && action !== "silence-pattern") store.recordFeedback(targetId, action, note);
+    else store.recordFeedbackAction({ targetType, targetId, action: action as FeedbackAction, signature, note, expiresAt });
+
+    const clusterStatus = action === "silence-pattern" ? "silenced" : action === "dismiss" ? "dismissed" : action === "promote-later" ? "promoted-later" : action === "make-rule" ? "make-rule" : null;
+    if (clusterStatus && targetClusterId) store.updateClusterStatus(targetClusterId, clusterStatus);
+    else if (clusterStatus && signature) store.updateClustersForSignature(signature, clusterStatus);
   } finally {
     store.close();
   }
@@ -282,9 +305,10 @@ function formatSuggestionStatus(status: LiveSuggestionStatus | null): string[] {
 
 function formatWatchStatus(status: SessionWatchStatus | null, suggestionStatus: LiveSuggestionStatus | null = null): string {
   if (!status) return "Flight recorder live mode: stopped\nWatcher: stopped\nNo persisted watcher status found.";
+  const sharedNote = status.state === "watched-by-another-process" ? " (shared; another Pi session/process owns the indexing lock)" : "";
   const lines = [
     `Flight recorder live mode: ${status.mode}`,
-    `Watcher: ${status.state}`,
+    `Watcher: ${status.state}${sharedNote}`,
     `Sources: ${status.sourceDirs.join(", ") || "none"}`,
     `Watched files: ${status.watchedPaths.length}`,
     `Last sync: ${status.lastSyncAt ?? "never"}`,
@@ -375,7 +399,7 @@ async function runWatch(args: string[], io: CliIO): Promise<number> {
   try {
     const status = await service.start();
     io.stdout(formatWatchStatus(status, engine.status()));
-    if (status.state !== "active") return status.state === "watched-by-another-process" ? 2 : 1;
+    if (status.state !== "active") return status.state === "watched-by-another-process" ? 0 : 1;
     await service.waitUntilStopped();
     io.stdout("Flight recorder watch stopped.");
     return 0;

@@ -74,17 +74,46 @@ export function watchStopRequestPath(dataDir: string): string {
   return path.join(dataDir, "watch-stop.json");
 }
 
+function processIsAlive(pid: number): boolean {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return !(error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "ESRCH");
+  }
+}
+
+async function lockBelongsToDeadProcess(lockPath: string): Promise<boolean> {
+  try {
+    const parsed = JSON.parse(await readFile(lockPath, "utf8")) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return false;
+    const pid = (parsed as { pid?: unknown }).pid;
+    return typeof pid === "number" && Number.isInteger(pid) && pid > 0 && !processIsAlive(pid);
+  } catch {
+    return false;
+  }
+}
+
 async function acquireLock(dataDir: string, sourceDirs: string[]): Promise<WatchLock | null> {
   await ensureDataDir(dataDir);
   const lockPath = watchLockPath(dataDir, sourceDirs);
-  try {
-    const handle = await open(lockPath, "wx");
-    await handle.writeFile(JSON.stringify({ pid: process.pid, sourceDirs, createdAt: new Date().toISOString() }, null, 2));
-    return { path: lockPath, handle };
-  } catch (error) {
-    if (error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "EEXIST") return null;
-    throw error;
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const handle = await open(lockPath, "wx");
+      await handle.writeFile(JSON.stringify({ pid: process.pid, sourceDirs, createdAt: new Date().toISOString() }, null, 2));
+      return { path: lockPath, handle };
+    } catch (error) {
+      if (error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "EEXIST") {
+        if (attempt === 0 && await lockBelongsToDeadProcess(lockPath)) {
+          await unlink(lockPath).catch(() => undefined);
+          continue;
+        }
+        return null;
+      }
+      throw error;
+    }
   }
+  return null;
 }
 
 async function releaseLock(lock: WatchLock | null): Promise<void> {
@@ -162,15 +191,14 @@ export class SessionWatchService {
   async start(): Promise<SessionWatchStatus> {
     if (this.state === "active" || this.state === "catching-up") return this.status();
     await ensureDataDir(this.dataDir);
-    await clearWatchStopRequest(this.dataDir);
     this.lock = await acquireLock(this.dataDir, this.sourceDirs);
     if (!this.lock) {
       this.state = "watched-by-another-process";
-      this.lastError = "Another pi-flight-recorder watcher owns the lock for these source directories.";
-      await this.emitStatus();
+      this.lastError = await this.hydrateSharedWatcherStatus() ? null : "Watcher lock exists, but no active owner status was found.";
       return this.status();
     }
 
+    await clearWatchStopRequest(this.dataDir);
     this.state = "catching-up";
     await this.emitStatus();
     try {
@@ -194,6 +222,7 @@ export class SessionWatchService {
   }
 
   async stop(): Promise<SessionWatchStatus> {
+    const ownedLock = Boolean(this.lock);
     if (this.pollTimer) clearInterval(this.pollTimer);
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
     this.pollTimer = null;
@@ -202,8 +231,10 @@ export class SessionWatchService {
     await releaseLock(this.lock);
     this.lock = null;
     this.state = "stopped";
-    await clearWatchStopRequest(this.dataDir);
-    await this.emitStatus();
+    if (ownedLock) {
+      await clearWatchStopRequest(this.dataDir);
+      await this.emitStatus();
+    }
     this.resolveStopped?.();
     return this.status();
   }
@@ -291,6 +322,19 @@ export class SessionWatchService {
       const snapshot = await fileSnapshot(file);
       if (snapshot) this.watchedPaths.set(file, snapshot);
     }
+  }
+
+  private async hydrateSharedWatcherStatus(): Promise<boolean> {
+    const ownerStatus = await readPersistedWatchStatus(this.dataDir);
+    if (!ownerStatus || ownerStatus.lockPath !== watchLockPath(this.dataDir, this.sourceDirs)) return false;
+    if (ownerStatus.state !== "active" && ownerStatus.state !== "catching-up") return false;
+    this.watchedPaths.clear();
+    for (const file of ownerStatus.watchedPaths) this.watchedPaths.set(file, { size: 0, mtimeMs: 0 });
+    this.lastSyncAt = ownerStatus.lastSyncAt;
+    this.lastFailure = ownerStatus.lastFailure;
+    this.warningCount = ownerStatus.warningCount;
+    this.errorCount = ownerStatus.errorCount;
+    return true;
   }
 
   private async recordSyncResult(event: WatchFileSyncedEvent): Promise<void> {

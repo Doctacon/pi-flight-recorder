@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { main } from "./cli.js";
+import { defaultDatabasePath, FlightRecorderStore } from "./storage.js";
 
 function line(value: unknown): string {
   return JSON.stringify(value);
@@ -61,6 +62,12 @@ describe("CLI", () => {
     stdout.length = 0;
     await expect(main(["feedback", "--data-dir", dataDir, "--episode", episodeId, "--rating", "useful"], io)).resolves.toBe(0);
     expect(stdout.join("\n")).toContain("Recorded feedback");
+    stdout.length = 0;
+    await expect(main(["feedback", "--data-dir", dataDir, "--episode", episodeId, "--action", "snooze", "--duration-ms", "60000"], io)).resolves.toBe(0);
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    const actions = store.getFeedbackActions({ targetId: episodeId });
+    store.close();
+    expect(actions.some((action) => action.action === "snooze" && action.expiresAt)).toBe(true);
     expect(stderr).toEqual([]);
   });
 

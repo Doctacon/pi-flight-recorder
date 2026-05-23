@@ -4,7 +4,7 @@ import { existsSync, mkdirSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import { DatabaseSync, type StatementSync } from "node:sqlite";
-import { compactSnippet, redactSecrets } from "./redact.js";
+import { compactSnippet, redactLocalPaths, sanitizeStoredText } from "./redact.js";
 import { normalizeFailureSignature } from "./signatures.js";
 import type {
   ClusterEvidenceRef,
@@ -14,11 +14,16 @@ import type {
   FeedbackAction,
   FeedbackActionRecord,
   FeedbackTargetType,
+  FlightRule,
+  FlightRuleCandidate,
+  FlightRuleScope,
+  FlightRuleStatus,
   LiveFailureOccurrence,
   NewFailureOccurrence,
   ParsedSession,
   ParseWarning,
   ReflectionProposal,
+  RuleCandidateStatus,
   SessionEvent,
   SourceRef,
   SuggestionOutcome,
@@ -139,6 +144,42 @@ interface ReflectionProposalRow {
   actionsJson: string;
 }
 
+interface RuleCandidateRow {
+  id: string;
+  sourceType: string;
+  sourceId: string;
+  clusterId: string | null;
+  status: string;
+  draftText: string;
+  proposedScope: string;
+  projectRoot: string | null;
+  projectRootDisplay: string | null;
+  evidenceJson: string;
+  evidenceCount: number;
+  ruleId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  approvedAt: string | null;
+  rejectedAt: string | null;
+}
+
+interface FlightRuleRow {
+  id: string;
+  candidateId: string;
+  sourceProposalId: string;
+  clusterId: string | null;
+  scope: string;
+  projectRoot: string | null;
+  projectRootDisplay: string | null;
+  text: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  disabledAt: string | null;
+  lastInjectedAt: string | null;
+  injectionCount: number;
+}
+
 function json(value: unknown): string {
   return JSON.stringify(value);
 }
@@ -153,6 +194,30 @@ function parseJson<T>(value: string, fallback: T): T {
 
 function hash(value: string, length = 16): string {
   return createHash("sha256").update(value).digest("hex").slice(0, length);
+}
+
+function sanitizeSourceRef(ref: SourceRef): SourceRef {
+  return {
+    ...ref,
+    sourceFile: redactLocalPaths(ref.sourceFile),
+    cwd: ref.cwd ? redactLocalPaths(ref.cwd) : ref.cwd,
+  };
+}
+
+function sanitizeEpisodeForStorage(episode: FailureEpisode): FailureEpisode {
+  return {
+    ...episode,
+    signature: sanitizeStoredText(episode.signature, 500),
+    problemSummary: sanitizeStoredText(episode.problemSummary, 300),
+    cwd: episode.cwd ? redactLocalPaths(episode.cwd) : episode.cwd,
+    sourceRefs: episode.sourceRefs.map(sanitizeSourceRef),
+    observed: sanitizeStoredText(episode.observed, 1_200),
+    attempts: episode.attempts.map((attempt) => ({ ...attempt, summary: sanitizeStoredText(attempt.summary, 300), sourceRef: sanitizeSourceRef(attempt.sourceRef) })),
+    resolution: episode.resolution ? { ...episode.resolution, summary: sanitizeStoredText(episode.resolution.summary, 300), sourceRef: sanitizeSourceRef(episode.resolution.sourceRef) } : null,
+    files: episode.files.map(redactLocalPaths),
+    limits: episode.limits.map((limit) => sanitizeStoredText(limit, 300)),
+    searchText: sanitizeStoredText(episode.searchText, 2_000),
+  };
 }
 
 function rowToEpisode(row: EpisodeRow): FailureEpisode {
@@ -243,6 +308,64 @@ function rowToProposal(row: ReflectionProposalRow): ReflectionProposal {
     limits: parseJson<string[]>(row.limitsJson, []),
     actions: parseJson<FeedbackAction[]>(row.actionsJson, []),
   };
+}
+
+function ruleScope(value: string): FlightRuleScope {
+  return value === "project" ? "project" : "global";
+}
+
+function rowToRuleCandidate(row: RuleCandidateRow): FlightRuleCandidate {
+  return {
+    id: row.id,
+    sourceType: "proposal",
+    sourceId: row.sourceId,
+    clusterId: row.clusterId,
+    status: row.status === "approved" ? "approved" : row.status === "rejected" ? "rejected" : "draft",
+    draftText: row.draftText,
+    proposedScope: ruleScope(row.proposedScope),
+    projectRoot: row.projectRoot,
+    projectRootDisplay: row.projectRootDisplay,
+    evidenceJson: parseJson<ClusterEvidenceRef[]>(row.evidenceJson, []),
+    evidenceCount: row.evidenceCount,
+    ruleId: row.ruleId,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    approvedAt: row.approvedAt,
+    rejectedAt: row.rejectedAt,
+  };
+}
+
+function rowToFlightRule(row: FlightRuleRow): FlightRule {
+  return {
+    id: row.id,
+    candidateId: row.candidateId,
+    sourceProposalId: row.sourceProposalId,
+    clusterId: row.clusterId,
+    scope: ruleScope(row.scope),
+    projectRoot: row.projectRoot,
+    projectRootDisplay: row.projectRootDisplay,
+    text: row.text,
+    status: row.status === "disabled" ? "disabled" : "active",
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    disabledAt: row.disabledAt,
+    lastInjectedAt: row.lastInjectedAt,
+    injectionCount: row.injectionCount,
+  };
+}
+
+function sanitizeEvidenceRefs(evidence: ClusterEvidenceRef[]): ClusterEvidenceRef[] {
+  return evidence.slice(0, 10).map((item) => ({
+    ...item,
+    cwd: item.cwd ? redactLocalPaths(item.cwd) : item.cwd,
+    sessionFile: item.sessionFile ? redactLocalPaths(item.sessionFile) : item.sessionFile,
+    snippet: sanitizeStoredText(item.snippet, 500),
+  }));
+}
+
+function cwdIsInsideProject(cwd: string, projectRoot: string): boolean {
+  const relative = path.relative(path.resolve(projectRoot), path.resolve(cwd));
+  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
 }
 
 export function getDefaultDataDir(): string {
@@ -433,8 +556,78 @@ export class FlightRecorderStore {
         FOREIGN KEY(clusterId) REFERENCES failure_clusters(id) ON DELETE CASCADE
       );
 
-      INSERT OR REPLACE INTO meta(key, value) VALUES ('schemaVersion', '2');
+      CREATE TABLE IF NOT EXISTS rule_candidates (
+        id TEXT PRIMARY KEY,
+        sourceType TEXT NOT NULL,
+        sourceId TEXT NOT NULL,
+        clusterId TEXT,
+        status TEXT NOT NULL,
+        draftText TEXT NOT NULL,
+        proposedScope TEXT NOT NULL,
+        projectRoot TEXT,
+        projectRootDisplay TEXT,
+        evidenceJson TEXT NOT NULL,
+        evidenceCount INTEGER NOT NULL,
+        ruleId TEXT,
+        createdAt TEXT NOT NULL,
+        updatedAt TEXT NOT NULL,
+        approvedAt TEXT,
+        rejectedAt TEXT,
+        UNIQUE(sourceType, sourceId)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_rule_candidates_status ON rule_candidates(status, updatedAt);
+      CREATE INDEX IF NOT EXISTS idx_rule_candidates_source ON rule_candidates(sourceType, sourceId);
+
+      CREATE TABLE IF NOT EXISTS flight_rules (
+        id TEXT PRIMARY KEY,
+        candidateId TEXT NOT NULL UNIQUE,
+        sourceProposalId TEXT NOT NULL,
+        clusterId TEXT,
+        scope TEXT NOT NULL,
+        projectRoot TEXT,
+        projectRootDisplay TEXT,
+        text TEXT NOT NULL,
+        status TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        updatedAt TEXT NOT NULL,
+        disabledAt TEXT,
+        lastInjectedAt TEXT,
+        injectionCount INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KEY(candidateId) REFERENCES rule_candidates(id) ON DELETE CASCADE
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_flight_rules_status_scope ON flight_rules(status, scope);
+
+      INSERT OR REPLACE INTO meta(key, value) VALUES ('schemaVersion', '3');
     `);
+    this.migrateSchema();
+  }
+
+  private tableColumns(table: string): Set<string> {
+    const rows = this.db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+    return new Set(rows.map((row) => row.name));
+  }
+
+  private ensureColumn(table: string, column: string, definition: string): void {
+    if (this.tableColumns(table).has(column)) return;
+    this.db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+
+  private migrateSchema(): void {
+    this.ensureColumn("failure_occurrences", "suggestionJson", "TEXT");
+    this.ensureColumn("failure_occurrences", "dataJson", "TEXT NOT NULL DEFAULT '{}'");
+    this.ensureColumn("failure_occurrences", "repeatCount", "INTEGER NOT NULL DEFAULT 1");
+    this.ensureColumn("feedback_actions", "expiresAt", "TEXT");
+    this.ensureColumn("failure_clusters", "lastReflectedAt", "TEXT");
+    this.ensureColumn("failure_clusters", "score", "REAL NOT NULL DEFAULT 0");
+    this.ensureColumn("reflection_proposals", "actionsJson", "TEXT NOT NULL DEFAULT '[]'");
+    this.ensureColumn("rule_candidates", "ruleId", "TEXT");
+    this.ensureColumn("rule_candidates", "rejectedAt", "TEXT");
+    this.ensureColumn("flight_rules", "lastInjectedAt", "TEXT");
+    this.ensureColumn("flight_rules", "injectionCount", "INTEGER NOT NULL DEFAULT 0");
+    this.db.exec("PRAGMA user_version = 3");
+    this.db.prepare("INSERT OR REPLACE INTO meta(key, value) VALUES ('schemaVersion', '3')").run();
   }
 
   getSource(pathValue: string): SourceFileRecord | null {
@@ -479,7 +672,8 @@ export class FlightRecorderStore {
       `);
       const ftsInsert = this.db.prepare("INSERT INTO episode_fts(id, signature, problemSummary, searchText) VALUES (?, ?, ?, ?)");
       const createdAt = new Date().toISOString();
-      for (const episode of episodes) {
+      for (const rawEpisode of episodes) {
+        const episode = sanitizeEpisodeForStorage(rawEpisode);
         episodeInsert.run(
           episode.id,
           episode.sourceFile,
@@ -503,7 +697,7 @@ export class FlightRecorderStore {
     });
   }
 
-  count(table: "source_files" | "events" | "parse_warnings" | "episodes" | "failure_occurrences" | "feedback_actions" | "failure_clusters" | "reflection_proposals"): number {
+  count(table: "source_files" | "events" | "parse_warnings" | "episodes" | "failure_occurrences" | "feedback_actions" | "failure_clusters" | "reflection_proposals" | "rule_candidates" | "flight_rules"): number {
     const row = this.db.prepare(`SELECT COUNT(*) AS count FROM ${table}`).get() as { count: number };
     return row.count;
   }
@@ -534,10 +728,11 @@ export class FlightRecorderStore {
     if (!ftsQuery) return [];
     const limit = Math.max(1, Math.min(options.limit ?? 5, 50));
     const excludeEpisodeIds = Array.from(new Set(options.excludeEpisodeIds ?? [])).filter(Boolean);
-    const rows = this.prepareSearch({ withCwd: Boolean(options.cwd), excludeCount: excludeEpisodeIds.length }).all(
+    const queryCwd = options.cwd ? redactLocalPaths(options.cwd) : null;
+    const rows = this.prepareSearch({ withCwd: Boolean(queryCwd), excludeCount: excludeEpisodeIds.length }).all(
       ...[
         ftsQuery,
-        ...(options.cwd ? [options.cwd] : []),
+        ...(queryCwd ? [queryCwd, options.cwd ?? queryCwd] : []),
         ...excludeEpisodeIds,
         limit,
       ],
@@ -563,13 +758,16 @@ export class FlightRecorderStore {
 
   recordFailureOccurrence(input: NewFailureOccurrence): LiveFailureOccurrence {
     const now = input.now ?? new Date().toISOString();
-    const redactedQuery = redactSecrets(input.query).trim();
+    const redactedQuery = sanitizeStoredText(input.query, 1_500).trim();
     const signatureInput: { query: string; signature?: string | null; fallbackId?: string | null } = { query: redactedQuery, fallbackId: input.entryId ?? null };
     if (input.signature !== undefined) signatureInput.signature = input.signature;
     const signature = normalizeFailureSignature(signatureInput);
     const queryPreview = compactSnippet(redactedQuery.replace(/\s+/g, " "), 180);
     const snippet = compactSnippet(redactedQuery, 1_200);
-    const dedupeKey = input.dedupeKey?.trim() || [input.source, input.cwd ?? "", input.sessionFile ?? "", input.entryId ?? "", signature, hash(redactedQuery, 12)].join("\u0000");
+    const storedCommand = input.command ? sanitizeStoredText(input.command, 500) : null;
+    const storedCwd = input.cwd ? redactLocalPaths(input.cwd) : null;
+    const storedSessionFile = input.sessionFile ? redactLocalPaths(input.sessionFile) : null;
+    const dedupeKey = input.dedupeKey?.trim() || [input.source, storedCwd ?? "", storedSessionFile ?? "", input.entryId ?? "", signature, hash(redactedQuery, 12)].join("\u0000");
     const id = `occ_${hash(dedupeKey)}`;
     const data = input.data ?? {};
 
@@ -588,9 +786,9 @@ export class FlightRecorderStore {
         dedupeKey,
         input.source,
         input.toolName ?? null,
-        input.command ?? null,
-        input.cwd ?? null,
-        input.sessionFile ?? null,
+        storedCommand,
+        storedCwd,
+        storedSessionFile,
         input.entryId ?? null,
         input.timestamp ?? null,
         signature,
@@ -786,6 +984,11 @@ export class FlightRecorderStore {
     this.db.prepare("UPDATE failure_clusters SET status = ?, updatedAt = ? WHERE id = ?").run(status, new Date().toISOString(), clusterId);
   }
 
+  updateClustersForSignature(signature: string, status: FailureClusterStatus): number {
+    const result = this.db.prepare("UPDATE failure_clusters SET status = ?, updatedAt = ? WHERE representativeSignature = ?").run(status, new Date().toISOString(), signature);
+    return Number(result.changes);
+  }
+
   markClusterReflected(clusterId: string, at = new Date().toISOString()): void {
     this.db.prepare("UPDATE failure_clusters SET lastReflectedAt = ?, updatedAt = ? WHERE id = ?").run(at, at, clusterId);
   }
@@ -857,6 +1060,162 @@ export class FlightRecorderStore {
     return rows.map(rowToProposal);
   }
 
+  createRuleCandidate(input: {
+    sourceType?: "proposal";
+    sourceId: string;
+    clusterId?: string | null;
+    draftText: string;
+    proposedScope: FlightRuleScope;
+    projectRoot?: string | null;
+    evidence?: ClusterEvidenceRef[];
+    now?: string;
+  }): FlightRuleCandidate {
+    const now = input.now ?? new Date().toISOString();
+    const sourceType = input.sourceType ?? "proposal";
+    const id = `rule_cand_${hash(`${sourceType}\u0000${input.sourceId}`)}`;
+    const draftText = sanitizeStoredText(input.draftText, 700);
+    const projectRoot = input.projectRoot ?? null;
+    const projectRootDisplay = projectRoot ? redactLocalPaths(projectRoot) : null;
+    const evidence = sanitizeEvidenceRefs(input.evidence ?? []);
+    this.db.prepare(`
+      INSERT INTO rule_candidates(id, sourceType, sourceId, clusterId, status, draftText, proposedScope, projectRoot, projectRootDisplay, evidenceJson, evidenceCount, ruleId, createdAt, updatedAt, approvedAt, rejectedAt)
+      VALUES (?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?, NULL, ?, ?, NULL, NULL)
+      ON CONFLICT(sourceType, sourceId) DO UPDATE SET
+        draftText = CASE WHEN rule_candidates.status = 'draft' THEN excluded.draftText ELSE rule_candidates.draftText END,
+        proposedScope = CASE WHEN rule_candidates.status = 'draft' THEN excluded.proposedScope ELSE rule_candidates.proposedScope END,
+        projectRoot = CASE WHEN rule_candidates.status = 'draft' THEN excluded.projectRoot ELSE rule_candidates.projectRoot END,
+        projectRootDisplay = CASE WHEN rule_candidates.status = 'draft' THEN excluded.projectRootDisplay ELSE rule_candidates.projectRootDisplay END,
+        evidenceJson = CASE WHEN rule_candidates.status = 'draft' THEN excluded.evidenceJson ELSE rule_candidates.evidenceJson END,
+        evidenceCount = CASE WHEN rule_candidates.status = 'draft' THEN excluded.evidenceCount ELSE rule_candidates.evidenceCount END,
+        updatedAt = CASE WHEN rule_candidates.status = 'draft' THEN excluded.updatedAt ELSE rule_candidates.updatedAt END
+    `).run(id, sourceType, input.sourceId, input.clusterId ?? null, draftText, input.proposedScope, projectRoot, projectRootDisplay, json(evidence), evidence.length, now, now);
+    const saved = this.getRuleCandidate(id) ?? this.getRuleCandidateForSource(sourceType, input.sourceId);
+    if (!saved) throw new Error(`Failed to create rule candidate ${id}`);
+    return saved;
+  }
+
+  updateRuleCandidateDraft(candidateId: string, draftText: string, proposedScope?: FlightRuleScope, projectRoot?: string | null): FlightRuleCandidate | null {
+    const existing = this.getRuleCandidate(candidateId);
+    if (!existing || existing.status !== "draft") return existing;
+    const updates: string[] = ["draftText = ?", "updatedAt = ?"];
+    const params: Array<string | null> = [sanitizeStoredText(draftText, 700), new Date().toISOString()];
+    if (proposedScope) {
+      updates.push("proposedScope = ?");
+      params.push(proposedScope);
+    }
+    if (projectRoot !== undefined) {
+      updates.push("projectRoot = ?", "projectRootDisplay = ?");
+      params.push(projectRoot, projectRoot ? redactLocalPaths(projectRoot) : null);
+    }
+    params.push(candidateId);
+    this.db.prepare(`UPDATE rule_candidates SET ${updates.join(", ")} WHERE id = ?`).run(...params);
+    return this.getRuleCandidate(candidateId);
+  }
+
+  getRuleCandidate(id: string): FlightRuleCandidate | null {
+    const row = this.db.prepare("SELECT * FROM rule_candidates WHERE id = ?").get(id) as RuleCandidateRow | undefined;
+    return row ? rowToRuleCandidate(row) : null;
+  }
+
+  getRuleCandidateForSource(sourceType: "proposal", sourceId: string): FlightRuleCandidate | null {
+    const row = this.db.prepare("SELECT * FROM rule_candidates WHERE sourceType = ? AND sourceId = ?").get(sourceType, sourceId) as RuleCandidateRow | undefined;
+    return row ? rowToRuleCandidate(row) : null;
+  }
+
+  listRuleCandidates(options: { status?: RuleCandidateStatus; limit?: number } = {}): FlightRuleCandidate[] {
+    const limit = Math.max(1, Math.min(options.limit ?? 20, 200));
+    const rows = options.status
+      ? this.db.prepare("SELECT * FROM rule_candidates WHERE status = ? ORDER BY updatedAt DESC LIMIT ?").all(options.status, limit) as unknown as RuleCandidateRow[]
+      : this.db.prepare("SELECT * FROM rule_candidates ORDER BY updatedAt DESC LIMIT ?").all(limit) as unknown as RuleCandidateRow[];
+    return rows.map(rowToRuleCandidate);
+  }
+
+  approveRuleCandidate(candidateId: string, options: { scope?: FlightRuleScope; text?: string; projectRoot?: string | null; now?: string } = {}): FlightRule | null {
+    const candidate = this.getRuleCandidate(candidateId);
+    if (!candidate) return null;
+    const now = options.now ?? new Date().toISOString();
+    const scope = options.scope ?? candidate.proposedScope;
+    const projectRoot = scope === "project" ? options.projectRoot ?? candidate.projectRoot : null;
+    const projectRootDisplay = projectRoot ? redactLocalPaths(projectRoot) : null;
+    const text = sanitizeStoredText(options.text ?? candidate.draftText, 700);
+    const ruleId = candidate.ruleId ?? `rule_${hash(`${candidate.id}\u0000${scope}\u0000${text}`)}`;
+    this.transaction(() => {
+      this.db.prepare(`
+        INSERT INTO flight_rules(id, candidateId, sourceProposalId, clusterId, scope, projectRoot, projectRootDisplay, text, status, createdAt, updatedAt, disabledAt, lastInjectedAt, injectionCount)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, NULL, NULL, 0)
+        ON CONFLICT(candidateId) DO UPDATE SET
+          scope = excluded.scope,
+          projectRoot = excluded.projectRoot,
+          projectRootDisplay = excluded.projectRootDisplay,
+          text = excluded.text,
+          status = 'active',
+          updatedAt = excluded.updatedAt,
+          disabledAt = NULL
+      `).run(ruleId, candidate.id, candidate.sourceId, candidate.clusterId, scope, projectRoot, projectRootDisplay, text, now, now);
+      this.db.prepare("UPDATE rule_candidates SET status = 'approved', draftText = ?, proposedScope = ?, projectRoot = ?, projectRootDisplay = ?, ruleId = ?, approvedAt = COALESCE(approvedAt, ?), updatedAt = ? WHERE id = ?")
+        .run(text, scope, projectRoot, projectRootDisplay, ruleId, now, now, candidate.id);
+    });
+    return this.getFlightRule(ruleId) ?? this.getFlightRuleByCandidate(candidate.id);
+  }
+
+  rejectRuleCandidate(candidateId: string, now = new Date().toISOString()): FlightRuleCandidate | null {
+    const existing = this.getRuleCandidate(candidateId);
+    if (!existing) return null;
+    this.transaction(() => {
+      this.db.prepare("UPDATE rule_candidates SET status = 'rejected', rejectedAt = COALESCE(rejectedAt, ?), updatedAt = ? WHERE id = ?").run(now, now, candidateId);
+      this.db.prepare("UPDATE flight_rules SET status = 'disabled', disabledAt = COALESCE(disabledAt, ?), updatedAt = ? WHERE candidateId = ?").run(now, now, candidateId);
+    });
+    return this.getRuleCandidate(candidateId);
+  }
+
+  getFlightRule(id: string): FlightRule | null {
+    const row = this.db.prepare("SELECT * FROM flight_rules WHERE id = ?").get(id) as FlightRuleRow | undefined;
+    return row ? rowToFlightRule(row) : null;
+  }
+
+  getFlightRuleByCandidate(candidateId: string): FlightRule | null {
+    const row = this.db.prepare("SELECT * FROM flight_rules WHERE candidateId = ?").get(candidateId) as FlightRuleRow | undefined;
+    return row ? rowToFlightRule(row) : null;
+  }
+
+  listFlightRules(options: { status?: FlightRuleStatus; scope?: FlightRuleScope; cwd?: string; limit?: number } = {}): FlightRule[] {
+    const clauses: string[] = [];
+    const params: Array<string | number> = [];
+    if (options.status) {
+      clauses.push("status = ?");
+      params.push(options.status);
+    }
+    if (options.scope) {
+      clauses.push("scope = ?");
+      params.push(options.scope);
+    }
+    const limit = Math.max(1, Math.min(options.limit ?? 20, 100));
+    const sqlLimit = options.cwd ? 500 : limit;
+    const where = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
+    const rows = this.db.prepare(`SELECT * FROM flight_rules ${where} ORDER BY updatedAt DESC LIMIT ?`).all(...params, sqlLimit) as unknown as FlightRuleRow[];
+    const rules = rows.map(rowToFlightRule);
+    const filtered = options.cwd ? rules.filter((rule) => rule.scope === "global" || Boolean(rule.projectRoot && cwdIsInsideProject(options.cwd!, rule.projectRoot))) : rules;
+    return filtered.slice(0, limit);
+  }
+
+  listActiveFlightRulesForCwd(cwd: string | null, limit = 5): FlightRule[] {
+    if (!cwd) return this.listFlightRules({ status: "active", scope: "global", limit });
+    return this.listFlightRules({ status: "active", cwd, limit });
+  }
+
+  disableFlightRule(ruleId: string, now = new Date().toISOString()): FlightRule | null {
+    this.db.prepare("UPDATE flight_rules SET status = 'disabled', disabledAt = COALESCE(disabledAt, ?), updatedAt = ? WHERE id = ?").run(now, now, ruleId);
+    return this.getFlightRule(ruleId);
+  }
+
+  markFlightRulesInjected(ruleIds: string[], at = new Date().toISOString()): void {
+    if (ruleIds.length === 0) return;
+    const update = this.db.prepare("UPDATE flight_rules SET lastInjectedAt = ?, injectionCount = injectionCount + 1, updatedAt = ? WHERE id = ?");
+    this.transaction(() => {
+      for (const id of ruleIds) update.run(at, at, id);
+    });
+  }
+
   private prepareSearch(options: { withCwd: boolean; excludeCount: number }): StatementSync {
     const base = `
       SELECT e.*, bm25(episode_fts) AS score
@@ -864,7 +1223,7 @@ export class FlightRecorderStore {
       JOIN episodes e ON e.id = episode_fts.id
       WHERE episode_fts MATCH ?
     `;
-    const cwdClause = options.withCwd ? " AND (e.cwd = ? OR e.cwd IS NULL)" : "";
+    const cwdClause = options.withCwd ? " AND (e.cwd = ? OR e.cwd = ? OR e.cwd IS NULL)" : "";
     const excludeClause = options.excludeCount > 0 ? ` AND e.id NOT IN (${Array.from({ length: options.excludeCount }, () => "?").join(", ")})` : "";
     return this.db.prepare(`${base}${cwdClause}${excludeClause} ORDER BY score ASC, e.confidence DESC LIMIT ?`);
   }
@@ -872,6 +1231,9 @@ export class FlightRecorderStore {
   private insertEvent(statement: StatementSync, event: SessionEvent): void {
     const source = event.source;
     const eventKey = `${source.sourceFile}:${source.entryId ?? source.lineNumber}`;
+    const redactedText = sanitizeStoredText(event.text, 2_000);
+    const redactedCommand = event.command ? sanitizeStoredText(event.command, 500) : null;
+    const redactedOutput = event.output ? sanitizeStoredText(event.output, 2_000) : null;
     statement.run(
       eventKey,
       source.sourceFile,
@@ -885,11 +1247,11 @@ export class FlightRecorderStore {
       source.role,
       event.kind,
       json(source.ancestry),
-      [event.text, event.command ?? "", event.output ?? "", event.toolName ?? ""].join("\n"),
+      [redactedText, redactedCommand ?? "", redactedOutput ?? "", event.toolName ?? ""].join("\n"),
       json({
-        text: event.text,
-        command: event.command,
-        output: event.output,
+        text: redactedText,
+        command: redactedCommand,
+        output: redactedOutput,
         exitCode: event.exitCode,
         cancelled: event.cancelled,
         truncated: event.truncated,

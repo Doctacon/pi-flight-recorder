@@ -11,4 +11,6 @@ export * from "./settings.js";
 export * from "./signatures.js";
 export * from "./pattern-miner.js";
 export * from "./reflection.js";
+export * from "./flight-rules.js";
+export * from "./interactive-review.js";
 export * from "./redact.js";

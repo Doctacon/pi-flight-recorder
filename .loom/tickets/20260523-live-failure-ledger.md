@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-live-failure-ledger
 Type: Ticket
-Status: open
+Status: review
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: medium - adds persistent event-level state that downstream clustering and suggestions depend on
@@ -55,8 +55,13 @@ The ledger should record enough for future clustering without storing raw secret
 
 ## Current State
 
-Ready after bootstrap. Current code can query live failures and sync session files, but low-confidence/no-match live failures are not persisted as first-class occurrences for reflection.
+Implementation is complete and in review. Live failed `tool_result` events are recorded as redacted occurrence records with normalized signatures, repeat counts, metadata, and suggestion outcomes; user-bash result capture remains explicitly disabled and surfaced in status/docs. Evidence: `evidence:20260523-seamless-ux-validation` OBS-001, OBS-002.
+
+Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`; FIND-001 addressed by redacted occurrence/event persistence and tests; FIND-005 addressed by v2 migration compatibility fixture. Evidence: `evidence:20260523-findings-fix-validation` OBS-003 and OBS-006. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope; remaining residual gaps are tracked as non-blocking follow-up/tuning unless this ticket explicitly covers high-confidence notification smoke or long-run corpus evaluation.
 
 ## Journal
 
 - 2026-05-23: Created ticket to establish the data foundation for seamless capture and reflection.
+- 2026-05-23: Implemented seamless UX slice for this ticket and moved to review with validation evidence in `evidence:20260523-seamless-ux-validation`.
+- 2026-05-23: Review run recorded `audit:20260523-seamless-ux-review` with verdict `changes-needed`; pending disposition: FIND-001, FIND-005.
+- 2026-05-23: Dispositioned review finding(s) for this ticket with `evidence:20260523-live-pi-tui-smoke` and/or `evidence:20260523-findings-fix-validation`; follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` in the inspected scope; residual high-confidence notification/model-provider/long-run tuning gaps remain as follow-up where applicable.

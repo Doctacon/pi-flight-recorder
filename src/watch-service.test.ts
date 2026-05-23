@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { FlightRecorderStore, defaultDatabasePath } from "./storage.js";
-import { requestWatchStop, SessionWatchService } from "./watch-service.js";
+import { readPersistedWatchStatus, requestWatchStop, SessionWatchService } from "./watch-service.js";
 
 function line(value: unknown): string {
   return JSON.stringify(value);
@@ -86,18 +86,24 @@ describe("SessionWatchService", () => {
     await service.stop();
   });
 
-  it("reports duplicate watcher starts through the local lock", async () => {
+  it("treats duplicate watcher starts as shared and does not overwrite owner status", async () => {
     const sourceDir = await mkdtemp(path.join(tmpdir(), "pfr-watch-lock-src-"));
     const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-watch-lock-data-"));
-    await writeSession(path.join(sourceDir, "session.jsonl"));
+    const file = path.join(sourceDir, "session.jsonl");
+    await writeSession(file);
     const first = new SessionWatchService({ sourceDirs: [sourceDir], dataDir, pollIntervalMs: 25, debounceMs: 10 });
     const second = new SessionWatchService({ sourceDirs: [sourceDir], dataDir, pollIntervalMs: 25, debounceMs: 10 });
 
     expect((await first.start()).state).toBe("active");
-    expect((await second.start()).state).toBe("watched-by-another-process");
+    const secondStatus = await second.start();
+    expect(secondStatus.state).toBe("watched-by-another-process");
+    expect(secondStatus.lastError).toBeNull();
+    expect(secondStatus.watchedPaths).toEqual([file]);
+    expect((await readPersistedWatchStatus(dataDir))?.state).toBe("active");
 
-    await first.stop();
     await second.stop();
+    expect((await readPersistedWatchStatus(dataDir))?.state).toBe("active");
+    await first.stop();
   });
 
   it("stops on request and reports stopped status", async () => {

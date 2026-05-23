@@ -14,11 +14,12 @@ Implemented:
 - failure/fix episode extraction with redaction;
 - incremental single-file sync and foreground polling watcher;
 - Pi extension autostart on `session_start` with persisted local settings;
+- shared watcher behavior for multiple simultaneous Pi sessions in the same project/source set;
 - live failure occurrence ledger for quiet/no-match/suppressed failures;
 - high-confidence live suggestion gates with prior-resolution requirement, specificity gate, cooldown, and silence/snooze feedback;
 - local repeated-failure clustering and `/flight-reflect` pattern proposals;
 - optional model-assisted reflection only when explicitly requested and a provider is available;
-- Pi commands: `/flight-status`, `/flight-mode`, `/flight-feedback`, `/flight-reflect`, `/flight-sync`, `/seen-this-before`, `/flight-watch`;
+- Pi commands: `/flight-status`, `/flight-mode`, `/flight-feedback`, `/flight-reflect`, `/flight-review`, `/flight-rules`, `/flight-sync`, `/seen-this-before`, `/flight-watch`;
 - debug CLI commands: `status`, `sync`, `query`, `seen-this-before`, `watch`, `reflect`, `feedback`.
 
 ## Requirements
@@ -54,6 +55,8 @@ Useful Pi commands:
 /flight-mode resume
 /flight-mode disable
 /flight-reflect
+/flight-review
+/flight-rules status
 /flight-feedback --action snooze --occurrence occ_...
 /seen-this-before --cwd current Cannot find module src/config/app.ts
 ```
@@ -64,7 +67,8 @@ Default behavior:
 - mode defaults to `suggest-on-failure`, but live nudges require conservative gates;
 - no-match, low-confidence, cooldown, broad-match, and silenced failures are buffered quietly;
 - `/flight-reflect` groups repeated buffered failures into pattern-level proposals;
-- model-assisted reflection is disabled by default and only used for `/flight-reflect --model` when Pi provides a model completion surface.
+- model-assisted reflection is disabled by default and only used for `/flight-reflect --model` when Pi provides a model completion surface;
+- if another Pi session already owns the watcher lock, this session uses the shared watcher/index and continues live occurrence capture without an autostart warning.
 
 ## Immediate suggestions
 
@@ -96,6 +100,8 @@ Reflection proposals include:
 - confidence and limits;
 - actions: `useful`, `wrong-match`, `snooze`, `silence-pattern`, `promote-later`, `make-rule`.
 
+Use `/flight-review` or `/flight-reflect --interactive` for a guided Pi-native review flow. `make-rule` drafts a Flight Rule candidate, lets you edit/approve scope, and only approved rules are injected into future turns. `/flight-rules status|pending|show|disable|export` keeps rules inspectable and reversible.
+
 ## Debug CLI usage
 
 The CLI is a development/debug/recovery harness, not the normal UX.
@@ -115,8 +121,8 @@ The foreground watcher intentionally does not install launchd/systemd services.
 
 - No network calls are made by default.
 - Raw Pi sessions stay as source files; derived indexes are rebuildable.
-- Derived snippets redact obvious token/password/key/private-key patterns.
-- Model-assisted reflection is opt-in/manual and uses bounded redacted snippets.
+- Derived snippets and event/occurrence text redact obvious token/password/key/private-key patterns and user-home/session-file paths.
+- Model-assisted reflection is opt-in/manual and uses bounded redacted snippets plus redacted local path labels.
 - Query/suggestion/reflection answers cite local evidence and limits.
 
 ## Loom records
