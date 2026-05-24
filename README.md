@@ -35,8 +35,11 @@ Node currently prints an `ExperimentalWarning` when `node:sqlite` is first loade
 npm install
 npm run typecheck
 npm test
+npm run test:smoke:local
 npm run build
 ```
+
+`npm run test:smoke:local` is a release-oriented local smoke path. It uses synthetic Pi JSONL fixture data plus temporary recorder data directories, not your real `~/.pi/agent/sessions` or `~/.pi/flight-recorder` state, and exercises extension status/sync/query/live occurrence/reflection/rule surfaces in a fake-Pi harness.
 
 ## Normal Pi usage
 
@@ -79,6 +82,8 @@ A live nudge is shown only when a failed `tool_result` matches strong prior loca
 - same-cwd matches are preferred;
 - cooldown and max-window budgets allow another notification;
 - the signature is not snoozed or silenced.
+
+When a live nudge does pass these gates, the extension shows the formatted prior-fix text as a warning and as a visible Flight Recorder widget so the suggestion remains inspectable after the tool result renders.
 
 The extension does **not** mutate Pi tool results. `user_bash` remains disabled for result capture because Pi exposes it before execution; wrapping shell commands would risk changing semantics.
 
@@ -124,6 +129,15 @@ The foreground watcher intentionally does not install launchd/systemd services.
 - Derived snippets and event/occurrence text redact obvious token/password/key/private-key patterns and user-home/session-file paths.
 - Model-assisted reflection is opt-in/manual and uses bounded redacted snippets plus redacted local path labels.
 - Query/suggestion/reflection answers cite local evidence and limits.
+
+## Release validation limits
+
+Current validation includes automated tests, the source-checkout local smoke command, build/package dry-run, installed project-local Pi package smoke in a disposable TUI, selected prior real Pi TUI smoke for status/live capture/reflection, real interactive TUI evidence for guided Flight Rule promotion, and real TUI evidence for visible high-confidence prior-resolved suggestion text. The following remain explicit limits rather than proven release claims:
+
+- model-assisted reflection has only fake-provider/bounded-context validation unless you explicitly run it with a real provider;
+- long-run reflection precision/noise tuning needs a mature local occurrence corpus.
+
+`npm run test:smoke:local` is for a source checkout. It calls the source CLI entrypoint and fake-Pi extension harness; it is not a substitute for real TUI validation. Installed-package behavior is covered only by the separate disposable project-local Pi smoke evidence, not by local smoke itself.
 
 ## Loom records
 

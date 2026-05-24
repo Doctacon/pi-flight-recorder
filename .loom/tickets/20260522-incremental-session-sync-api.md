@@ -2,9 +2,9 @@
 
 ID: ticket:20260522-incremental-session-sync-api
 Type: Ticket
-Status: review
+Status: closed
 Created: 2026-05-22
-Updated: 2026-05-22
+Updated: 2026-05-23
 Risk: medium - sync semantics affect live correctness and duplicate alerts
 Priority: high - watcher and Pi hook both need changed-file sync and new-episode detection
 
@@ -54,7 +54,9 @@ The API should distinguish `indexed`, `skipped`, `warnings`, `episodesExtracted`
 
 ## Current State
 
-Implementation appears complete and is in review. Added `syncSessionFile`, structured per-file results, new episode ID detection, batch result details, and storage helpers for episode ID lookup. Existing CLI sync behavior remains compatible. Acceptance is supported by automated tests and validation evidence; no separate Ralph audit has been run yet.
+Closed. The live-monitoring implementation review state is reconciled. `evidence:20260522-live-monitoring-validation` supports incremental sync, watcher service, live suggestion decisions, CLI controls, Pi live hook behavior, and validation docs through tests plus CLI watcher smoke. Later real Pi evidence (`evidence:20260523-live-pi-tui-smoke`, `evidence:20260523-installed-package-high-confidence-smoke`, and `evidence:20260523-high-confidence-visible-suggestion-tui`) covers the no-CLI real TUI path, failed `tool_result` capture, reflection rendering, installed-package startup, and visible high-confidence prior-fix suggestion text. `audit:20260523-final-review-state-reconciliation-review` found no material issue with closing stale live-monitoring review tickets.
+
+Residual limits remain outside this ticket: `user_bash` result capture is intentionally deferred because Pi exposes it before execution, real hosted/model-provider reflection is unproven, and long-run corpus precision/noise tuning remains separate.
 
 ## Evidence
 
@@ -66,3 +68,4 @@ Implementation appears complete and is in review. Added `syncSessionFile`, struc
 - 2026-05-22: Created ticket with Status `open` for the first live-monitoring foundation slice.
 - 2026-05-22: Moved to `active` and began implementation of incremental sync as the first dependency for live monitoring.
 - 2026-05-22: Moved to `review` after implementing incremental sync and recording validation evidence.
+- 2026-05-23: Final review-state reconciliation closed this stale `review` ticket with supporting evidence/audit links; residual provider/corpus limits remain outside this ticket.

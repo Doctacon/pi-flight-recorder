@@ -8,8 +8,11 @@
 npm install
 npm run typecheck
 npm test
+npm run test:smoke:local
 npm run build
 ```
+
+The local smoke command uses synthetic Pi session fixtures and temporary recorder data directories. It is intended as a release/refactor safety check for extension status, sync/query, live occurrence capture, reflection, and Flight Rule status/injection surfaces without reading your real Pi session history.
 
 Then install/enable the package as a Pi extension using Pi's package workflow. The package manifest exposes:
 
@@ -140,6 +143,15 @@ npm run cli -- watch start --foreground --mode index-only
 ```
 
 Foreground CLI watch is not an OS service.
+
+## Validation limits
+
+The source-checkout local smoke command proves a deterministic fake-Pi path with synthetic fixture data and temp recorder data dirs. It is not real interactive Pi TUI proof and it does not execute the installed package path. Separate evidence now covers disposable project-local `pi install <package> -l` startup, real interactive TUI guided Flight Rule promotion, and visible high-confidence prior-resolved suggestion text.
+
+Still-unproven release edges:
+
+- model-assisted reflection with a real provider;
+- long-run reflection precision/noise tuning over a mature occurrence corpus.
 
 ## Notes and limits
 

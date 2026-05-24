@@ -1,0 +1,4 @@
+total 48
+drwxr-xr-x@ 3 crlough  wheel     96 May 23 18:39 .
+drwx------@ 5 crlough  wheel    160 May 23 18:39 ..
+-rw-r--r--@ 1 crlough  wheel  21853 May 23 18:39 tui-2026-05-23_18-39-55-26343.log

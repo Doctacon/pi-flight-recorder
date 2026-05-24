@@ -2,9 +2,9 @@
 
 ID: ticket:20260522-session-watch-service
 Type: Ticket
-Status: review
+Status: closed
 Created: 2026-05-22
-Updated: 2026-05-22
+Updated: 2026-05-23
 Risk: medium - long-running watcher lifecycle can create duplicate processing or stale state
 Priority: high - automatic tracking needs source-file change detection
 Depends On: ticket:20260522-incremental-session-sync-api
@@ -59,7 +59,9 @@ Implementation should evaluate `@parcel/watcher` as an open-source runtime depen
 
 ## Current State
 
-Implementation appears complete and is in review. Added `SessionWatchService` with foreground polling, catch-up sync, debounce, JSONL filtering via discovered session files, local lock, persisted status, stop request, non-fatal warning/error counts, and tests. Chose a polling watcher for this slice instead of adding a native watcher dependency; this is documented as a deliberate low-friction fallback. No separate Ralph audit has been run yet.
+Closed. The live-monitoring implementation review state is reconciled. `evidence:20260522-live-monitoring-validation` supports incremental sync, watcher service, live suggestion decisions, CLI controls, Pi live hook behavior, and validation docs through tests plus CLI watcher smoke. Later real Pi evidence (`evidence:20260523-live-pi-tui-smoke`, `evidence:20260523-installed-package-high-confidence-smoke`, and `evidence:20260523-high-confidence-visible-suggestion-tui`) covers the no-CLI real TUI path, failed `tool_result` capture, reflection rendering, installed-package startup, and visible high-confidence prior-fix suggestion text. `audit:20260523-final-review-state-reconciliation-review` found no material issue with closing stale live-monitoring review tickets.
+
+Residual limits remain outside this ticket: `user_bash` result capture is intentionally deferred because Pi exposes it before execution, real hosted/model-provider reflection is unproven, and long-run corpus precision/noise tuning remains separate.
 
 ## Evidence
 
@@ -70,3 +72,4 @@ Implementation appears complete and is in review. Added `SessionWatchService` wi
 
 - 2026-05-22: Created ticket with Status `open`. Scope is automatic file tracking, not suggestions or Pi UI.
 - 2026-05-22: Implemented watch service after incremental sync foundation and moved ticket to `review` with validation evidence.
+- 2026-05-23: Final review-state reconciliation closed this stale `review` ticket with supporting evidence/audit links; residual provider/corpus limits remain outside this ticket.

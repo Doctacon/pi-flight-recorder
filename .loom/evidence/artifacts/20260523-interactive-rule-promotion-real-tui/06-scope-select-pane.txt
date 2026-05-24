@@ -1,0 +1,62 @@
+
+ pi v0.75.5
+ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+[Extensions]
+  pi-extension.js, rule-block-observer-extension.ts
+
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+ Approve this Flight Rule?
+
+ → Approve global — Use across codebases
+   Approve project — Use only in this project/cwd
+   Save draft — Keep candidate pending
+   Cancel — Do not create a candidate
+
+ ↑↓ navigate  enter select  escape/ctrl+c cancel
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/private/tmp/pfr-rule-promotion-workspace-o1QGI1
+0.0%/4.1k (auto)                                                                                                                                                                                                                 stub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

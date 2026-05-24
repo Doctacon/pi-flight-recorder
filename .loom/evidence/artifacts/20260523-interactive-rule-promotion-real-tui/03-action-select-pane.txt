@@ -1,0 +1,62 @@
+
+ pi v0.75.5
+ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+[Extensions]
+  pi-extension.js, rule-block-observer-extension.ts
+
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+ Action for Flight Recorder proposal
+ Pattern: exact-text edit mismatches
+ Seen 2 related failures in <temp-path>.
+ Likely fix/next step: Before editing, re-read the target block and apply the smallest exact-text replacement; if the block changed, fall back to a narrower patch instead of retrying the stale oldText.
+ Confidence: 0.75 (local); Proposal: refl_c70bb44179db5cd8
+
+ → Useful — Mark this proposal as helpful signal
+   Make Rule — Draft and approve reusable guidance
+   Wrong match — Record that this proposal grouped the wrong things
+   Snooze — Hide this pattern temporarily
+   Silence — Hide this pattern until changed manually
+   Promote later — Store intent without activating a rule
+
+ ↑↓ navigate  enter select  escape/ctrl+c cancel
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/private/tmp/pfr-rule-promotion-workspace-o1QGI1
+0.0%/4.1k (auto)                                                                                                                                                                                                                 stub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

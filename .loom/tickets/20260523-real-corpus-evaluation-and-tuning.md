@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-real-corpus-evaluation-and-tuning
 Type: Ticket
-Status: review
+Status: blocked
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: high - production usefulness depends on precision/noise over real sessions, not only fixtures
@@ -58,9 +58,11 @@ Evaluation should produce metrics or structured observations such as number of c
 
 ## Current State
 
-Partial evaluation is complete and remains in review. Real default data-dir status/reflection dry runs were performed without raw snippets; the real store has historical episodes (32 on the latest check) but zero occurrence-ledger records, so reflection precision tuning awaits normal live use. Interactive TUI smoke and Ralph-backed audit remain pending/not performed. Evidence: `evidence:20260523-seamless-ux-validation` OBS-005, OBS-006.
+Blocked. This ticket is no longer allowed to sit in stale `review`: the current-flow release gaps (installed-package startup, real-TUI rule promotion, and visible high-confidence suggestion text) are now evidenced, but this ticket's own long-run corpus/provider acceptance is not satisfied.
 
-Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`; FIND-002 addressed for status/capture/reflection by live Pi TUI smoke. Real occurrence count is no longer zero after the smoke, but long-run precision/noise tuning and real model-provider validation remain residual follow-up. Evidence: `evidence:20260523-live-pi-tui-smoke` and `evidence:20260523-findings-fix-validation`. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope; remaining residual gaps are tracked as non-blocking follow-up/tuning unless this ticket explicitly covers high-confidence notification smoke or long-run corpus evaluation.
+Concrete blocker: a mature local occurrence corpus and/or explicit operator authorization for real hosted/model-provider reflection evaluation is needed before this ticket can honestly claim real-corpus precision/noise tuning or real-provider behavior. Existing evidence supports smoke-level status/capture/reflection and fixture/fake-provider behavior only.
+
+Do not close this ticket until the corpus/provider evaluation acceptance is either performed with redacted evidence and audit or explicitly re-scoped/cancelled by the operator.
 
 ## Journal
 
@@ -68,3 +70,4 @@ Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`
 - 2026-05-23: Implemented seamless UX slice for this ticket and moved to review with validation evidence in `evidence:20260523-seamless-ux-validation`.
 - 2026-05-23: Review run recorded `audit:20260523-seamless-ux-review` with verdict `changes-needed`; pending disposition: FIND-002 plus real occurrence/model/provider evidence gaps.
 - 2026-05-23: Dispositioned review finding(s) for this ticket with `evidence:20260523-live-pi-tui-smoke` and/or `evidence:20260523-findings-fix-validation`; follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` in the inspected scope; residual high-confidence notification/model-provider/long-run tuning gaps remain as follow-up where applicable.
+- 2026-05-23: Final review-state reconciliation moved this ticket from stale `review` to `blocked`; current-flow smoke gaps are resolved, but long-run corpus/provider evaluation remains unsatisfied.

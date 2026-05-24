@@ -1,0 +1,2 @@
+/tmp/pfr-installed-highconf-SUwWLA/workspace/.pi/settings.json
+/tmp/pfr-installed-highconf-SUwWLA/workspace/package.json

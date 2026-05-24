@@ -2,7 +2,7 @@
 
 ID: plan:20260523-seamless-failure-memory-ux
 Type: Plan
-Status: active
+Status: blocked
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: high - changes default extension behavior, background capture, user interruption policy, reflection cadence, and privacy/model boundaries
@@ -169,33 +169,11 @@ The user can review/refine reflection proposals in Pi, and real-corpus validatio
 
 ## Current State
 
-Plan is active. All child tickets have implementation work completed and are now in `review` with validation evidence in `evidence:20260523-seamless-ux-validation`, `evidence:20260523-live-pi-tui-smoke`, and `evidence:20260523-findings-fix-validation`. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope.
+Blocked on residual evaluation, not stale review. The current-flow UX gaps that blocked release-readiness are now resolved or routed: installed project-local package startup is evidenced, real-TUI guided Flight Rule promotion is evidenced, and visible high-confidence prior-fix suggestion text is evidenced. Most implementation child tickets are closed after final reconciliation.
 
-Implemented plan-level outcomes:
+The remaining blocked child ticket is `ticket:20260523-real-corpus-evaluation-and-tuning`. Completion of this broader seamless plan still requires either a mature local occurrence corpus/real-corpus tuning pass and/or explicit operator authorization for real hosted/model-provider reflection evaluation, or an operator-approved re-scope that removes those goals from this plan.
 
-- extension autostart and `/flight-status`;
-- persistent live failure occurrence ledger;
-- high-confidence suggestion gates and quiet buffering;
-- Pi-native feedback/snooze/silence controls;
-- local cluster model and deterministic pattern miner;
-- reflection trigger/proposal pipeline and `/flight-reflect`;
-- extension-first docs and debug CLI status/reflect commands;
-- build, package dry-run, and project-local `pi install . -l` validation.
-
-Review finding disposition:
-
-- `FIND-001`: addressed by redacted derived storage/model context and regression tests.
-- `FIND-002`: addressed for `/flight-status`, live failed `tool_result` capture, and `/flight-reflect` by live Pi TUI smoke.
-- `FIND-003`: addressed by feedback target validation plus signature/cluster suppression propagation and regression tests.
-- `FIND-004`: addressed by centralized command data-dir switching that stops watcher/engine state and regression test.
-- `FIND-005`: addressed by v2 migration compatibility logic and legacy DB fixture test.
-
-Remaining review risks before completion:
-
-- high-confidence prior resolved suggestion notification was not exercised in the real Pi TUI smoke;
-- model-assisted reflection was tested only with a fake provider;
-- long-run real-corpus reflection precision/noise tuning remains limited to the new smoke occurrences rather than a mature occurrence corpus;
-- follow-up audit is clear, but residual gaps remain intentionally open as follow-up/tuning evidence rather than blocking FIND-001 through FIND-005 closure.
+Do not mark this plan completed until `ticket:20260523-real-corpus-evaluation-and-tuning` is closed, cancelled, or explicitly re-scoped with authority.
 
 ## Journal
 
@@ -205,3 +183,6 @@ Remaining review risks before completion:
 - 2026-05-23: Recorded live Pi TUI smoke in `evidence:20260523-live-pi-tui-smoke`, fixed/dispositioned FIND-001 through FIND-005, and recorded validation in `evidence:20260523-findings-fix-validation`.
 - 2026-05-23: Ran follow-up Ralph review `audit:20260523-seamless-ux-followup-review`; verdict `clear` in inspected scope. Residual gaps remain for high-confidence live suggestion smoke, real model-provider reflection, and long-run corpus tuning.
 - 2026-05-23: After real two-terminal use exposed watcher lock warning, changed duplicate autostart to shared-watcher behavior and recorded `evidence:20260523-shared-watcher-validation`.
+- 2026-05-23: Ran disposable project-local installed-package/high-confidence real TUI smoke in `evidence:20260523-installed-package-high-confidence-smoke`. The package install/startup, status, failed Pi bash tool capture, and `kind=suggested` high-confidence state are evidenced; formatted transient notification text was not captured, so that rendering detail remains a partial gap.
+- 2026-05-23: Added persistent high-confidence suggestion widget and recorded `evidence:20260523-high-confidence-visible-suggestion-tui`; audit `audit:20260523-high-confidence-visible-suggestion-review` returned `clear`. Visible suggestion rendering gap is resolved; real-provider reflection and long-run corpus tuning remain.
+- 2026-05-23: Final review-state reconciliation closed stale implementation review tickets and moved this plan to `blocked` on the explicit residual real-corpus/provider evaluation ticket. Current-flow release UX gaps are resolved; long-run/provider validation remains outside current evidence.

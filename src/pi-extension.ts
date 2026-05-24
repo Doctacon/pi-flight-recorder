@@ -1,138 +1,17 @@
 import { writeFile } from "node:fs/promises";
-import { contentToText } from "./session-parser.js";
 import { formatFlightRule, formatRuleCandidate, formatRuleInjectionBlock, formatRulesMarkdown } from "./flight-rules.js";
 import { askReviewChoice, askReviewEditor, fallbackMessage, type ReviewChoice } from "./interactive-review.js";
 import { compactSnippet } from "./redact.js";
 import { normalizeFailureSignature } from "./signatures.js";
 import { DEFAULT_SETTINGS, readSettings, updateSettings, type FlightRecorderSettings } from "./settings.js";
 import type { LiveMode, LiveSuggestionDecision, LiveSuggestionEngine } from "./live-suggestions.js";
+import { currentCwd, formatCaptureStatus, notify, optionlessText, parseFeedbackAction, parseLimit, parseMode, parseNumber, readOption, readRepeatedOption, resolveCwd, showLiveSuggestion, splitArgs } from "./pi-extension-command-utils.js";
+import { eventMetadata, isRecord, toolResultFailed, toolResultQuery } from "./pi-extension-event-utils.js";
+import type { LiveExtensionState, PiCommandContext, PiLike } from "./pi-extension-types.js";
 import type { QueryOptions } from "./query.js";
 import type { SyncOptions } from "./sync.js";
 import { defaultDatabasePath, FlightRecorderStore, getDefaultDataDir } from "./storage.js";
 import type { FeedbackAction, FeedbackTargetType, FlightRuleScope, NewFailureOccurrence, ReflectionProposal, SuggestionOutcome } from "./types.js";
-import type { SessionWatchService, SessionWatchStatus } from "./watch-service.js";
-
-interface PiLike {
-  registerCommand?: (name: string, command: { description: string; handler: (args: string, ctx: PiCommandContext) => Promise<void> }) => void;
-  registerTool?: (tool: unknown) => void;
-  on?: (eventName: string, handler: (event: unknown, ctx: PiCommandContext) => Promise<unknown> | unknown) => void;
-}
-
-interface PiCommandContext {
-  cwd?: string;
-  ui?: {
-    notify?: (message: string, level?: "info" | "error" | "success" | "warning") => void;
-    select?: (message: string, choices: string[]) => Promise<string | undefined> | string | undefined;
-    editor?: (message: string, prefilled?: string) => Promise<string | undefined> | string | undefined;
-    confirm?: (title: string, message: string) => Promise<boolean> | boolean;
-  };
-  sessionManager?: {
-    getCwd?: () => string;
-    getSessionFile?: () => string | null;
-  };
-  model?: {
-    complete?: (prompt: string) => Promise<string>;
-  };
-}
-
-interface LiveExtensionState {
-  mode: LiveMode;
-  dataDir?: string;
-  sourceDirs: string[];
-  minConfidence?: number;
-  cooldownMs?: number;
-  maxSuggestionsPerWindow?: number;
-  watcher: SessionWatchService | null;
-  engine: LiveSuggestionEngine | null;
-  bootstrapped: boolean;
-  bootstrapInFlight: Promise<void> | null;
-  bootstrapGeneration: number;
-  autoStart: boolean;
-  modelReflection: boolean;
-  reflectionOnSessionEnd: boolean;
-  dailyDigest: boolean;
-  lastBootstrapAt: string | null;
-  lastBootstrapError: string | null;
-  lastOccurrenceId: string | null;
-  lastSuppressionReason: string | null;
-  lastInjectedRuleIds: string[];
-}
-
-function splitArgs(input: string): string[] {
-  const result: string[] = [];
-  const pattern = /"([^"]*)"|'([^']*)'|(\S+)/g;
-  let match: RegExpExecArray | null;
-  while ((match = pattern.exec(input)) !== null) {
-    result.push(match[1] ?? match[2] ?? match[3] ?? "");
-  }
-  return result;
-}
-
-function readOption(args: string[], name: string): string | null {
-  const index = args.indexOf(name);
-  if (index === -1) return null;
-  return args[index + 1] ?? null;
-}
-
-function readRepeatedOption(args: string[], name: string): string[] {
-  const values: string[] = [];
-  for (let index = 0; index < args.length; index += 1) {
-    const value = args[index + 1];
-    if (args[index] === name && value) values.push(value);
-  }
-  return values;
-}
-
-function parseLimit(value: string | null): number | undefined {
-  if (!value) return undefined;
-  const parsed = Number.parseInt(value, 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
-}
-
-function parseNumber(value: string | null): number | undefined {
-  if (!value) return undefined;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined;
-}
-
-function parseMode(value: string | null): LiveMode | null {
-  if (value === "off" || value === "index-only" || value === "suggest-on-failure") return value;
-  return null;
-}
-
-function parseFeedbackAction(value: string | null): FeedbackAction | null {
-  const allowed = new Set<FeedbackAction>(["useful", "wrong-match", "already-solved", "not-useful", "snooze", "silence-pattern", "promote-later", "make-rule", "dismiss"]);
-  return value && allowed.has(value as FeedbackAction) ? value as FeedbackAction : null;
-}
-
-function notify(ctx: PiCommandContext, message: string, level: "info" | "error" | "success" | "warning" = "info"): void {
-  ctx.ui?.notify?.(message, level);
-}
-
-function currentCwd(ctx: PiCommandContext): string | undefined {
-  return ctx.cwd ?? ctx.sessionManager?.getCwd?.();
-}
-
-function formatCaptureStatus(watchStatus: SessionWatchStatus | undefined): string {
-  if (!watchStatus) return "not watching";
-  if (watchStatus.state === "watched-by-another-process") {
-    return `shared watcher; another Pi session is indexing these sources; watched ${watchStatus.watchedPaths.length}; last sync ${watchStatus.lastSyncAt ?? "never"}`;
-  }
-  return `${watchStatus.state}; watched ${watchStatus.watchedPaths.length}; last sync ${watchStatus.lastSyncAt ?? "never"}`;
-}
-
-function resolveCwd(value: string | null, ctx: PiCommandContext): string | undefined {
-  if (!value) return undefined;
-  if (value === "current") return currentCwd(ctx);
-  return value;
-}
-
-function optionlessText(args: string[], optionNames: string[]): string {
-  return args.filter((arg, index) => {
-    const previous = args[index - 1];
-    return !optionNames.includes(arg) && !optionNames.includes(previous ?? "");
-  }).join(" ").trim();
-}
 
 function stateDataDir(state: LiveExtensionState): string {
   return state.dataDir ?? getDefaultDataDir();
@@ -336,7 +215,7 @@ async function recordLiveFailure(params: {
     const outcome = decisionOutcome(decision);
     store.updateOccurrenceSuggestion(occurrence.id, outcome);
     params.state.lastSuppressionReason = outcome.kind === "suppressed" ? outcome.reason : null;
-    if (decision.kind === "suggestion") notify(params.ctx, formatLiveSuggestion(decision), "warning");
+    if (decision.kind === "suggestion") showLiveSuggestion(params.ctx, formatLiveSuggestion(decision));
   } finally {
     store.close();
   }
@@ -915,56 +794,6 @@ async function handleFlightRules(argsText: string, ctx: PiCommandContext, state:
   } finally {
     store.close();
   }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value && typeof value === "object");
-}
-
-function nestedExitCode(value: unknown): number | null {
-  if (!isRecord(value)) return null;
-  const direct = value.exitCode;
-  if (typeof direct === "number") return direct;
-  for (const nested of Object.values(value)) {
-    if (isRecord(nested)) {
-      const found = nestedExitCode(nested);
-      if (found !== null) return found;
-    }
-  }
-  return null;
-}
-
-function toolResultFailed(event: unknown): boolean {
-  if (!isRecord(event)) return false;
-  if (event.isError === true) return true;
-  const exitCode = nestedExitCode(event.details);
-  return exitCode !== null && exitCode !== 0;
-}
-
-function toolResultQuery(event: unknown): string {
-  if (!isRecord(event)) return "";
-  const input = isRecord(event.input) ? event.input : {};
-  const command = typeof input.command === "string" ? input.command : "";
-  const content = contentToText(event.content);
-  const details = event.details ? contentToText(event.details) : "";
-  const toolName = typeof event.toolName === "string" ? event.toolName : "";
-  return [toolName, command, content, details].filter(Boolean).join("\n");
-}
-
-function stringField(value: Record<string, unknown>, name: string): string | null {
-  const field = value[name];
-  return typeof field === "string" ? field : null;
-}
-
-function eventMetadata(event: unknown): { toolName: string | null; command: string | null; entryId: string | null; timestamp: string | null } {
-  if (!isRecord(event)) return { toolName: null, command: null, entryId: null, timestamp: null };
-  const input = isRecord(event.input) ? event.input : {};
-  return {
-    toolName: stringField(event, "toolName"),
-    command: stringField(input, "command"),
-    entryId: stringField(event, "id") ?? stringField(event, "toolCallId") ?? stringField(event, "entryId"),
-    timestamp: stringField(event, "timestamp"),
-  };
 }
 
 async function handleToolResult(event: unknown, ctx: PiCommandContext, state: LiveExtensionState): Promise<void> {

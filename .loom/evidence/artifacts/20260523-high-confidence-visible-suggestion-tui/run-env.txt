@@ -1,0 +1,13 @@
+run_root=/tmp/pfr-visible-highconf-Xsz8BE
+home=/tmp/pfr-visible-highconf-Xsz8BE/home
+workspace=/tmp/pfr-visible-highconf-Xsz8BE/workspace
+agent_dir=/tmp/pfr-visible-highconf-Xsz8BE/home/.pi/agent
+session_dir=/tmp/pfr-visible-highconf-Xsz8BE/home/.pi/agent/sessions
+tui_log_dir=/tmp/pfr-visible-highconf-Xsz8BE/tui-logs
+data_dir=/tmp/pfr-visible-highconf-Xsz8BE/home/.pi/flight-recorder
+source_dir=/tmp/pfr-visible-highconf-Xsz8BE/source-sessions
+provider_extension=/Users/crlough/Code/personal/pi-flight-recorder/.loom/evidence/artifacts/20260523-high-confidence-visible-suggestion-tui/tool-call-provider-extension.ts
+installed_package=/Users/crlough/Code/personal/pi-flight-recorder
+tmux_session=pfr_visible_highconf_1779589541_66196
+command=env -i HOME=<temp-home> PATH=<redacted-path> TERM=xterm-256color SHELL=/bin/bash PI_OFFLINE=1 PI_CODING_AGENT_DIR=<temp-agent-dir> PI_CODING_AGENT_SESSION_DIR=<temp-session-dir> PI_TUI_WRITE_LOG=<temp-tui-log-dir> PFR_LOCAL_STUB_KEY=stub pi --offline --no-skills --no-prompt-templates --no-context-files --no-session --model pfr-local/bash-fail -e <tool-call-provider-extension>
+forced_kill=false

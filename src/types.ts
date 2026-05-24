@@ -248,3 +248,191 @@ export interface FlightRule {
   lastInjectedAt: string | null;
   injectionCount: number;
 }
+
+export type DeltaEvidenceSourceType =
+  | "occurrence"
+  | "episode"
+  | "cluster"
+  | "proposal"
+  | "rule-candidate"
+  | "flight-rule"
+  | "session-entry"
+  | "manual";
+
+export interface DeltaEvidenceRef {
+  sourceType: DeltaEvidenceSourceType;
+  sourceId: string | null;
+  sourceFile: string | null;
+  sessionFile: string | null;
+  cwd: string | null;
+  entryId: string | null;
+  timestamp: string | null;
+  snippet: string | null;
+  note: string | null;
+}
+
+export type ExpectationDeltaSource = "manual" | "detector" | "reflection" | "import";
+export type ExpectationDeltaStatus = "candidate" | "accepted" | "dismissed" | "routed" | "resolved" | "recurring";
+export type ExpectationDeltaSeverity = "low" | "medium" | "high" | "unknown";
+
+export interface ExpectationDelta {
+  id: string;
+  status: ExpectationDeltaStatus;
+  source: ExpectationDeltaSource;
+  summary: string;
+  expectation: string | null;
+  reality: string | null;
+  impact: string | null;
+  severity: ExpectationDeltaSeverity;
+  cwd: string | null;
+  sourceSessionFile: string | null;
+  sourceEntryId: string | null;
+  evidenceRefs: DeltaEvidenceRef[];
+  activeArtifactCandidateId: string | null;
+  statusReason: string | null;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  acceptedAt: string | null;
+  routedAt: string | null;
+  dismissedAt: string | null;
+  resolvedAt: string | null;
+  recurringAt: string | null;
+}
+
+export interface NewExpectationDelta {
+  id?: string;
+  source: ExpectationDeltaSource;
+  summary: string;
+  expectation?: string | null;
+  reality?: string | null;
+  impact?: string | null;
+  severity?: ExpectationDeltaSeverity;
+  cwd?: string | null;
+  sourceSessionFile?: string | null;
+  sourceEntryId?: string | null;
+  evidenceRefs?: DeltaEvidenceRef[];
+  metadata?: Record<string, unknown>;
+  now?: string;
+}
+
+export type DeltaDetectorSignalType =
+  | "manual-capture"
+  | "repeated-tool-failure"
+  | "failed-validation"
+  | "user-correction"
+  | "reversal-retry-loop"
+  | "stale-edit-attempt"
+  | "repeated-clarification"
+  | "reflection-cluster"
+  | "other";
+
+export interface DeltaDetectorSignal {
+  id: string;
+  deltaId: string;
+  type: DeltaDetectorSignalType;
+  explanation: string;
+  confidence: number | null;
+  evidenceRefs: DeltaEvidenceRef[];
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface NewDeltaDetectorSignal {
+  id?: string;
+  deltaId: string;
+  type: DeltaDetectorSignalType;
+  explanation: string;
+  confidence?: number | null;
+  evidenceRefs?: DeltaEvidenceRef[];
+  metadata?: Record<string, unknown>;
+  now?: string;
+}
+
+export type ArtifactCandidateType =
+  | "flight-rule"
+  | "loom-ticket"
+  | "loom-spec"
+  | "loom-research"
+  | "loom-knowledge"
+  | "test-check"
+  | "prompt-context"
+  | "skill-or-template"
+  | "code-legibility"
+  | "observe";
+
+export type ArtifactCandidateStatus =
+  | "candidate"
+  | "pending-review"
+  | "accepted"
+  | "routed"
+  | "dismissed"
+  | "applied"
+  | "resolved"
+  | "recurring";
+
+export type ArtifactCandidateOutcome = "unknown" | "pending" | "helped" | "no-change" | "worse" | "superseded" | "needs-reroute";
+
+export interface ArtifactCandidate {
+  id: string;
+  deltaId: string;
+  artifactType: ArtifactCandidateType;
+  status: ArtifactCandidateStatus;
+  title: string;
+  rationale: string;
+  proposedDraft: string | null;
+  nextStep: string | null;
+  confidence: number | null;
+  limits: string[];
+  evidenceRefs: DeltaEvidenceRef[];
+  applied: boolean;
+  appliedArtifactRef: string | null;
+  outcome: ArtifactCandidateOutcome;
+  outcomeSummary: string | null;
+  supersedesCandidateId: string | null;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+  acceptedAt: string | null;
+  dismissedAt: string | null;
+  appliedAt: string | null;
+  resolvedAt: string | null;
+  recurringAt: string | null;
+}
+
+export interface NewArtifactCandidate {
+  id?: string;
+  deltaId: string;
+  artifactType: ArtifactCandidateType;
+  title: string;
+  rationale: string;
+  proposedDraft?: string | null;
+  nextStep?: string | null;
+  confidence?: number | null;
+  limits?: string[];
+  evidenceRefs?: DeltaEvidenceRef[];
+  supersedesCandidateId?: string | null;
+  metadata?: Record<string, unknown>;
+  routeDelta?: boolean;
+  now?: string;
+}
+
+export interface DeltaRecurrenceLink {
+  id: string;
+  deltaId: string;
+  priorArtifactCandidateId: string;
+  reason: string;
+  similarity: number | null;
+  evidenceRefs: DeltaEvidenceRef[];
+  createdAt: string;
+}
+
+export interface NewDeltaRecurrenceLink {
+  id?: string;
+  deltaId: string;
+  priorArtifactCandidateId: string;
+  reason: string;
+  similarity?: number | null;
+  evidenceRefs?: DeltaEvidenceRef[];
+  now?: string;
+}

@@ -1,0 +1,62 @@
+
+ pi v0.75.5
+ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+[Extensions]
+  pi-extension.js, rule-block-observer-extension.ts
+
+
+ Flight Rules status:
+ Active/disabled rules:
+ - rule_22b8d9a30a3d4d6c [active; global; injected 0]: Before exact-text edit replacements, re-read the target block and use the smallest current oldText; if the block changed, narrow the patch instead of retrying stale text.
+ Keep rule concise.
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/private/tmp/pfr-rule-promotion-workspace-o1QGI1
+0.0%/4.1k (auto)                                                                                                                                                                                                                 stub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

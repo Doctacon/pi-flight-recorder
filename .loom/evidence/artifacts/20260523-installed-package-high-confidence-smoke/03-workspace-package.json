@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "test": "node -e \"console.error('PFR_HIGHCONF_FAILURE'); process.exit(7)\""
+  }
+}

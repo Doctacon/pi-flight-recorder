@@ -1,0 +1,21 @@
+{
+  "candidates": [
+    {
+      "id": "rule_cand_f9de9dbea5029357",
+      "status": "approved",
+      "draftText": "Before exact-text edit replacements, re-read the target block and use the smallest current oldText; if the block changed, narrow the patch instead of retrying stale text. Keep rule concise.",
+      "ruleId": "rule_22b8d9a30a3d4d6c"
+    }
+  ],
+  "rules": [
+    {
+      "id": "rule_22b8d9a30a3d4d6c",
+      "status": "disabled",
+      "scope": "global",
+      "text": "Before exact-text edit replacements, re-read the target block and use the smallest current oldText; if the block changed, narrow the patch instead of retrying stale text. Keep rule concise.",
+      "injectionCount": 1,
+      "lastInjectedAt": "2026-05-24T01:51:01.821Z",
+      "disabledAt": "2026-05-24T01:51:07.840Z"
+    }
+  ]
+}

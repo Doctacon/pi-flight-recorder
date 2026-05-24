@@ -2,9 +2,9 @@
 
 ID: ticket:20260522-live-monitoring-validation-docs
 Type: Ticket
-Status: review
+Status: closed
 Created: 2026-05-22
-Updated: 2026-05-22
+Updated: 2026-05-23
 Risk: low - validation/docs should summarize implemented behavior without changing semantics
 Priority: medium - needed before treating live monitoring as trustworthy
 Depends On: ticket:20260522-watch-cli-controls, ticket:20260522-pi-live-failure-hook
@@ -53,7 +53,9 @@ Validation should include at least one temp-directory watcher flow and one fake-
 
 ## Current State
 
-Implementation appears complete and is in review. Added `docs/live-monitoring.md`, updated README and first-run docs, and recorded `evidence:20260522-live-monitoring-validation` with typecheck/test/build/pack, CLI watch status/stop, foreground watcher smoke, suggestion tests, and fake-Pi validation. No live Pi TUI smoke or separate Ralph audit has been run yet.
+Closed. The live-monitoring implementation review state is reconciled. `evidence:20260522-live-monitoring-validation` supports incremental sync, watcher service, live suggestion decisions, CLI controls, Pi live hook behavior, and validation docs through tests plus CLI watcher smoke. Later real Pi evidence (`evidence:20260523-live-pi-tui-smoke`, `evidence:20260523-installed-package-high-confidence-smoke`, and `evidence:20260523-high-confidence-visible-suggestion-tui`) covers the no-CLI real TUI path, failed `tool_result` capture, reflection rendering, installed-package startup, and visible high-confidence prior-fix suggestion text. `audit:20260523-final-review-state-reconciliation-review` found no material issue with closing stale live-monitoring review tickets.
+
+Residual limits remain outside this ticket: `user_bash` result capture is intentionally deferred because Pi exposes it before execution, real hosted/model-provider reflection is unproven, and long-run corpus precision/noise tuning remains separate.
 
 ## Evidence
 
@@ -64,3 +66,4 @@ Implementation appears complete and is in review. Added `docs/live-monitoring.md
 
 - 2026-05-22: Created ticket with Status `open`. Scope is final validation and documentation for live behavior.
 - 2026-05-22: Added validation docs/evidence and moved ticket to `review`.
+- 2026-05-23: Final review-state reconciliation closed this stale `review` ticket with supporting evidence/audit links; residual provider/corpus limits remain outside this ticket.

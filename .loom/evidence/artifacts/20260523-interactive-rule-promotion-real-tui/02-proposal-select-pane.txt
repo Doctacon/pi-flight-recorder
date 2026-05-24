@@ -1,0 +1,62 @@
+
+ pi v0.75.5
+ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+[Extensions]
+  pi-extension.js, rule-block-observer-extension.ts
+
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+ Choose a Flight Recorder proposal
+
+ → 1. exact-text edit mismatches (0.75) — Before editing, re-read the target block and apply the smallest exact-te ...[truncated] [refl_c70bb44179db5cd8]
+
+ ↑↓ navigate  enter select  escape/ctrl+c cancel
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/private/tmp/pfr-rule-promotion-workspace-o1QGI1
+0.0%/4.1k (auto)                                                                                                                                                                                                                 stub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

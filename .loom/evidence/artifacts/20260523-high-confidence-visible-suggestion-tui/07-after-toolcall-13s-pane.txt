@@ -1,0 +1,62 @@
+
+ pi v0.75.5
+ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+
+
+ [compaction]
+
+ Compacted from 0 tokens (ctrl+o to expand)
+
+
+
+ trigger the high confidence visible suggestion smoke
+
+
+
+ $ npm test
+
+ ... (2 earlier lines, ctrl+o to expand)
+
+ PFR_HIGHCONF_FAILURE
+
+
+ Command exited with code 7
+
+
+ PFR_LOCAL_TOOLCALL_DONE
+
+
+ [compaction]
+
+ Compacted from 0 tokens (ctrl+o to expand)
+
+
+ ⚠ Seen before: likely match (0.82)
+ Failure: `npm test` exited 7: PFR_HIGHCONF_FAILURE
+ Prior fix: Validation passed: npm test
+ Evidence:
+ - session prior-high-confidence, entry prior-fail-0001, cwd <temp-path>, <temp-path>
+ - session prior-high-confidence, entry prior-assistant-0001, cwd <temp-path>, <temp-path>
+ - session prior-high-confidence, entry prior-pass-0001, cwd <temp-path>, <temp-path>
+ Limits:
+ - Prior match is from a different cwd (<temp-path>); inspect before applying in /private/tmp/pfr-visible-highconf-Xsz8BE/workspace.
+ - Likely fix is inferred from later session events; inspect evidence before applying.
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/private/tmp/pfr-visible-highconf-Xsz8BE/workspace
+?/4.1k (auto)                                                                                                                                                                                                               bash-fail
+
+
+
+
+
+
+
+
+
+

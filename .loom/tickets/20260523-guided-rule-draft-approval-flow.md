@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-guided-rule-draft-approval-flow
 Type: Ticket
-Status: review
+Status: closed
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: medium-high - approval turns reflection output into durable behavior state
@@ -66,7 +66,9 @@ Rule drafting constraints:
 
 ## Current State
 
-Implementation is complete and in review. Automated validation evidence is recorded in `evidence:20260523-interactive-rule-promotion-validation`: `npm run typecheck`, `npm test` (13 files, 62 tests), `npm run build`, and `npm pack --dry-run` passed. Follow-up audit `audit:20260523-interactive-rule-promotion-review` returned `concerns` with no material code blockers in the automated scope; real TUI validation remains plan-level blocked follow-up.
+Closed. The Flight Rule implementation review state is reconciled. Automated implementation evidence is recorded in `evidence:20260523-interactive-rule-promotion-validation`, and the original real-TUI blocker is resolved by `evidence:20260523-interactive-rule-promotion-real-tui-validation`. `audit:20260523-interactive-rule-promotion-real-tui-review` returned `clear` for the guided proposal selection, Make Rule draft/edit/scope approval, approved-rule injection, disable, and no-injection-after-disable flow. `audit:20260523-final-review-state-reconciliation-review` found no material issue with closing stale rule-promotion implementation tickets.
+
+Residual limits remain outside this ticket: hosted/real model-provider behavior and long-run corpus tuning are not claimed.
 
 ## Journal
 
@@ -74,3 +76,4 @@ Implementation is complete and in review. Automated validation evidence is recor
 - 2026-05-23: Implemented this slice as part of `plan:20260523-reflection-rule-promotion-ux`; moved to review with evidence `evidence:20260523-interactive-rule-promotion-validation`.
 - 2026-05-23: Follow-up audit `audit:20260523-interactive-rule-promotion-review` returned `concerns` with no material code blockers for this automated implementation scope.
 - 2026-05-23: First real TUI attempt showed action selection lacked proposal context; updated `/flight-review` choices/prompts to include title, summary, likely fix, confidence, and ID, with tests and validation re-run.
+- 2026-05-23: Final review-state reconciliation closed this stale `review` ticket with supporting evidence/audit links; residual provider/corpus limits remain outside this ticket.

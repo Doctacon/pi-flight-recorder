@@ -1,0 +1,6 @@
+/tmp/pfr-installed-highconf-SUwWLA/home/.npm/_logs/2026-05-24T02_14_08_211Z-debug-0.log
+/tmp/pfr-installed-highconf-SUwWLA/home/.npm/_update-notifier-last-checked
+/tmp/pfr-installed-highconf-SUwWLA/home/.pi/agent/auth.json
+/tmp/pfr-installed-highconf-SUwWLA/home/.pi/agent/settings.json
+/tmp/pfr-installed-highconf-SUwWLA/home/.pi/flight-recorder/flight-recorder.db
+/tmp/pfr-installed-highconf-SUwWLA/home/.pi/flight-recorder/live-status.json

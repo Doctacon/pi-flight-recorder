@@ -1,0 +1,9 @@
+run_root=/tmp/pfr-tui-guardrails-0P6H4g
+home=/tmp/pfr-tui-guardrails-0P6H4g/home
+workspace=/tmp/pfr-tui-guardrails-0P6H4g/workspace
+agent_dir=/tmp/pfr-tui-guardrails-0P6H4g/home/.pi/agent
+session_dir=/tmp/pfr-tui-guardrails-0P6H4g/home/.pi/agent/sessions
+tui_log_dir=/tmp/pfr-tui-guardrails-0P6H4g/tui-logs
+tmux_session=pfr_guard_1779586624_12405
+command=env -i HOME=<temp-home> PATH=<redacted-path> TERM=xterm-256color SHELL=/bin/bash PI_OFFLINE=1 PI_CODING_AGENT_DIR=<temp-agent-dir> PI_CODING_AGENT_SESSION_DIR=<temp-session-dir> PI_TUI_WRITE_LOG=<temp-tui-log-dir> pi --offline --no-extensions --no-skills --no-prompt-templates --no-context-files --no-session --no-tools
+forced_kill=false

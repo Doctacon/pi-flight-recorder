@@ -2,9 +2,9 @@
 
 ID: ticket:20260522-extract-failure-fix-episodes
 Type: Ticket
-Status: review
+Status: closed
 Created: 2026-05-22
-Updated: 2026-05-22
+Updated: 2026-05-23
 Risk: medium - heuristic errors can create misleading recovery advice
 Priority: high - this is the core product differentiation
 Depends On: ticket:20260522-ingest-pi-sessions
@@ -65,10 +65,13 @@ Stop if fixture scenarios reveal that resolution inference cannot be made safely
 
 ## Current State
 
-Implementation complete. `src/extractor.ts` detects failed bash/tool events, computes signatures, extracts attempts/resolution evidence on same branch ancestry, redacts secret-looking values, and keeps unresolved failures honest. Extractor tests pass. Evidence is recorded in `evidence:20260522-mvp-validation`. Ready for closure review; no independent Ralph audit has been performed.
+Closed. The MVP implementation review state is reconciled. `evidence:20260522-mvp-validation` supports the scaffold/parser/storage/extractor/query/Pi-wrapper/docs acceptance at fixture/test/build/package level, and later release validation (`npm run typecheck`, `npm test`, `npm run test:smoke:local`, `npm run build`, and `npm pack --dry-run`) passed in the stabilized code shape. `audit:20260523-final-review-state-reconciliation-review` found no material issue with closing stale MVP review tickets while preserving broader limits.
+
+Residual limits remain outside this ticket: full real-corpus precision tuning and hosted/model-provider behavior are not claimed by the MVP closure.
 
 ## Journal
 
 - 2026-05-22: Created ticket with Status `open`. Scope is outcome-aware extraction only; query UX and Pi wrapper are separate.
 
 - 2026-05-22: Implemented the ticket scope and moved Status to `review`. Validation evidence: `evidence:20260522-mvp-validation`. Closure still needs review/audit disposition; residual live-Pi and heuristic-quality limits are explicit where applicable.
+- 2026-05-23: Final review-state reconciliation closed this stale `review` ticket with supporting evidence/audit links; residual provider/corpus limits remain outside this ticket.

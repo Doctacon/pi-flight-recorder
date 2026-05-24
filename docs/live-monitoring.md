@@ -64,6 +64,8 @@ A failed `tool_result` may produce a notification only when:
 - the match is specific enough for a live nudge;
 - confidence clears the configured threshold.
 
+When a failure passes these gates, Flight Recorder shows the prior-fix text as a warning and a visible widget above the editor so the suggestion remains inspectable after the tool result renders.
+
 Suppressed reasons are stored with occurrences, including `no-match`, `unresolved-match`, `broad-match`, `low-confidence`, `cooldown`, `max-suggestions`, and `silenced`.
 
 ## Occurrence ledger
@@ -115,6 +117,13 @@ npm run cli -- reflect --min-count 2
 ```
 
 Foreground CLI watch still uses local polling, debounce, a local lock, and stop-request files. It intentionally does not install an OS daemon.
+
+## Validation limits
+
+Automated tests and local smoke cover live occurrence capture, quiet buffering, reflection, feedback/rule paths, and bounded prompt injection in fake-Pi/source-checkout contexts. Real Pi evidence now covers `/flight-status`, failed `tool_result` capture, `/flight-reflect` rendering, disposable project-local package startup, guided Flight Rule promotion, and visible prior-resolved high-confidence suggestion text. Release evidence still does not prove:
+
+- model-assisted reflection with a real provider;
+- long-run precision/noise tuning over a mature local occurrence corpus.
 
 ## Privacy and limits
 

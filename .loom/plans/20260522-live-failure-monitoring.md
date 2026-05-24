@@ -2,9 +2,9 @@
 
 ID: plan:20260522-live-failure-monitoring
 Type: Plan
-Status: review
+Status: completed
 Created: 2026-05-22
-Updated: 2026-05-22
+Updated: 2026-05-23
 Risk: medium - adds long-running watcher state, live Pi event handling, and user-facing automatic suggestions
 
 ## Summary
@@ -116,10 +116,13 @@ Docs and evidence explain how to use the feature, what was validated, and what r
 
 ## Current State
 
-Plan implementation appears complete and is in review. All six child tickets are in `review`, and `evidence:20260522-live-monitoring-validation` records typecheck/test/build/package checks plus CLI watcher smoke. Remaining review limits: no live Pi TUI smoke was run, no separate Ralph audit was run, and `user_bash` result observation is explicitly deferred.
+Completed. All six child tickets are closed after final review-state reconciliation. The live-monitoring closure is supported by `evidence:20260522-live-monitoring-validation`, later real Pi evidence for `/flight-status`, failed `tool_result` capture, `/flight-reflect`, installed-package startup, and visible high-confidence suggestion text, plus `audit:20260523-final-review-state-reconciliation-review`.
+
+The completed live-monitoring claim remains narrow: foreground/polling watcher, live `tool_result` capture/suggestion, CLI controls, and docs are validated. It does not claim `user_bash` result wrapping, hosted/model-provider reflection, or long-run corpus precision tuning.
 
 ## Journal
 
 - 2026-05-22: Created plan with Status `open`, based on SocratiCode watcher/Pi event research and active Live Failure Monitoring spec. Created six child tickets and linked them from execution units.
 - 2026-05-22: Moved plan to `active` at operator request to implement the live failure monitoring plan and tickets.
 - 2026-05-22: Moved plan to `review` after implementing child tickets, updating docs, and recording validation evidence.
+- 2026-05-23: Final review-state reconciliation closed all live-monitoring child tickets and set plan status to `completed`; `user_bash`, provider, and long-run corpus limits remain explicit outside this plan.

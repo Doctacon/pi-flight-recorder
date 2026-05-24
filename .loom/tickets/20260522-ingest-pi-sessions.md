@@ -2,9 +2,9 @@
 
 ID: ticket:20260522-ingest-pi-sessions
 Type: Ticket
-Status: review
+Status: closed
 Created: 2026-05-22
-Updated: 2026-05-22
+Updated: 2026-05-23
 Risk: medium - parser correctness affects all downstream episode evidence
 Priority: high - storage and extraction depend on parsed session events
 Depends On: ticket:20260522-bootstrap-project-scaffold
@@ -60,10 +60,13 @@ Stop if Pi session format docs conflict with observed fixture/source reality; ro
 
 ## Current State
 
-Implementation complete. `src/session-parser.ts` parses Pi JSONL fixtures, preserves source refs, warnings, bash/tool events, and branch ancestry. Parser tests pass. Evidence is recorded in `evidence:20260522-mvp-validation`. Ready for closure review; no independent Ralph audit has been performed.
+Closed. The MVP implementation review state is reconciled. `evidence:20260522-mvp-validation` supports the scaffold/parser/storage/extractor/query/Pi-wrapper/docs acceptance at fixture/test/build/package level, and later release validation (`npm run typecheck`, `npm test`, `npm run test:smoke:local`, `npm run build`, and `npm pack --dry-run`) passed in the stabilized code shape. `audit:20260523-final-review-state-reconciliation-review` found no material issue with closing stale MVP review tickets while preserving broader limits.
+
+Residual limits remain outside this ticket: full real-corpus precision tuning and hosted/model-provider behavior are not claimed by the MVP closure.
 
 ## Journal
 
 - 2026-05-22: Created ticket with Status `open`. Scope is parser/event model only; extraction and storage are separate tickets.
 
 - 2026-05-22: Implemented the ticket scope and moved Status to `review`. Validation evidence: `evidence:20260522-mvp-validation`. Closure still needs review/audit disposition; residual live-Pi and heuristic-quality limits are explicit where applicable.
+- 2026-05-23: Final review-state reconciliation closed this stale `review` ticket with supporting evidence/audit links; residual provider/corpus limits remain outside this ticket.

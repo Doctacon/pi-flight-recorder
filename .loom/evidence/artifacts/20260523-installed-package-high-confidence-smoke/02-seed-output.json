@@ -1,0 +1,126 @@
+{
+  "workspace": "/tmp/pfr-installed-highconf-SUwWLA/workspace",
+  "dataDir": "/tmp/pfr-installed-highconf-SUwWLA/home/.pi/flight-recorder",
+  "sourceDir": "/tmp/pfr-installed-highconf-SUwWLA/source-sessions",
+  "sessionPath": "/tmp/pfr-installed-highconf-SUwWLA/source-sessions/prior-high-confidence.jsonl",
+  "syncResult": {
+    "dataDir": "/tmp/pfr-installed-highconf-SUwWLA/home/.pi/flight-recorder",
+    "dbPath": "/tmp/pfr-installed-highconf-SUwWLA/home/.pi/flight-recorder/flight-recorder.db",
+    "sourceFile": "/tmp/pfr-installed-highconf-SUwWLA/source-sessions/prior-high-confidence.jsonl",
+    "indexed": true,
+    "skipped": false,
+    "episodesExtracted": 1,
+    "newEpisodeIds": [
+      "ep_70da13e85de121ce"
+    ],
+    "warnings": 0,
+    "parseWarnings": []
+  },
+  "counts": {
+    "sourceFiles": 1,
+    "episodes": 1,
+    "occurrences": 0
+  },
+  "episode": {
+    "id": "ep_70da13e85de121ce",
+    "sourceFile": "/tmp/pfr-installed-highconf-SUwWLA/source-sessions/prior-high-confidence.jsonl",
+    "signature": "npm test exit num npm test",
+    "problemSummary": "`npm test` exited 7: PFR_HIGHCONF_FAILURE",
+    "status": "resolved",
+    "confidence": 0.8999999999999999,
+    "cwd": "<temp-path>",
+    "sessionId": "prior-high-confidence",
+    "sourceRefs": [
+      {
+        "sourceFile": "<temp-path>",
+        "lineNumber": 2,
+        "sessionId": "prior-high-confidence",
+        "cwd": "<temp-path>",
+        "entryId": "prior-fail-0001",
+        "parentId": null,
+        "timestamp": "2026-05-23T01:00:02.000Z",
+        "entryType": "message",
+        "role": "bashExecution",
+        "ancestry": [
+          "prior-fail-0001"
+        ]
+      },
+      {
+        "sourceFile": "<temp-path>",
+        "lineNumber": 3,
+        "sessionId": "prior-high-confidence",
+        "cwd": "<temp-path>",
+        "entryId": "prior-assistant-0001",
+        "parentId": "prior-fail-0001",
+        "timestamp": "2026-05-23T01:00:03.000Z",
+        "entryType": "message",
+        "role": "assistant",
+        "ancestry": [
+          "prior-fail-0001",
+          "prior-assistant-0001"
+        ]
+      },
+      {
+        "sourceFile": "<temp-path>",
+        "lineNumber": 4,
+        "sessionId": "prior-high-confidence",
+        "cwd": "<temp-path>",
+        "entryId": "prior-pass-0001",
+        "parentId": "prior-assistant-0001",
+        "timestamp": "2026-05-23T01:00:04.000Z",
+        "entryType": "message",
+        "role": "bashExecution",
+        "ancestry": [
+          "prior-fail-0001",
+          "prior-assistant-0001",
+          "prior-pass-0001"
+        ]
+      }
+    ],
+    "observed": "npm test\nPFR_HIGHCONF_FAILURE\n\n$ npm test\nPFR_HIGHCONF_FAILURE",
+    "attempts": [
+      {
+        "summary": "Try the narrow smoke fix and rerun the same validation command.",
+        "sourceRef": {
+          "sourceFile": "<temp-path>",
+          "lineNumber": 3,
+          "sessionId": "prior-high-confidence",
+          "cwd": "<temp-path>",
+          "entryId": "prior-assistant-0001",
+          "parentId": "prior-fail-0001",
+          "timestamp": "2026-05-23T01:00:03.000Z",
+          "entryType": "message",
+          "role": "assistant",
+          "ancestry": [
+            "prior-fail-0001",
+            "prior-assistant-0001"
+          ]
+        }
+      }
+    ],
+    "resolution": {
+      "summary": "Validation passed: npm test",
+      "sourceRef": {
+        "sourceFile": "<temp-path>",
+        "lineNumber": 4,
+        "sessionId": "prior-high-confidence",
+        "cwd": "<temp-path>",
+        "entryId": "prior-pass-0001",
+        "parentId": "prior-assistant-0001",
+        "timestamp": "2026-05-23T01:00:04.000Z",
+        "entryType": "message",
+        "role": "bashExecution",
+        "ancestry": [
+          "prior-fail-0001",
+          "prior-assistant-0001",
+          "prior-pass-0001"
+        ]
+      }
+    },
+    "files": [],
+    "limits": [
+      "Likely fix is inferred from later session events; inspect evidence before applying."
+    ],
+    "searchText": "npm test exit num npm test\n`npm test` exited 7: PFR_HIGHCONF_FAILURE\nnpm test\nPFR_HIGHCONF_FAILURE\n\n$ npm test\nPFR_HIGHCONF_FAILURE\nTry the narrow smoke fix and rerun the same validation command.\nValidation passed: npm test"
+  }
+}

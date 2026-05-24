@@ -1,0 +1,62 @@
+
+ pi v0.75.5
+ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+[Extensions]
+  pi-extension.js, tool-call-provider-extension.ts
+
+
+ Flight recorder: suggest-on-failure (autostart on)
+ Data dir: /tmp/pfr-visible-highconf-Xsz8BE/home/.pi/flight-recorder
+ Capture/index: active; watched 0; last sync never
+ Failures captured: 0; last occurrence: none
+ Suggestions: minConfidence=0.78, emittedInWindow=0, last=none, last suppression=none
+ Reflection: session-end=true, daily=false, model=disabled
+ Flight Rules: active=0, pending=0, last injected=none
+ User-bash capture: disabled (Pi user_bash is pre-execution; command semantics are not wrapped).
+ Errors: none
+ Recent feedback: none
+ Privacy: local SQLite only by default; no model calls unless `/flight-reflect --model` or model reflection is enabled.
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/private/tmp/pfr-visible-highconf-Xsz8BE/workspace
+0.0%/4.1k (auto)                                                                                                                                                                                                            bash-fail
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

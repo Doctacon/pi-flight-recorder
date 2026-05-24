@@ -1,0 +1,2 @@
+/tmp/pfr-visible-highconf-Xsz8BE/workspace/.pi/settings.json
+/tmp/pfr-visible-highconf-Xsz8BE/workspace/package.json

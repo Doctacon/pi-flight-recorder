@@ -1,10 +1,40 @@
-import { createHash } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { existsSync, mkdirSync } from "node:fs";
 import { homedir } from "node:os";
 import path from "node:path";
 import { DatabaseSync, type StatementSync } from "node:sqlite";
 import { compactSnippet, redactLocalPaths, sanitizeStoredText } from "./redact.js";
+import {
+  cwdIsInsideProject,
+  hash,
+  json,
+  rowToArtifactCandidate,
+  rowToCluster,
+  rowToDeltaDetectorSignal,
+  rowToDeltaRecurrenceLink,
+  rowToEpisode,
+  rowToExpectationDelta,
+  rowToFeedback,
+  rowToFlightRule,
+  rowToOccurrence,
+  rowToProposal,
+  rowToRuleCandidate,
+  sanitizeDeltaEvidenceRefs,
+  sanitizeEpisodeForStorage,
+  sanitizeEvidenceRefs,
+  sanitizeMetadata,
+  type ArtifactCandidateRow,
+  type DeltaDetectorSignalRow,
+  type DeltaRecurrenceLinkRow,
+  type EpisodeRow,
+  type ExpectationDeltaRow,
+  type FailureClusterRow,
+  type FeedbackActionRow,
+  type FlightRuleRow,
+  type OccurrenceRow,
+  type ReflectionProposalRow,
+  type RuleCandidateRow,
+} from "./storage-mappers.js";
 import { normalizeFailureSignature } from "./signatures.js";
 import type {
   ClusterEvidenceRef,
@@ -25,7 +55,6 @@ import type {
   ReflectionProposal,
   RuleCandidateStatus,
   SessionEvent,
-  SourceRef,
   SuggestionOutcome,
 } from "./types.js";
 
@@ -62,310 +91,6 @@ export interface ClusterListOptions {
   limit?: number;
   status?: FailureClusterStatus;
   minCount?: number;
-}
-
-interface EpisodeRow {
-  id: string;
-  sourceFile: string;
-  signature: string;
-  problemSummary: string;
-  status: string;
-  confidence: number;
-  cwd: string | null;
-  sessionId: string | null;
-  sourceRefsJson: string;
-  observed: string;
-  attemptsJson: string;
-  resolutionJson: string | null;
-  filesJson: string;
-  limitsJson: string;
-  searchText: string;
-}
-
-interface OccurrenceRow {
-  id: string;
-  dedupeKey: string;
-  source: string;
-  toolName: string | null;
-  command: string | null;
-  cwd: string | null;
-  sessionFile: string | null;
-  entryId: string | null;
-  timestamp: string | null;
-  signature: string;
-  queryPreview: string;
-  snippet: string;
-  repeatCount: number;
-  firstSeenAt: string;
-  lastSeenAt: string;
-  suggestionJson: string | null;
-  dataJson: string;
-}
-
-interface FeedbackActionRow {
-  id: number;
-  targetType: string;
-  targetId: string;
-  action: string;
-  signature: string | null;
-  note: string | null;
-  expiresAt: string | null;
-  createdAt: string;
-}
-
-interface FailureClusterRow {
-  id: string;
-  clusterKey: string;
-  title: string;
-  representativeSignature: string;
-  status: string;
-  count: number;
-  occurrenceIdsJson: string;
-  cwdSummaryJson: string;
-  toolsJson: string;
-  firstSeenAt: string;
-  lastSeenAt: string;
-  lastReflectedAt: string | null;
-  score: number;
-}
-
-interface ReflectionProposalRow {
-  id: string;
-  clusterId: string;
-  generatedAt: string;
-  mode: string;
-  title: string;
-  summary: string;
-  affectedJson: string;
-  likelyFix: string;
-  confidence: number;
-  evidenceJson: string;
-  limitsJson: string;
-  actionsJson: string;
-}
-
-interface RuleCandidateRow {
-  id: string;
-  sourceType: string;
-  sourceId: string;
-  clusterId: string | null;
-  status: string;
-  draftText: string;
-  proposedScope: string;
-  projectRoot: string | null;
-  projectRootDisplay: string | null;
-  evidenceJson: string;
-  evidenceCount: number;
-  ruleId: string | null;
-  createdAt: string;
-  updatedAt: string;
-  approvedAt: string | null;
-  rejectedAt: string | null;
-}
-
-interface FlightRuleRow {
-  id: string;
-  candidateId: string;
-  sourceProposalId: string;
-  clusterId: string | null;
-  scope: string;
-  projectRoot: string | null;
-  projectRootDisplay: string | null;
-  text: string;
-  status: string;
-  createdAt: string;
-  updatedAt: string;
-  disabledAt: string | null;
-  lastInjectedAt: string | null;
-  injectionCount: number;
-}
-
-function json(value: unknown): string {
-  return JSON.stringify(value);
-}
-
-function parseJson<T>(value: string, fallback: T): T {
-  try {
-    return JSON.parse(value) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function hash(value: string, length = 16): string {
-  return createHash("sha256").update(value).digest("hex").slice(0, length);
-}
-
-function sanitizeSourceRef(ref: SourceRef): SourceRef {
-  return {
-    ...ref,
-    sourceFile: redactLocalPaths(ref.sourceFile),
-    cwd: ref.cwd ? redactLocalPaths(ref.cwd) : ref.cwd,
-  };
-}
-
-function sanitizeEpisodeForStorage(episode: FailureEpisode): FailureEpisode {
-  return {
-    ...episode,
-    signature: sanitizeStoredText(episode.signature, 500),
-    problemSummary: sanitizeStoredText(episode.problemSummary, 300),
-    cwd: episode.cwd ? redactLocalPaths(episode.cwd) : episode.cwd,
-    sourceRefs: episode.sourceRefs.map(sanitizeSourceRef),
-    observed: sanitizeStoredText(episode.observed, 1_200),
-    attempts: episode.attempts.map((attempt) => ({ ...attempt, summary: sanitizeStoredText(attempt.summary, 300), sourceRef: sanitizeSourceRef(attempt.sourceRef) })),
-    resolution: episode.resolution ? { ...episode.resolution, summary: sanitizeStoredText(episode.resolution.summary, 300), sourceRef: sanitizeSourceRef(episode.resolution.sourceRef) } : null,
-    files: episode.files.map(redactLocalPaths),
-    limits: episode.limits.map((limit) => sanitizeStoredText(limit, 300)),
-    searchText: sanitizeStoredText(episode.searchText, 2_000),
-  };
-}
-
-function rowToEpisode(row: EpisodeRow): FailureEpisode {
-  return {
-    id: row.id,
-    sourceFile: row.sourceFile,
-    signature: row.signature,
-    problemSummary: row.problemSummary,
-    status: row.status === "resolved" ? "resolved" : "unresolved",
-    confidence: row.confidence,
-    cwd: row.cwd,
-    sessionId: row.sessionId,
-    sourceRefs: parseJson<SourceRef[]>(row.sourceRefsJson, []),
-    observed: row.observed,
-    attempts: parseJson(row.attemptsJson, []),
-    resolution: row.resolutionJson ? parseJson(row.resolutionJson, null) : null,
-    files: parseJson<string[]>(row.filesJson, []),
-    limits: parseJson<string[]>(row.limitsJson, []),
-    searchText: row.searchText,
-  };
-}
-
-function rowToOccurrence(row: OccurrenceRow): LiveFailureOccurrence {
-  return {
-    id: row.id,
-    dedupeKey: row.dedupeKey,
-    source: row.source as LiveFailureOccurrence["source"],
-    toolName: row.toolName,
-    command: row.command,
-    cwd: row.cwd,
-    sessionFile: row.sessionFile,
-    entryId: row.entryId,
-    timestamp: row.timestamp,
-    signature: row.signature,
-    queryPreview: row.queryPreview,
-    snippet: row.snippet,
-    repeatCount: row.repeatCount,
-    firstSeenAt: row.firstSeenAt,
-    lastSeenAt: row.lastSeenAt,
-    suggestion: row.suggestionJson ? parseJson<SuggestionOutcome | null>(row.suggestionJson, null) : null,
-    data: parseJson<Record<string, unknown>>(row.dataJson, {}),
-  };
-}
-
-function rowToFeedback(row: FeedbackActionRow): FeedbackActionRecord {
-  return {
-    id: row.id,
-    targetType: row.targetType as FeedbackTargetType,
-    targetId: row.targetId,
-    action: row.action as FeedbackAction,
-    signature: row.signature,
-    note: row.note,
-    expiresAt: row.expiresAt,
-    createdAt: row.createdAt,
-  };
-}
-
-function rowToCluster(row: FailureClusterRow): FailureCluster {
-  return {
-    id: row.id,
-    clusterKey: row.clusterKey,
-    title: row.title,
-    representativeSignature: row.representativeSignature,
-    status: row.status as FailureClusterStatus,
-    count: row.count,
-    occurrenceIds: parseJson<string[]>(row.occurrenceIdsJson, []),
-    cwdSummary: parseJson<string[]>(row.cwdSummaryJson, []),
-    tools: parseJson<string[]>(row.toolsJson, []),
-    firstSeenAt: row.firstSeenAt,
-    lastSeenAt: row.lastSeenAt,
-    lastReflectedAt: row.lastReflectedAt,
-    score: row.score,
-  };
-}
-
-function rowToProposal(row: ReflectionProposalRow): ReflectionProposal {
-  return {
-    id: row.id,
-    clusterId: row.clusterId,
-    generatedAt: row.generatedAt,
-    mode: row.mode === "model-assisted" ? "model-assisted" : "local",
-    title: row.title,
-    summary: row.summary,
-    affected: parseJson<string[]>(row.affectedJson, []),
-    likelyFix: row.likelyFix,
-    confidence: row.confidence,
-    evidence: parseJson<ClusterEvidenceRef[]>(row.evidenceJson, []),
-    limits: parseJson<string[]>(row.limitsJson, []),
-    actions: parseJson<FeedbackAction[]>(row.actionsJson, []),
-  };
-}
-
-function ruleScope(value: string): FlightRuleScope {
-  return value === "project" ? "project" : "global";
-}
-
-function rowToRuleCandidate(row: RuleCandidateRow): FlightRuleCandidate {
-  return {
-    id: row.id,
-    sourceType: "proposal",
-    sourceId: row.sourceId,
-    clusterId: row.clusterId,
-    status: row.status === "approved" ? "approved" : row.status === "rejected" ? "rejected" : "draft",
-    draftText: row.draftText,
-    proposedScope: ruleScope(row.proposedScope),
-    projectRoot: row.projectRoot,
-    projectRootDisplay: row.projectRootDisplay,
-    evidenceJson: parseJson<ClusterEvidenceRef[]>(row.evidenceJson, []),
-    evidenceCount: row.evidenceCount,
-    ruleId: row.ruleId,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-    approvedAt: row.approvedAt,
-    rejectedAt: row.rejectedAt,
-  };
-}
-
-function rowToFlightRule(row: FlightRuleRow): FlightRule {
-  return {
-    id: row.id,
-    candidateId: row.candidateId,
-    sourceProposalId: row.sourceProposalId,
-    clusterId: row.clusterId,
-    scope: ruleScope(row.scope),
-    projectRoot: row.projectRoot,
-    projectRootDisplay: row.projectRootDisplay,
-    text: row.text,
-    status: row.status === "disabled" ? "disabled" : "active",
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-    disabledAt: row.disabledAt,
-    lastInjectedAt: row.lastInjectedAt,
-    injectionCount: row.injectionCount,
-  };
-}
-
-function sanitizeEvidenceRefs(evidence: ClusterEvidenceRef[]): ClusterEvidenceRef[] {
-  return evidence.slice(0, 10).map((item) => ({
-    ...item,
-    cwd: item.cwd ? redactLocalPaths(item.cwd) : item.cwd,
-    sessionFile: item.sessionFile ? redactLocalPaths(item.sessionFile) : item.sessionFile,
-    snippet: sanitizeStoredText(item.snippet, 500),
-  }));
-}
-
-function cwdIsInsideProject(cwd: string, projectRoot: string): boolean {
-  const relative = path.relative(path.resolve(projectRoot), path.resolve(cwd));
-  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
 }
 
 export function getDefaultDataDir(): string {

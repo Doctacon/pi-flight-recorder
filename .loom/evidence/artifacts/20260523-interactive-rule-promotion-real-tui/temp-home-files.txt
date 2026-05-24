@@ -1,0 +1,4 @@
+/tmp/pfr-rule-promotion-real-tui-IcvMyL/home/.pi/agent/auth.json
+/tmp/pfr-rule-promotion-real-tui-IcvMyL/home/.pi/agent/settings.json
+/tmp/pfr-rule-promotion-real-tui-IcvMyL/home/.pi/flight-recorder/flight-recorder.db
+/tmp/pfr-rule-promotion-real-tui-IcvMyL/home/.pi/flight-recorder/live-status.json

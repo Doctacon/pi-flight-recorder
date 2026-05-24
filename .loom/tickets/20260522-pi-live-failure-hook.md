@@ -2,9 +2,9 @@
 
 ID: ticket:20260522-pi-live-failure-hook
 Type: Ticket
-Status: review
+Status: closed
 Created: 2026-05-22
-Updated: 2026-05-22
+Updated: 2026-05-23
 Risk: medium - Pi event timing and notification noise affect active user workflow
 Priority: high - this delivers the imagined “command fails → seen before” behavior inside Pi
 Depends On: ticket:20260522-live-suggestion-engine
@@ -60,7 +60,9 @@ The hook should use `tool_result` for assistant tool failures and `user_bash` or
 
 ## Current State
 
-Implementation appears complete and is in review. Added `/flight-mode`, `/flight-watch`, live `tool_result` handling, immediate suggestion lookup, delayed current-session sync, and fake-Pi tests asserting tool-result non-mutation. `user_bash` is registered as a future seam but result observation is explicitly deferred because Pi fires it before execution and wrapping shell operations could alter command semantics. No live Pi TUI smoke or separate Ralph audit has been run yet.
+Closed. The live-monitoring implementation review state is reconciled. `evidence:20260522-live-monitoring-validation` supports incremental sync, watcher service, live suggestion decisions, CLI controls, Pi live hook behavior, and validation docs through tests plus CLI watcher smoke. Later real Pi evidence (`evidence:20260523-live-pi-tui-smoke`, `evidence:20260523-installed-package-high-confidence-smoke`, and `evidence:20260523-high-confidence-visible-suggestion-tui`) covers the no-CLI real TUI path, failed `tool_result` capture, reflection rendering, installed-package startup, and visible high-confidence prior-fix suggestion text. `audit:20260523-final-review-state-reconciliation-review` found no material issue with closing stale live-monitoring review tickets.
+
+Residual limits remain outside this ticket: `user_bash` result capture is intentionally deferred because Pi exposes it before execution, real hosted/model-provider reflection is unproven, and long-run corpus precision/noise tuning remains separate.
 
 ## Evidence
 
@@ -72,3 +74,4 @@ Implementation appears complete and is in review. Added `/flight-mode`, `/flight
 
 - 2026-05-22: Created ticket with Status `open`. Scope is Pi live observation/notification, not file watcher daemon.
 - 2026-05-22: Implemented Pi live hook and moved ticket to `review` with fake-Pi validation evidence; user-bash result wrapping remains deferred and documented.
+- 2026-05-23: Final review-state reconciliation closed this stale `review` ticket with supporting evidence/audit links; residual provider/corpus limits remain outside this ticket.

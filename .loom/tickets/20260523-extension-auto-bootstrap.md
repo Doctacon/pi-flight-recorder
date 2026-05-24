@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-extension-auto-bootstrap
 Type: Ticket
-Status: review
+Status: closed
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: medium - changes default extension lifecycle and background behavior inside Pi
@@ -55,9 +55,9 @@ Bootstrap should treat package installation/enabling as the user opt-in. Default
 
 ## Current State
 
-Implementation is complete and in review. The extension now defaults to persisted autostart settings, handles `session_start`, starts quiet local indexing/capture in the background, exposes `/flight-status`, and persists pause/resume/disable/mode controls. Evidence: `evidence:20260523-seamless-ux-validation` OBS-001, OBS-002.
+Closed. The seamless UX implementation review state is reconciled for this ticket's bounded slice. Implementation validation is recorded across `evidence:20260523-seamless-ux-validation`, `evidence:20260523-live-pi-tui-smoke`, `evidence:20260523-findings-fix-validation`, `evidence:20260523-installed-package-high-confidence-smoke`, and `evidence:20260523-high-confidence-visible-suggestion-tui`. `audit:20260523-seamless-ux-followup-review` cleared FIND-001 through FIND-005, and `audit:20260523-high-confidence-visible-suggestion-review` cleared the remaining visible high-confidence suggestion gap. `audit:20260523-final-review-state-reconciliation-review` found no material issue with closing stale seamless implementation tickets.
 
-Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`; FIND-002 addressed by live Pi TUI smoke in `evidence:20260523-live-pi-tui-smoke`; FIND-004 addressed by centralized `switchDataDir` watcher stop/reset behavior and regression test in `evidence:20260523-findings-fix-validation` OBS-005. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope; remaining residual gaps are tracked as non-blocking follow-up/tuning unless this ticket explicitly covers high-confidence notification smoke or long-run corpus evaluation.
+Residual limits remain routed to `ticket:20260523-real-corpus-evaluation-and-tuning` and `plan:20260523-seamless-failure-memory-ux`: hosted/real model-provider reflection and long-run corpus precision/noise tuning are not claimed here.
 
 ## Journal
 
@@ -66,3 +66,4 @@ Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`
 - 2026-05-23: Review run recorded `audit:20260523-seamless-ux-review` with verdict `changes-needed`; pending disposition: FIND-002, FIND-004.
 - 2026-05-23: Dispositioned review finding(s) for this ticket with `evidence:20260523-live-pi-tui-smoke` and/or `evidence:20260523-findings-fix-validation`; follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` in the inspected scope; residual high-confidence notification/model-provider/long-run tuning gaps remain as follow-up where applicable.
 - 2026-05-23: Fixed multi-session autostart lock contention by treating duplicate watcher ownership as shared indexing instead of degraded startup; evidence in `evidence:20260523-shared-watcher-validation`.
+- 2026-05-23: Final review-state reconciliation closed this stale `review` ticket with supporting evidence/audit links; residual provider/corpus limits remain outside this ticket.

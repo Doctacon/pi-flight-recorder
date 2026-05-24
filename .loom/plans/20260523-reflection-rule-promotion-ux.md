@@ -2,7 +2,7 @@
 
 ID: plan:20260523-reflection-rule-promotion-ux
 Type: Plan
-Status: active
+Status: completed
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: medium-high - approved rules can affect future agent behavior, so UX must be explicit, reversible, bounded, and well-evidenced
@@ -174,21 +174,11 @@ Additional evidence expectations:
 
 ## Current State
 
-Plan is active. Implementation is complete for the data model, interactive primitives, guided proposal action flow, guided rule draft/approval flow, approved-rule injection, and management/export fallback commands. Those child tickets are in `review` with automated evidence in `evidence:20260523-interactive-rule-promotion-validation`.
+Completed. All child tickets are closed, including the original real-TUI validation ticket. The plan is supported by automated implementation evidence in `evidence:20260523-interactive-rule-promotion-validation`, real interactive TUI evidence in `evidence:20260523-interactive-rule-promotion-real-tui-validation`, clear audit `audit:20260523-interactive-rule-promotion-real-tui-review`, and final reconciliation audit `audit:20260523-final-review-state-reconciliation-review`.
 
-Implemented outcomes:
+Completed outcomes include rule candidate/active-rule storage, Pi-native review/approval UI, approved-rule injection, rule management/export fallback commands, and real TUI validation of proposal selection, Make Rule, draft edit, approval, injection, disable, and no-injection-after-disable.
 
-- rule candidate and active Flight Rule schema/storage APIs;
-- Pi-native selection/editor helper abstraction;
-- `/flight-review` and `/flight-reflect --interactive` guided proposal action flow;
-- `make-rule` candidate creation, draft edit, scope selection, and approval;
-- bounded `before_agent_start` injection of approved relevant rules;
-- `/flight-rules pending|status|show|approve|reject|disable|export` fallback controls;
-- docs and automated tests.
-
-Validation passed: `npm run typecheck`, `npm test` (13 files, 62 tests), `npm run build`, and `npm pack --dry-run`.
-
-Plan-level blocker: `ticket:20260523-interactive-rule-promotion-tui-validation` remains blocked until the guided flow is exercised in a real interactive Pi TUI and captured as evidence. Follow-up audit `audit:20260523-interactive-rule-promotion-review` returned `concerns`: no material code blockers in the automated implementation scope, but real TUI validation remains required before completion unless explicitly deferred.
+Residual limits outside this completed plan: hosted/real model-provider behavior and long-run corpus tuning are not claimed.
 
 ## Journal
 
@@ -196,3 +186,5 @@ Plan-level blocker: `ticket:20260523-interactive-rule-promotion-tui-validation` 
 - 2026-05-23: Reworked plan around operator direction that promotion should use an interactive ask-user-question-style Pi TUI flow rather than requiring commands for every step. Created child tickets for storage, interactive primitives, guided actions, guided approval, injection, management/export, and real TUI validation.
 - 2026-05-23: Implemented all non-real-TUI slices and recorded automated validation in `evidence:20260523-interactive-rule-promotion-validation`. Plan remains active/blocker-bound on real interactive Pi TUI validation.
 - 2026-05-23: Ran follow-up Ralph review `audit:20260523-interactive-rule-promotion-review`; verdict `concerns` with no material code blockers in automated scope and real TUI validation still outstanding.
+- 2026-05-23: Real interactive Pi TUI validation completed through `ticket:20260523-interactive-rule-promotion-tui-validation`; evidence and clear audit recorded. Moved plan to `review` because the real-TUI blocker is resolved and only stale child-ticket review reconciliation remains.
+- 2026-05-23: Final review-state reconciliation closed the stale rule-promotion implementation tickets and set plan status to `completed`.

@@ -1,0 +1,8 @@
+database_path=/tmp/pfr-rule-promotion-fixture-data-maS4qw/flight-recorder.db
+DB tables:
+failure_occurrences: 2
+failure_clusters: 1
+reflection_proposals: 1
+rule_candidates: 0
+flight_rules: 0
+{"id":"refl_c70bb44179db5cd8","title":"Pattern: exact-text edit mismatches","confidence":0.75}

@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-seamless-install-and-real-pi-smoke
 Type: Ticket
-Status: review
+Status: closed
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: medium - validates actual Pi package lifecycle instead of fake harness only
@@ -54,9 +54,16 @@ This ticket should use a real Pi run if possible. If a live Pi TUI smoke cannot 
 
 ## Current State
 
-Implementation/package validation is partially complete and in review. Build, package dry-run, and `pi install . -l` project-local install succeeded. Interactive Pi TUI smoke for `/flight-status`, live notification rendering, and live no-CLI capture remains unverified in this harness. Evidence: `evidence:20260523-seamless-ux-validation` OBS-003, OBS-004.
+Review. Focused follow-up smoke is recorded in `evidence:20260523-installed-package-high-confidence-smoke`. It used disposable `HOME`, `PI_CODING_AGENT_DIR`, `PI_CODING_AGENT_SESSION_DIR`, workspace, and data dir; installed the package with `pi install /Users/crlough/Code/personal/pi-flight-recorder -l`; started a real interactive Pi TUI from project settings without `--no-extensions`; loaded Flight Recorder as `pi-extension.js`; rendered `/flight-status`; triggered a harmless failed Pi bash tool call through a local no-network helper provider; recorded one live occurrence; and status/DB showed `kind=suggested`, `emittedInWindow=1`, and `last=ep_70da13e85de121ce`.
 
-Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`; FIND-002 addressed for `/flight-status`, live failed `tool_result` capture, and `/flight-reflect` in a real Pi TUI session. Evidence: `evidence:20260523-live-pi-tui-smoke`. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope; remaining residual gaps are tracked as non-blocking follow-up/tuning unless this ticket explicitly covers high-confidence notification smoke or long-run corpus evaluation.
+Acceptance support:
+
+- ACC-001: supported by `01-pi-install-output.txt`, `03-project-settings.json`, and `05-startup-pane.txt`.
+- ACC-002: supported by `06-status-before-pane.txt`.
+- ACC-003: supported by `08-status-after-pane.txt` and `09-db-after.json`.
+- ACC-004: docs were updated in README, `docs/first-run.md`, and `docs/live-monitoring.md` to reflect installed-package and real-TUI rule-promotion evidence while preserving high-confidence notification rendering, real-provider, and long-run corpus limits.
+
+Audit `audit:20260523-release-readiness-followup-review` returned `concerns` only for the high-confidence visible-notification rendering claim, which is outside this ticket's narrow installed-package/no-CLI closure claim. This ticket is closed with a narrow claim: disposable project-local package install/startup, installed-extension `/flight-status`, real Pi bash tool-result capture, and suggested-state status/DB are evidenced; visible high-confidence notification text remains owned by `ticket:20260523-high-confidence-suggestion-ux` and is not claimed here.
 
 ## Journal
 
@@ -64,3 +71,6 @@ Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`
 - 2026-05-23: Implemented seamless UX slice for this ticket and moved to review with validation evidence in `evidence:20260523-seamless-ux-validation`.
 - 2026-05-23: Review run recorded `audit:20260523-seamless-ux-review` with verdict `changes-needed`; pending disposition: FIND-002.
 - 2026-05-23: Dispositioned review finding(s) for this ticket with `evidence:20260523-live-pi-tui-smoke` and/or `evidence:20260523-findings-fix-validation`; follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` in the inspected scope; residual high-confidence notification/model-provider/long-run tuning gaps remain as follow-up where applicable.
+- 2026-05-23: Set status back to `active` for focused disposable installed-package/high-confidence real TUI smoke requested as release-readiness follow-up.
+- 2026-05-23: Recorded `evidence:20260523-installed-package-high-confidence-smoke`; moved to `review` pending audit/closure.
+- 2026-05-23: Consumed `audit:20260523-release-readiness-followup-review`; closed ticket with narrow installed-package/no-CLI smoke claim and routed visible notification rendering gap to `ticket:20260523-high-confidence-suggestion-ux`.

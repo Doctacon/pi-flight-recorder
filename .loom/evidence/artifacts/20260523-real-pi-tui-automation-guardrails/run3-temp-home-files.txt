@@ -1,0 +1,2 @@
+/tmp/pfr-tui-guardrails-ext-P258Po/home/.pi/agent/auth.json
+/tmp/pfr-tui-guardrails-ext-P258Po/home/.pi/agent/settings.json

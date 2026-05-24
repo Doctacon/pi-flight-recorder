@@ -1,0 +1,13 @@
+run_root=/tmp/pfr-installed-highconf-SUwWLA
+home=/tmp/pfr-installed-highconf-SUwWLA/home
+workspace=/tmp/pfr-installed-highconf-SUwWLA/workspace
+agent_dir=/tmp/pfr-installed-highconf-SUwWLA/home/.pi/agent
+session_dir=/tmp/pfr-installed-highconf-SUwWLA/home/.pi/agent/sessions
+tui_log_dir=/tmp/pfr-installed-highconf-SUwWLA/tui-logs
+data_dir=/tmp/pfr-installed-highconf-SUwWLA/home/.pi/flight-recorder
+source_dir=/tmp/pfr-installed-highconf-SUwWLA/source-sessions
+provider_extension=/Users/crlough/Code/personal/pi-flight-recorder/.loom/evidence/artifacts/20260523-installed-package-high-confidence-smoke/tool-call-provider-extension.ts
+installed_package=/Users/crlough/Code/personal/pi-flight-recorder
+tmux_session=pfr_installed_highconf_1779588838_2543
+command=env -i HOME=<temp-home> PATH=<redacted-path> TERM=xterm-256color SHELL=/bin/bash PI_OFFLINE=1 PI_CODING_AGENT_DIR=<temp-agent-dir> PI_CODING_AGENT_SESSION_DIR=<temp-session-dir> PI_TUI_WRITE_LOG=<temp-tui-log-dir> PFR_LOCAL_STUB_KEY=stub pi --offline --no-skills --no-prompt-templates --no-context-files --no-session --model pfr-local/bash-fail -e <tool-call-provider-extension>
+forced_kill=false

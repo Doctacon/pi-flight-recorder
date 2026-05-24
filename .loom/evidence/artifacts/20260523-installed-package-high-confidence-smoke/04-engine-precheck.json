@@ -1,0 +1,16 @@
+{
+  "decisionKind": "suggestion",
+  "reason": null,
+  "confidence": 0.82,
+  "priorFix": "Validation passed: npm test",
+  "episodes": [
+    {
+      "id": "ep_70da13e85de121ce",
+      "score": -0.0000016923076923076922,
+      "status": "resolved",
+      "confidence": 0.8999999999999999,
+      "cwd": "<temp-path>",
+      "resolution": "Validation passed: npm test"
+    }
+  ]
+}

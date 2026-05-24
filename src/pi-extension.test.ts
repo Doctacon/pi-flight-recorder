@@ -181,7 +181,18 @@ describe("Pi extension wrapper", () => {
       on: (eventName, handler) => events.set(eventName, handler),
     });
     const notifications: string[] = [];
-    const ctx = { cwd: "/repo", ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => null } };
+    const widgets = new Map<string, string[]>();
+    const ctx = {
+      cwd: "/repo",
+      ui: {
+        notify: (message: string) => notifications.push(message),
+        setWidget: (id: string, value: string[] | undefined) => {
+          if (value) widgets.set(id, value);
+          else widgets.delete(id);
+        },
+      },
+      sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
+    };
     await commands.get("flight-sync")?.handler(`--source ${root} --data-dir ${dataDir}`, ctx);
     await commands.get("flight-mode")?.handler(`suggest-on-failure --data-dir ${dataDir}`, ctx);
     notifications.length = 0;
@@ -193,6 +204,8 @@ describe("Pi extension wrapper", () => {
     expect(JSON.stringify(event)).toBe(before);
     expect(notifications.join("\n")).toContain("Seen before");
     expect(notifications.join("\n")).toContain("Prior fix: Validation passed: npm test");
+    expect(widgets.get("pi-flight-recorder-live-suggestion")?.join("\n")).toContain("Seen before");
+    expect(widgets.get("pi-flight-recorder-live-suggestion")?.join("\n")).toContain("Prior fix: Validation passed: npm test");
 
     notifications.length = 0;
     await events.get("tool_result")?.(event, ctx);

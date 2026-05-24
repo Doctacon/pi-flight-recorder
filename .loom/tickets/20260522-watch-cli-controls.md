@@ -2,9 +2,9 @@
 
 ID: ticket:20260522-watch-cli-controls
 Type: Ticket
-Status: review
+Status: closed
 Created: 2026-05-22
-Updated: 2026-05-22
+Updated: 2026-05-23
 Risk: low - command wrapper over watcher/suggestion services
 Priority: medium - users need to start, stop, and inspect live mode outside Pi
 Depends On: ticket:20260522-session-watch-service
@@ -54,7 +54,9 @@ A foreground watch command is acceptable for this slice. If background stop/stat
 
 ## Current State
 
-Implementation appears complete and is in review. Added `watch start --foreground`, `watch status`, and `watch stop` CLI controls with source/data-dir/mode/debounce/poll/confidence/cooldown/max-suggestions options. `watch start` remains foreground-only by design; OS daemon installation is out of scope. No separate Ralph audit has been run yet.
+Closed. The live-monitoring implementation review state is reconciled. `evidence:20260522-live-monitoring-validation` supports incremental sync, watcher service, live suggestion decisions, CLI controls, Pi live hook behavior, and validation docs through tests plus CLI watcher smoke. Later real Pi evidence (`evidence:20260523-live-pi-tui-smoke`, `evidence:20260523-installed-package-high-confidence-smoke`, and `evidence:20260523-high-confidence-visible-suggestion-tui`) covers the no-CLI real TUI path, failed `tool_result` capture, reflection rendering, installed-package startup, and visible high-confidence prior-fix suggestion text. `audit:20260523-final-review-state-reconciliation-review` found no material issue with closing stale live-monitoring review tickets.
+
+Residual limits remain outside this ticket: `user_bash` result capture is intentionally deferred because Pi exposes it before execution, real hosted/model-provider reflection is unproven, and long-run corpus precision/noise tuning remains separate.
 
 ## Evidence
 
@@ -66,3 +68,4 @@ Implementation appears complete and is in review. Added `watch start --foregroun
 
 - 2026-05-22: Created ticket with Status `open`. Scope is CLI control surface only.
 - 2026-05-22: Implemented watch CLI controls and moved ticket to `review` with validation evidence.
+- 2026-05-23: Final review-state reconciliation closed this stale `review` ticket with supporting evidence/audit links; residual provider/corpus limits remain outside this ticket.

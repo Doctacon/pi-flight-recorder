@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-cli-demotion-and-debug-tools
 Type: Ticket
-Status: review
+Status: closed
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: low - primarily docs/help and debug affordance alignment
@@ -48,9 +48,9 @@ Docs should make clear that `npm run cli` is for development from the repo, whil
 
 ## Current State
 
-Implementation is complete and in review. README/first-run/live-monitoring now lead with extension-first usage; CLI help labels the CLI as debug/manual/recovery; `status --json` exposes machine-readable state without starting behavior. Evidence: `evidence:20260523-seamless-ux-validation` OBS-001, OBS-002, OBS-003.
+Closed. The seamless UX implementation review state is reconciled for this ticket's bounded slice. Implementation validation is recorded across `evidence:20260523-seamless-ux-validation`, `evidence:20260523-live-pi-tui-smoke`, `evidence:20260523-findings-fix-validation`, `evidence:20260523-installed-package-high-confidence-smoke`, and `evidence:20260523-high-confidence-visible-suggestion-tui`. `audit:20260523-seamless-ux-followup-review` cleared FIND-001 through FIND-005, and `audit:20260523-high-confidence-visible-suggestion-review` cleared the remaining visible high-confidence suggestion gap. `audit:20260523-final-review-state-reconciliation-review` found no material issue with closing stale seamless implementation tickets.
 
-Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`; FIND-002 addressed enough for docs to continue presenting extension-first flow because live Pi TUI smoke now exists for status/capture/reflection. Evidence: `evidence:20260523-live-pi-tui-smoke`; high-confidence notification remains a residual untested scenario. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope; remaining residual gaps are tracked as non-blocking follow-up/tuning unless this ticket explicitly covers high-confidence notification smoke or long-run corpus evaluation.
+Residual limits remain routed to `ticket:20260523-real-corpus-evaluation-and-tuning` and `plan:20260523-seamless-failure-memory-ux`: hosted/real model-provider reflection and long-run corpus precision/noise tuning are not claimed here.
 
 ## Journal
 
@@ -58,3 +58,4 @@ Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`
 - 2026-05-23: Implemented seamless UX slice for this ticket and moved to review with validation evidence in `evidence:20260523-seamless-ux-validation`.
 - 2026-05-23: Review run recorded `audit:20260523-seamless-ux-review` with verdict `changes-needed`; pending disposition: FIND-002.
 - 2026-05-23: Dispositioned review finding(s) for this ticket with `evidence:20260523-live-pi-tui-smoke` and/or `evidence:20260523-findings-fix-validation`; follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` in the inspected scope; residual high-confidence notification/model-provider/long-run tuning gaps remain as follow-up where applicable.
+- 2026-05-23: Final review-state reconciliation closed this stale `review` ticket with supporting evidence/audit links; residual provider/corpus limits remain outside this ticket.

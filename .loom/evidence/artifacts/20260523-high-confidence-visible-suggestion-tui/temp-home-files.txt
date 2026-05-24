@@ -1,0 +1,6 @@
+/tmp/pfr-visible-highconf-Xsz8BE/home/.npm/_logs/2026-05-24T02_25_51_214Z-debug-0.log
+/tmp/pfr-visible-highconf-Xsz8BE/home/.npm/_update-notifier-last-checked
+/tmp/pfr-visible-highconf-Xsz8BE/home/.pi/agent/auth.json
+/tmp/pfr-visible-highconf-Xsz8BE/home/.pi/agent/settings.json
+/tmp/pfr-visible-highconf-Xsz8BE/home/.pi/flight-recorder/flight-recorder.db
+/tmp/pfr-visible-highconf-Xsz8BE/home/.pi/flight-recorder/live-status.json

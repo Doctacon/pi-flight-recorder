@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-high-confidence-suggestion-ux
 Type: Ticket
-Status: review
+Status: closed
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: medium - user trust depends on not spamming weak or generic suggestions
@@ -54,9 +54,20 @@ Default gates should likely require a prior resolved episode or exact-signature 
 
 ## Current State
 
-Implementation is complete and in review. Live suggestions now require prior resolved evidence, confidence/specificity gates, cooldown/window controls, and active snooze/silence checks; broad and unresolved matches are buffered quietly. Live Pi TUI rendering remains unverified outside fake-Pi tests and is tracked by `ticket:20260523-seamless-install-and-real-pi-smoke`. Evidence: `evidence:20260523-seamless-ux-validation` OBS-001, OBS-002.
+Review. Focused follow-up evidence is recorded in `evidence:20260523-installed-package-high-confidence-smoke`. A disposable real Pi TUI run seeded synthetic prior resolved evidence, triggered a harmless failed Pi bash tool call, and status/DB showed a high-confidence suggestion state: `kind=suggested`, confidence `0.82`, `emittedInWindow=1`, and `last=ep_70da13e85de121ce`.
 
-Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`; FIND-002 partly addressed by live Pi TUI smoke showing live capture/suppression status; high-confidence resolved suggestion notification remains not exercised in real TUI. Evidence: `evidence:20260523-live-pi-tui-smoke`. Follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` for FIND-001 through FIND-005 in the inspected scope; remaining residual gaps are tracked as non-blocking follow-up/tuning unless this ticket explicitly covers high-confidence notification smoke or long-run corpus evaluation.
+This narrows but does not fully erase the previous real-TUI gap: pane snapshots and the TUI write log did not capture the formatted transient warning notification text (`Seen before`, `Prior fix`, `likely match`). Therefore ACC-004 is only partially supported for visible notification rendering. Keep this ticket in `review` unless a later audit accepts the narrower closure claim or a follow-up run captures the notification text.
+
+Closed. High-confidence suggestions now render through a persistent Flight Recorder TUI widget in addition to the transient notification. Focused fake-Pi tests assert widget text, and `evidence:20260523-high-confidence-visible-suggestion-tui` captures the formatted suggestion in a disposable installed-package real Pi TUI after a failed Pi `bash` tool result.
+
+Closure support:
+
+- ACC-001: Same-cwd prior resolved suggestion behavior remains covered by `src/live-suggestions.test.ts` and `src/pi-extension.test.ts`; widget text is asserted in `src/pi-extension.test.ts`.
+- ACC-002: Broad/low-confidence suppression remains covered by `src/live-suggestions.test.ts` and no source change widened matching thresholds.
+- ACC-003: Cooldown/max-window/silence behavior remains covered by existing suggestion tests; widget rendering only happens after `decision.kind === "suggestion"`.
+- ACC-004: Real TUI evidence `07-after-toolcall-01s-pane.txt` through `07-after-toolcall-15s-pane.txt` shows `⚠ Seen before: likely match (0.82)` and `Prior fix: Validation passed: npm test`; status/DB show `kind=suggested`, `emittedInWindow=1`, and confidence `0.82`.
+
+Audit `audit:20260523-high-confidence-visible-suggestion-review` returned `clear` within audited scope. Residual limits remain for hosted/real provider behavior, global/user-scope package install, and long-run corpus tuning.
 
 ## Journal
 
@@ -64,3 +75,9 @@ Audit disposition: `audit:20260523-seamless-ux-review` returned `changes-needed`
 - 2026-05-23: Implemented seamless UX slice for this ticket and moved to review with validation evidence in `evidence:20260523-seamless-ux-validation`.
 - 2026-05-23: Review run recorded `audit:20260523-seamless-ux-review` with verdict `changes-needed`; pending disposition: FIND-002.
 - 2026-05-23: Dispositioned review finding(s) for this ticket with `evidence:20260523-live-pi-tui-smoke` and/or `evidence:20260523-findings-fix-validation`; follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` in the inspected scope; residual high-confidence notification/model-provider/long-run tuning gaps remain as follow-up where applicable.
+- 2026-05-23: Set status back to `active` for focused real TUI high-confidence prior-resolved suggestion smoke.
+- 2026-05-23: Recorded `evidence:20260523-installed-package-high-confidence-smoke`; moved to `review` with ACC-004 only partially supported because the suggestion state is evidenced but the transient formatted notification text was not captured.
+- 2026-05-23: Consumed `audit:20260523-release-readiness-followup-review#FIND-001`; keeping ticket in `review` instead of closing over the visible-notification rendering gap.
+- 2026-05-23: Set status to `active` to resolve visible notification rendering by adding a persistent high-confidence suggestion widget and re-validating in real TUI.
+- 2026-05-23: Added `showLiveSuggestion()` widget path, updated fake-Pi tests, and recorded `evidence:20260523-high-confidence-visible-suggestion-tui` with real TUI visible suggestion text.
+- 2026-05-23: Recorded `audit:20260523-high-confidence-visible-suggestion-review` with verdict `clear`; closed ticket.

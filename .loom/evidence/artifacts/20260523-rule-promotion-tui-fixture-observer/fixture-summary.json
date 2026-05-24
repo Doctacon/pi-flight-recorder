@@ -1,0 +1,18 @@
+{
+  "dataDir": "/tmp/pfr-rule-promotion-fixture-data-maS4qw",
+  "databasePath": "/tmp/pfr-rule-promotion-fixture-data-maS4qw/flight-recorder.db",
+  "cwd": "/tmp/pfr-rule-promotion-workspace-o1QGI1",
+  "proposals": [
+    {
+      "id": "refl_c70bb44179db5cd8",
+      "clusterId": "cluster_a0a444da4838caa3",
+      "title": "Pattern: exact-text edit mismatches",
+      "likelyFix": "Before editing, re-read the target block and apply the smallest exact-text replacement; if the block changed, fall back to a narrower patch instead of retrying the stale oldText.",
+      "confidence": 0.75,
+      "evidenceCount": 2
+    }
+  ],
+  "mining": {
+    "examined": 2
+  }
+}

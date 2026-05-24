@@ -1,0 +1,2 @@
+/tmp/pfr-tui-guardrails-0P6H4g/home/.pi/agent/auth.json
+/tmp/pfr-tui-guardrails-0P6H4g/home/.pi/agent/settings.json

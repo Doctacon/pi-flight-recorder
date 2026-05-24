@@ -1,0 +1,4 @@
+total 360
+drwx------@   3 crlough  wheel      96 May 23 18:44 .
+drwxrwxrwt  182 root     wheel    5824 May 23 18:44 ..
+-rw-r--r--@   1 crlough  wheel  184320 May 23 18:44 flight-recorder.db

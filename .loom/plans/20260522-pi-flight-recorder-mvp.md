@@ -2,9 +2,9 @@
 
 ID: plan:20260522-pi-flight-recorder-mvp
 Type: Plan
-Status: review
+Status: completed
 Created: 2026-05-22
-Updated: 2026-05-22
+Updated: 2026-05-23
 Risk: medium - coordinates new local storage, session parsing, heuristic extraction, and Pi integration
 
 ## Summary
@@ -110,14 +110,13 @@ The core works inside Pi, has end-to-end validation evidence, has first-run docs
 
 ## Current State
 
-Plan implementation has run through every execution unit. All seven child tickets are now in `review` with implementation complete and shared validation evidence in `evidence:20260522-mvp-validation`.
+Completed. All seven child tickets are closed after final review-state reconciliation. The MVP closure is supported by `evidence:20260522-mvp-validation` plus later stabilized-code validation (`npm run typecheck`, `npm test`, `npm run test:smoke:local`, `npm run build`, and `npm pack --dry-run`) and `audit:20260523-final-review-state-reconciliation-review`.
 
-Implemented source surfaces include strict TypeScript scaffold, Pi session parser, SQLite/FTS storage, failure/fix extractor, CLI/query/feedback flow, Pi extension wrapper, README/docs, and package dry-run validation.
-
-Plan-level residual risks: live Pi TUI extension loading has not been manually verified; extraction precision has only been tested against fixtures, not the user's full real session corpus; no independent Ralph adversarial audit was available/performed. Next honest plan-level move is review/audit disposition or a live-Pi smoke test before marking the plan completed.
+The completed MVP claim remains narrow: local-first parsing/storage/extraction/query/Pi-wrapper behavior is implemented and validated at fixture/test/build/package level. It does not claim long-run real-corpus precision tuning or hosted/model-provider behavior.
 
 ## Journal
 
 - 2026-05-22: Created plan with Status `open`, based on completed landscape research and active Failure Memory MVP spec. Created seven child tickets and linked them from execution units.
 
 - 2026-05-22: Ran the MVP plan through all child tickets. Implementation and validation evidence exist; moved plan Status to `review` pending audit/live-Pi disposition.
+- 2026-05-23: Final review-state reconciliation closed all MVP child tickets and set plan status to `completed`; residual corpus/provider limits remain outside the MVP completion claim.

@@ -1,0 +1,14 @@
+run_root=/tmp/pfr-rule-promotion-real-tui-IcvMyL
+home=/tmp/pfr-rule-promotion-real-tui-IcvMyL/home
+workspace=/tmp/pfr-rule-promotion-workspace-o1QGI1
+agent_dir=/tmp/pfr-rule-promotion-real-tui-IcvMyL/home/.pi/agent
+session_dir=/tmp/pfr-rule-promotion-real-tui-IcvMyL/home/.pi/agent/sessions
+tui_log_dir=/tmp/pfr-rule-promotion-real-tui-IcvMyL/tui-logs
+observer_log=/tmp/pfr-rule-promotion-real-tui-IcvMyL/rule-observer.ndjson
+data_dir=/tmp/pfr-rule-promotion-fixture-data-maS4qw
+flight_extension=/Users/crlough/Code/personal/pi-flight-recorder/dist/pi-extension.js
+observer_extension=/Users/crlough/Code/personal/pi-flight-recorder/.loom/evidence/artifacts/20260523-rule-promotion-tui-fixture-observer/rule-block-observer-extension.ts
+tmux_session=pfr_rule_real_tui_1779587437_80223
+command=env -i HOME=<temp-home> PATH=<redacted-path> TERM=xterm-256color SHELL=/bin/bash PI_OFFLINE=1 PI_CODING_AGENT_DIR=<temp-agent-dir> PI_CODING_AGENT_SESSION_DIR=<temp-session-dir> PI_TUI_WRITE_LOG=<temp-tui-log-dir> PFR_RULE_OBSERVER_LOG=<temp-observer-log> PFR_LOCAL_STUB_KEY=stub pi --offline --no-extensions --no-skills --no-prompt-templates --no-context-files --no-session --no-tools --model pfr-local/stub -e <dist/pi-extension.js> -e <observer-extension>
+rule_id=rule_22b8d9a30a3d4d6c
+forced_kill=false

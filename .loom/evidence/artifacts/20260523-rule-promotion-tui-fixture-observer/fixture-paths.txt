@@ -1,0 +1,2 @@
+data_dir=/tmp/pfr-rule-promotion-fixture-data-maS4qw
+cwd=/tmp/pfr-rule-promotion-workspace-o1QGI1

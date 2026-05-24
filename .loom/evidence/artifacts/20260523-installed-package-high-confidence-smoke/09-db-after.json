@@ -1,0 +1,24 @@
+{
+  "counts": {
+    "episodes": 1,
+    "occurrences": 1,
+    "feedback": 0
+  },
+  "occurrences": [
+    {
+      "id": "occ_3a60ff012c2d0c96",
+      "source": "tool_result",
+      "toolName": "bash",
+      "command": "npm test",
+      "cwd": "/private<temp-path>",
+      "signature": "bash npm test test node -e console.error pfr_highconf_failure process.exit num pfr_highconf_failure command exited with code num",
+      "suggestion": {
+        "kind": "suggested",
+        "reason": null,
+        "episodeId": "ep_70da13e85de121ce",
+        "confidence": 0.82,
+        "at": "2026-05-24T02:14:08.458Z"
+      }
+    }
+  ]
+}
