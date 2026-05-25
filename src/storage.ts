@@ -37,7 +37,15 @@ import {
 } from "./storage-mappers.js";
 import { normalizeFailureSignature } from "./signatures.js";
 import type {
+  ArtifactCandidate,
+  ArtifactCandidateOutcome,
+  ArtifactCandidateStatus,
   ClusterEvidenceRef,
+  DeltaDetectorSignal,
+  DeltaRecurrenceLink,
+  ExpectationDelta,
+  ExpectationDeltaSeverity,
+  ExpectationDeltaStatus,
   FailureCluster,
   FailureClusterStatus,
   FailureEpisode,
@@ -49,6 +57,10 @@ import type {
   FlightRuleScope,
   FlightRuleStatus,
   LiveFailureOccurrence,
+  NewArtifactCandidate,
+  NewDeltaDetectorSignal,
+  NewDeltaRecurrenceLink,
+  NewExpectationDelta,
   NewFailureOccurrence,
   ParsedSession,
   ParseWarning,
@@ -93,6 +105,21 @@ export interface ClusterListOptions {
   minCount?: number;
 }
 
+export interface DeltaListOptions {
+  limit?: number;
+  status?: ExpectationDeltaStatus;
+  cwd?: string;
+  since?: string;
+}
+
+export interface ArtifactCandidateListOptions {
+  limit?: number;
+  deltaId?: string;
+  artifactType?: ArtifactCandidate["artifactType"];
+  status?: ArtifactCandidateStatus;
+  outcome?: ArtifactCandidateOutcome;
+}
+
 export function getDefaultDataDir(): string {
   return path.join(homedir(), ".pi", "flight-recorder");
 }
@@ -103,6 +130,15 @@ export async function ensureDataDir(dataDir: string): Promise<void> {
 
 export function defaultDatabasePath(dataDir = getDefaultDataDir()): string {
   return path.join(dataDir, "flight-recorder.db");
+}
+
+function clampConfidence(value: number | null | undefined): number | null {
+  if (value === null || value === undefined || Number.isNaN(value)) return null;
+  return Math.max(0, Math.min(1, value));
+}
+
+function sanitizeOptionalText(value: string | null | undefined, maxLength: number): string | null {
+  return value ? sanitizeStoredText(value, maxLength) : null;
 }
 
 export class FlightRecorderStore {
@@ -324,7 +360,99 @@ export class FlightRecorderStore {
 
       CREATE INDEX IF NOT EXISTS idx_flight_rules_status_scope ON flight_rules(status, scope);
 
-      INSERT OR REPLACE INTO meta(key, value) VALUES ('schemaVersion', '3');
+      CREATE TABLE IF NOT EXISTS expectation_deltas (
+        id TEXT PRIMARY KEY,
+        status TEXT NOT NULL,
+        source TEXT NOT NULL,
+        summary TEXT NOT NULL,
+        expectation TEXT,
+        reality TEXT,
+        impact TEXT,
+        severity TEXT NOT NULL,
+        cwd TEXT,
+        sourceSessionFile TEXT,
+        sourceEntryId TEXT,
+        evidenceJson TEXT NOT NULL,
+        activeArtifactCandidateId TEXT,
+        statusReason TEXT,
+        metadataJson TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        updatedAt TEXT NOT NULL,
+        acceptedAt TEXT,
+        routedAt TEXT,
+        dismissedAt TEXT,
+        resolvedAt TEXT,
+        recurringAt TEXT
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_expectation_deltas_status_updated ON expectation_deltas(status, updatedAt);
+      CREATE INDEX IF NOT EXISTS idx_expectation_deltas_cwd ON expectation_deltas(cwd);
+      CREATE INDEX IF NOT EXISTS idx_expectation_deltas_active_candidate ON expectation_deltas(activeArtifactCandidateId);
+
+      CREATE TABLE IF NOT EXISTS delta_detector_signals (
+        id TEXT PRIMARY KEY,
+        deltaId TEXT NOT NULL,
+        type TEXT NOT NULL,
+        explanation TEXT NOT NULL,
+        confidence REAL,
+        evidenceJson TEXT NOT NULL,
+        metadataJson TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        FOREIGN KEY(deltaId) REFERENCES expectation_deltas(id) ON DELETE CASCADE
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_delta_detector_signals_delta ON delta_detector_signals(deltaId, createdAt);
+      CREATE INDEX IF NOT EXISTS idx_delta_detector_signals_type ON delta_detector_signals(type);
+
+      CREATE TABLE IF NOT EXISTS artifact_candidates (
+        id TEXT PRIMARY KEY,
+        deltaId TEXT NOT NULL,
+        artifactType TEXT NOT NULL,
+        status TEXT NOT NULL,
+        title TEXT NOT NULL,
+        rationale TEXT NOT NULL,
+        proposedDraft TEXT,
+        nextStep TEXT,
+        confidence REAL,
+        limitsJson TEXT NOT NULL,
+        evidenceJson TEXT NOT NULL,
+        applied INTEGER NOT NULL DEFAULT 0,
+        appliedArtifactRef TEXT,
+        outcome TEXT NOT NULL,
+        outcomeSummary TEXT,
+        supersedesCandidateId TEXT,
+        metadataJson TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        updatedAt TEXT NOT NULL,
+        acceptedAt TEXT,
+        dismissedAt TEXT,
+        appliedAt TEXT,
+        resolvedAt TEXT,
+        recurringAt TEXT,
+        FOREIGN KEY(deltaId) REFERENCES expectation_deltas(id) ON DELETE CASCADE,
+        FOREIGN KEY(supersedesCandidateId) REFERENCES artifact_candidates(id) ON DELETE SET NULL
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_artifact_candidates_delta ON artifact_candidates(deltaId, updatedAt);
+      CREATE INDEX IF NOT EXISTS idx_artifact_candidates_type_status ON artifact_candidates(artifactType, status);
+      CREATE INDEX IF NOT EXISTS idx_artifact_candidates_outcome ON artifact_candidates(outcome, updatedAt);
+
+      CREATE TABLE IF NOT EXISTS delta_recurrence_links (
+        id TEXT PRIMARY KEY,
+        deltaId TEXT NOT NULL,
+        priorArtifactCandidateId TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        similarity REAL,
+        evidenceJson TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        FOREIGN KEY(deltaId) REFERENCES expectation_deltas(id) ON DELETE CASCADE,
+        FOREIGN KEY(priorArtifactCandidateId) REFERENCES artifact_candidates(id) ON DELETE CASCADE
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_delta_recurrence_links_delta ON delta_recurrence_links(deltaId, createdAt);
+      CREATE INDEX IF NOT EXISTS idx_delta_recurrence_links_candidate ON delta_recurrence_links(priorArtifactCandidateId, createdAt);
+
+      INSERT OR REPLACE INTO meta(key, value) VALUES ('schemaVersion', '4');
     `);
     this.migrateSchema();
   }
@@ -351,8 +479,12 @@ export class FlightRecorderStore {
     this.ensureColumn("rule_candidates", "rejectedAt", "TEXT");
     this.ensureColumn("flight_rules", "lastInjectedAt", "TEXT");
     this.ensureColumn("flight_rules", "injectionCount", "INTEGER NOT NULL DEFAULT 0");
-    this.db.exec("PRAGMA user_version = 3");
-    this.db.prepare("INSERT OR REPLACE INTO meta(key, value) VALUES ('schemaVersion', '3')").run();
+    this.ensureColumn("expectation_deltas", "activeArtifactCandidateId", "TEXT");
+    this.ensureColumn("expectation_deltas", "statusReason", "TEXT");
+    this.ensureColumn("artifact_candidates", "applied", "INTEGER NOT NULL DEFAULT 0");
+    this.ensureColumn("artifact_candidates", "appliedArtifactRef", "TEXT");
+    this.db.exec("PRAGMA user_version = 4");
+    this.db.prepare("INSERT OR REPLACE INTO meta(key, value) VALUES ('schemaVersion', '4')").run();
   }
 
   getSource(pathValue: string): SourceFileRecord | null {
@@ -422,7 +554,7 @@ export class FlightRecorderStore {
     });
   }
 
-  count(table: "source_files" | "events" | "parse_warnings" | "episodes" | "failure_occurrences" | "feedback_actions" | "failure_clusters" | "reflection_proposals" | "rule_candidates" | "flight_rules"): number {
+  count(table: "source_files" | "events" | "parse_warnings" | "episodes" | "failure_occurrences" | "feedback_actions" | "failure_clusters" | "reflection_proposals" | "rule_candidates" | "flight_rules" | "expectation_deltas" | "delta_detector_signals" | "artifact_candidates" | "delta_recurrence_links"): number {
     const row = this.db.prepare(`SELECT COUNT(*) AS count FROM ${table}`).get() as { count: number };
     return row.count;
   }
@@ -562,6 +694,251 @@ export class FlightRecorderStore {
     const where = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
     const rows = this.db.prepare(`SELECT * FROM failure_occurrences ${where} ORDER BY lastSeenAt DESC LIMIT ?`).all(...params, limit) as unknown as OccurrenceRow[];
     return rows.map(rowToOccurrence);
+  }
+
+  createExpectationDelta(input: NewExpectationDelta): ExpectationDelta {
+    const now = input.now ?? new Date().toISOString();
+    const summary = sanitizeStoredText(input.summary, 300);
+    const expectation = sanitizeOptionalText(input.expectation, 700);
+    const reality = sanitizeOptionalText(input.reality, 700);
+    const impact = sanitizeOptionalText(input.impact, 500);
+    const cwd = input.cwd ? redactLocalPaths(input.cwd) : null;
+    const sourceSessionFile = input.sourceSessionFile ? redactLocalPaths(input.sourceSessionFile) : null;
+    const sourceEntryId = sanitizeOptionalText(input.sourceEntryId, 160);
+    const evidence = sanitizeDeltaEvidenceRefs(input.evidenceRefs);
+    const metadata = sanitizeMetadata(input.metadata);
+    const id = input.id ?? `delta_${hash([input.source, summary, expectation ?? "", reality ?? "", sourceEntryId ?? "", now].join("\u0000"))}`;
+
+    this.db.prepare(`
+      INSERT INTO expectation_deltas(id, status, source, summary, expectation, reality, impact, severity, cwd, sourceSessionFile, sourceEntryId, evidenceJson, activeArtifactCandidateId, statusReason, metadataJson, createdAt, updatedAt, acceptedAt, routedAt, dismissedAt, resolvedAt, recurringAt)
+      VALUES (?, 'candidate', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, NULL, NULL, NULL, NULL, NULL)
+    `).run(id, input.source, summary, expectation, reality, impact, input.severity ?? "unknown", cwd, sourceSessionFile, sourceEntryId, json(evidence), json(metadata), now, now);
+
+    const saved = this.getExpectationDelta(id);
+    if (!saved) throw new Error(`Failed to create expectation delta ${id}`);
+    return saved;
+  }
+
+  getExpectationDelta(id: string): ExpectationDelta | null {
+    const row = this.db.prepare("SELECT * FROM expectation_deltas WHERE id = ?").get(id) as ExpectationDeltaRow | undefined;
+    return row ? rowToExpectationDelta(row) : null;
+  }
+
+  listExpectationDeltas(options: DeltaListOptions = {}): ExpectationDelta[] {
+    const clauses: string[] = [];
+    const params: Array<string | number> = [];
+    if (options.status) {
+      clauses.push("status = ?");
+      params.push(options.status);
+    }
+    if (options.cwd) {
+      clauses.push("cwd = ?");
+      params.push(redactLocalPaths(options.cwd));
+    }
+    if (options.since) {
+      clauses.push("updatedAt >= ?");
+      params.push(options.since);
+    }
+    const limit = Math.max(1, Math.min(options.limit ?? 100, 1_000));
+    const where = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
+    const rows = this.db.prepare(`SELECT * FROM expectation_deltas ${where} ORDER BY updatedAt DESC LIMIT ?`).all(...params, limit) as unknown as ExpectationDeltaRow[];
+    return rows.map(rowToExpectationDelta);
+  }
+
+  acceptExpectationDelta(id: string, updates: { expectation?: string | null; reality?: string | null; impact?: string | null; severity?: ExpectationDeltaSeverity; now?: string } = {}): ExpectationDelta | null {
+    const existing = this.getExpectationDelta(id);
+    if (!existing) return null;
+    const now = updates.now ?? new Date().toISOString();
+    this.db.prepare(`
+      UPDATE expectation_deltas
+      SET status = 'accepted', expectation = ?, reality = ?, impact = ?, severity = ?, acceptedAt = COALESCE(acceptedAt, ?), updatedAt = ?
+      WHERE id = ?
+    `).run(
+      updates.expectation !== undefined ? sanitizeOptionalText(updates.expectation, 700) : existing.expectation,
+      updates.reality !== undefined ? sanitizeOptionalText(updates.reality, 700) : existing.reality,
+      updates.impact !== undefined ? sanitizeOptionalText(updates.impact, 500) : existing.impact,
+      updates.severity ?? existing.severity,
+      now,
+      now,
+      id,
+    );
+    return this.getExpectationDelta(id);
+  }
+
+  dismissExpectationDelta(id: string, reason: string | null = null, now = new Date().toISOString()): ExpectationDelta | null {
+    this.db.prepare("UPDATE expectation_deltas SET status = 'dismissed', statusReason = ?, dismissedAt = COALESCE(dismissedAt, ?), updatedAt = ? WHERE id = ?")
+      .run(sanitizeOptionalText(reason, 500), now, now, id);
+    return this.getExpectationDelta(id);
+  }
+
+  markExpectationDeltaResolved(id: string, reason: string | null = null, now = new Date().toISOString()): ExpectationDelta | null {
+    this.db.prepare("UPDATE expectation_deltas SET status = 'resolved', statusReason = ?, resolvedAt = COALESCE(resolvedAt, ?), updatedAt = ? WHERE id = ?")
+      .run(sanitizeOptionalText(reason, 500), now, now, id);
+    return this.getExpectationDelta(id);
+  }
+
+  markExpectationDeltaRecurring(id: string, reason: string | null = null, now = new Date().toISOString()): ExpectationDelta | null {
+    this.db.prepare("UPDATE expectation_deltas SET status = 'recurring', statusReason = ?, recurringAt = COALESCE(recurringAt, ?), updatedAt = ? WHERE id = ?")
+      .run(sanitizeOptionalText(reason, 500), now, now, id);
+    return this.getExpectationDelta(id);
+  }
+
+  rerouteExpectationDelta(deltaId: string, artifactCandidateId: string, reason: string | null = null, now = new Date().toISOString()): ExpectationDelta | null {
+    const candidate = this.getArtifactCandidate(artifactCandidateId);
+    if (!candidate || candidate.deltaId !== deltaId) return null;
+    this.db.prepare("UPDATE expectation_deltas SET status = 'routed', activeArtifactCandidateId = ?, statusReason = ?, routedAt = COALESCE(routedAt, ?), updatedAt = ? WHERE id = ?")
+      .run(artifactCandidateId, sanitizeOptionalText(reason, 500), now, now, deltaId);
+    return this.getExpectationDelta(deltaId);
+  }
+
+  recordDeltaDetectorSignal(input: NewDeltaDetectorSignal): DeltaDetectorSignal {
+    const now = input.now ?? new Date().toISOString();
+    const explanation = sanitizeStoredText(input.explanation, 700);
+    const id = input.id ?? `delta_sig_${hash([input.deltaId, input.type, explanation, now].join("\u0000"))}`;
+    const evidence = sanitizeDeltaEvidenceRefs(input.evidenceRefs);
+    const metadata = sanitizeMetadata(input.metadata);
+    this.db.prepare("INSERT INTO delta_detector_signals(id, deltaId, type, explanation, confidence, evidenceJson, metadataJson, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+      .run(id, input.deltaId, input.type, explanation, clampConfidence(input.confidence), json(evidence), json(metadata), now);
+    const saved = this.getDeltaDetectorSignal(id);
+    if (!saved) throw new Error(`Failed to record delta detector signal ${id}`);
+    return saved;
+  }
+
+  getDeltaDetectorSignal(id: string): DeltaDetectorSignal | null {
+    const row = this.db.prepare("SELECT * FROM delta_detector_signals WHERE id = ?").get(id) as DeltaDetectorSignalRow | undefined;
+    return row ? rowToDeltaDetectorSignal(row) : null;
+  }
+
+  listDeltaDetectorSignals(deltaId: string, limit = 50): DeltaDetectorSignal[] {
+    const rows = this.db.prepare("SELECT * FROM delta_detector_signals WHERE deltaId = ? ORDER BY createdAt DESC LIMIT ?").all(deltaId, Math.max(1, Math.min(limit, 200))) as unknown as DeltaDetectorSignalRow[];
+    return rows.map(rowToDeltaDetectorSignal);
+  }
+
+  createArtifactCandidate(input: NewArtifactCandidate): ArtifactCandidate {
+    const sourceDelta = this.getExpectationDelta(input.deltaId);
+    if (!sourceDelta) throw new Error(`Cannot create artifact candidate for missing delta ${input.deltaId}`);
+    const now = input.now ?? new Date().toISOString();
+    const title = sanitizeStoredText(input.title, 200);
+    const rationale = sanitizeStoredText(input.rationale, 900);
+    const proposedDraft = sanitizeOptionalText(input.proposedDraft, 2_000);
+    const nextStep = sanitizeOptionalText(input.nextStep, 700);
+    const limits = (input.limits ?? []).slice(0, 10).map((limit) => sanitizeStoredText(limit, 300));
+    const evidence = sanitizeDeltaEvidenceRefs(input.evidenceRefs ?? sourceDelta.evidenceRefs);
+    const metadata = sanitizeMetadata(input.metadata);
+    const supersedesCandidateId = input.supersedesCandidateId ?? null;
+    const id = input.id ?? `artifact_cand_${hash([input.deltaId, input.artifactType, title, rationale, supersedesCandidateId ?? "", now].join("\u0000"))}`;
+
+    this.transaction(() => {
+      this.db.prepare(`
+        INSERT INTO artifact_candidates(id, deltaId, artifactType, status, title, rationale, proposedDraft, nextStep, confidence, limitsJson, evidenceJson, applied, appliedArtifactRef, outcome, outcomeSummary, supersedesCandidateId, metadataJson, createdAt, updatedAt, acceptedAt, dismissedAt, appliedAt, resolvedAt, recurringAt)
+        VALUES (?, ?, ?, 'pending-review', ?, ?, ?, ?, ?, ?, ?, 0, NULL, 'unknown', NULL, ?, ?, ?, ?, NULL, NULL, NULL, NULL, NULL)
+      `).run(id, input.deltaId, input.artifactType, title, rationale, proposedDraft, nextStep, clampConfidence(input.confidence), json(limits), json(evidence), supersedesCandidateId, json(metadata), now, now);
+      if (input.routeDelta !== false) {
+        this.db.prepare("UPDATE expectation_deltas SET status = 'routed', activeArtifactCandidateId = ?, statusReason = ?, routedAt = COALESCE(routedAt, ?), updatedAt = ? WHERE id = ?")
+          .run(id, rationale, now, now, input.deltaId);
+      }
+    });
+
+    const saved = this.getArtifactCandidate(id);
+    if (!saved) throw new Error(`Failed to create artifact candidate ${id}`);
+    return saved;
+  }
+
+  getArtifactCandidate(id: string): ArtifactCandidate | null {
+    const row = this.db.prepare("SELECT * FROM artifact_candidates WHERE id = ?").get(id) as ArtifactCandidateRow | undefined;
+    return row ? rowToArtifactCandidate(row) : null;
+  }
+
+  listArtifactCandidates(options: ArtifactCandidateListOptions = {}): ArtifactCandidate[] {
+    const clauses: string[] = [];
+    const params: Array<string | number> = [];
+    if (options.deltaId) {
+      clauses.push("deltaId = ?");
+      params.push(options.deltaId);
+    }
+    if (options.artifactType) {
+      clauses.push("artifactType = ?");
+      params.push(options.artifactType);
+    }
+    if (options.status) {
+      clauses.push("status = ?");
+      params.push(options.status);
+    }
+    if (options.outcome) {
+      clauses.push("outcome = ?");
+      params.push(options.outcome);
+    }
+    const limit = Math.max(1, Math.min(options.limit ?? 100, 1_000));
+    const where = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
+    const rows = this.db.prepare(`SELECT * FROM artifact_candidates ${where} ORDER BY updatedAt DESC LIMIT ?`).all(...params, limit) as unknown as ArtifactCandidateRow[];
+    return rows.map(rowToArtifactCandidate);
+  }
+
+  acceptArtifactCandidate(id: string, now = new Date().toISOString()): ArtifactCandidate | null {
+    this.db.prepare("UPDATE artifact_candidates SET status = 'accepted', acceptedAt = COALESCE(acceptedAt, ?), updatedAt = ? WHERE id = ?").run(now, now, id);
+    return this.getArtifactCandidate(id);
+  }
+
+  dismissArtifactCandidate(id: string, reason: string | null = null, now = new Date().toISOString()): ArtifactCandidate | null {
+    const existing = this.getArtifactCandidate(id);
+    if (!existing) return null;
+    const metadata = reason ? sanitizeMetadata({ ...existing.metadata, dismissReason: reason }) : existing.metadata;
+    this.db.prepare("UPDATE artifact_candidates SET status = 'dismissed', metadataJson = ?, dismissedAt = COALESCE(dismissedAt, ?), updatedAt = ? WHERE id = ?").run(json(metadata), now, now, id);
+    return this.getArtifactCandidate(id);
+  }
+
+  markArtifactCandidateApplied(id: string, options: { appliedArtifactRef?: string | null; now?: string } = {}): ArtifactCandidate | null {
+    const now = options.now ?? new Date().toISOString();
+    this.db.prepare("UPDATE artifact_candidates SET status = 'applied', applied = 1, appliedArtifactRef = ?, appliedAt = COALESCE(appliedAt, ?), updatedAt = ? WHERE id = ?")
+      .run(sanitizeOptionalText(options.appliedArtifactRef, 500), now, now, id);
+    return this.getArtifactCandidate(id);
+  }
+
+  updateArtifactCandidateOutcome(id: string, input: { outcome: ArtifactCandidateOutcome; outcomeSummary?: string | null; status?: ArtifactCandidateStatus; now?: string }): ArtifactCandidate | null {
+    const now = input.now ?? new Date().toISOString();
+    const status = input.status ?? (input.outcome === "helped" ? "resolved" : input.outcome === "needs-reroute" || input.outcome === "no-change" ? "recurring" : null);
+    const timestampUpdate = status === "resolved" ? ", resolvedAt = COALESCE(resolvedAt, ?)" : status === "recurring" ? ", recurringAt = COALESCE(recurringAt, ?)" : "";
+    const params: Array<string | number | null> = [input.outcome, sanitizeOptionalText(input.outcomeSummary, 700)];
+    if (status) params.push(status);
+    if (timestampUpdate) params.push(now);
+    params.push(now, id);
+    const statusUpdate = status ? ", status = ?" : "";
+    this.db.prepare(`UPDATE artifact_candidates SET outcome = ?, outcomeSummary = ?${statusUpdate}${timestampUpdate}, updatedAt = ? WHERE id = ?`).run(...params);
+    return this.getArtifactCandidate(id);
+  }
+
+  linkDeltaRecurrence(input: NewDeltaRecurrenceLink): DeltaRecurrenceLink {
+    const now = input.now ?? new Date().toISOString();
+    const reason = sanitizeStoredText(input.reason, 700);
+    const id = input.id ?? `delta_recur_${hash([input.deltaId, input.priorArtifactCandidateId, reason, now].join("\u0000"))}`;
+    const evidence = sanitizeDeltaEvidenceRefs(input.evidenceRefs);
+    this.db.prepare("INSERT INTO delta_recurrence_links(id, deltaId, priorArtifactCandidateId, reason, similarity, evidenceJson, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)")
+      .run(id, input.deltaId, input.priorArtifactCandidateId, reason, clampConfidence(input.similarity), json(evidence), now);
+    const saved = this.getDeltaRecurrenceLink(id);
+    if (!saved) throw new Error(`Failed to create delta recurrence link ${id}`);
+    return saved;
+  }
+
+  getDeltaRecurrenceLink(id: string): DeltaRecurrenceLink | null {
+    const row = this.db.prepare("SELECT * FROM delta_recurrence_links WHERE id = ?").get(id) as DeltaRecurrenceLinkRow | undefined;
+    return row ? rowToDeltaRecurrenceLink(row) : null;
+  }
+
+  listDeltaRecurrenceLinks(options: { deltaId?: string; priorArtifactCandidateId?: string; limit?: number } = {}): DeltaRecurrenceLink[] {
+    const clauses: string[] = [];
+    const params: Array<string | number> = [];
+    if (options.deltaId) {
+      clauses.push("deltaId = ?");
+      params.push(options.deltaId);
+    }
+    if (options.priorArtifactCandidateId) {
+      clauses.push("priorArtifactCandidateId = ?");
+      params.push(options.priorArtifactCandidateId);
+    }
+    const limit = Math.max(1, Math.min(options.limit ?? 100, 1_000));
+    const where = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
+    const rows = this.db.prepare(`SELECT * FROM delta_recurrence_links ${where} ORDER BY createdAt DESC LIMIT ?`).all(...params, limit) as unknown as DeltaRecurrenceLinkRow[];
+    return rows.map(rowToDeltaRecurrenceLink);
   }
 
   recordFeedbackAction(input: {

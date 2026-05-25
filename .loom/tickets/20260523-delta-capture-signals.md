@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-delta-capture-signals
 Type: Ticket
-Status: open
+Status: closed
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: medium - detector suggestions can become noisy or misleading if signal reasons are weak, but pending-review status keeps the behavior reversible
@@ -63,8 +63,24 @@ Detector signal constraints:
 
 ## Current State
 
-Waiting on `ticket:20260523-delta-record-data-model`. Once the data contract exists, the first run should implement explicit capture and one or two conservative signal sources only.
+Closed. Explicit/manual delta capture and two conservative detector suggestion sources are implemented without artifact routing, artifact creation, model/classifier behavior, or noisy live notification side effects.
+
+Closure support:
+
+- ACC-001: `src/delta-capture.ts` exposes `captureManualDeltaWithStore` / `captureManualDelta`, and `src/cli.ts` exposes scriptable debug/manual `delta capture` and `delta list`; tests assert redacted expectation/reality/evidence/provenance capture.
+- ACC-002: `suggestDeltasFromReflectionClustersWithStore` and `suggestDeltasFromUserCorrectionsWithStore` create candidate deltas with explainable `reflection-cluster` and `user-correction` signals and evidence refs.
+- ACC-003: focused tests assert detector outputs remain `candidate` deltas, repeated detector runs are idempotent, and no artifact candidates are created.
+- ACC-004: final validation passed `npm run typecheck`, `npm test` (15 files / 68 tests), `npm run test:smoke:local`, `npm run build`, and `npm pack --dry-run` (77 files).
+
+Evidence: `evidence:20260523-delta-capture-signals-validation`.
+Audit: `audit:20260523-delta-capture-signals-review` with verdict `clear` within audited scope.
+
+Residual limits: no Pi-native review UI, no artifact routing/drafting/application, no model/classifier behavior, no automatic historical-session scan orchestration, and no long-run detector precision/noise tuning.
 
 ## Journal
 
 - 2026-05-23: Created as the corpus-capture child ticket for `plan:20260523-delta-artifact-learning-loop`.
+- 2026-05-23: Set active after `ticket:20260523-delta-record-data-model` closed; implementing explicit capture plus conservative reflection-cluster and user-correction signal capture only.
+- 2026-05-23: Added `src/delta-capture.ts`, focused tests, index export, and minimal debug/manual CLI `delta capture` / `delta list`.
+- 2026-05-23: Recorded `evidence:20260523-delta-capture-signals-validation`; final validation passed `npm run typecheck`, `npm test`, `npm run test:smoke:local`, `npm run build`, and `npm pack --dry-run`.
+- 2026-05-23: Recorded `audit:20260523-delta-capture-signals-review` with verdict `clear`; closed with routing/UI/artifact/model/classifier behavior explicitly out of scope.

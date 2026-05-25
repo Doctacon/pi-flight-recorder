@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-delta-record-data-model
 Type: Ticket
-Status: active
+Status: closed
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: high - the data model will shape future artifact routing and classifier evaluation, and a bad model would collapse evidence, rationale, and outcomes into unusable state
@@ -65,9 +65,24 @@ Design constraints:
 
 ## Current State
 
-Active. Execution is running as a bounded current-session Ralph slice. Read scope: `spec:delta-artifact-learning-loop`, `plan:20260523-delta-artifact-learning-loop`, constitution/spec dependencies, and `src/types.ts`, `src/storage.ts`, `src/storage-mappers.ts`, storage tests, and exports. Write scope: type/storage/mapping/test/index surfaces needed for the local delta/artifact-candidate data model plus this ticket/plan/evidence/audit records. Stop conditions: no detector heuristics, no Pi UI, no artifact mutation, no model/classifier behavior, and no breaking existing failure/reflection/rule APIs.
+Closed. The local expectation-delta/artifact-candidate data model substrate is implemented and validated within this ticket's storage/type boundary.
+
+Closure support:
+
+- ACC-001: `src/storage.ts` now creates separate `expectation_deltas`, `delta_detector_signals`, `artifact_candidates`, and `delta_recurrence_links` tables plus storage APIs for delta, signal, candidate, route/reroute, outcome, and recurrence-link flows.
+- ACC-002: `src/storage.test.ts` includes secret-like/path-heavy fixture coverage and raw SQLite row checks for redaction of derived delta/candidate fields.
+- ACC-003: migration coverage confirms a schema-v1 fixture opens under schema/user version 4 with the new tables present, and final validation passed `npm run typecheck`, `npm test`, `npm run test:smoke:local`, `npm run build`, and `npm pack --dry-run`.
+- ACC-004: focused tests demonstrate create candidate delta, accept/dismiss/reroute delta, create artifact candidate, mark accepted/applied, update outcome, and link recurrence without detector/UI/artifact-application decisions.
+
+Evidence: `evidence:20260523-delta-record-data-model-validation`.
+Audit: `audit:20260523-delta-record-data-model-review` with verdict `clear` within audited scope.
+
+Residual limits: this ticket does not implement detector heuristics, Pi review UI, artifact drafting/application, model calls, classifier behavior, or long-run corpus evaluation. Those remain in later plan tickets.
 
 ## Journal
 
 - 2026-05-23: Created as the foundational child ticket of `plan:20260523-delta-artifact-learning-loop`.
 - 2026-05-23: Set active for bounded current-session Ralph implementation slice; plan set active in parallel.
+- 2026-05-23: Implemented storage/schema/API substrate and focused tests for deltas, detector signals, artifact candidates, rerouting, outcomes, recurrence links, redaction, and old-DB migration.
+- 2026-05-23: Recorded `evidence:20260523-delta-record-data-model-validation`; final validation passed `npm run typecheck`, `npm test`, `npm run test:smoke:local`, `npm run build`, and `npm pack --dry-run`.
+- 2026-05-23: Recorded `audit:20260523-delta-record-data-model-review` with verdict `clear`; closed ticket with detector/UI/artifact/model/classifier behavior explicitly out of scope.

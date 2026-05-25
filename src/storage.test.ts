@@ -279,6 +279,148 @@ describe("FlightRecorderStore", () => {
     store.close();
   });
 
+  it("stores redacted expectation deltas, detector signals, artifact candidates, outcomes, and reroutes separately", async () => {
+    const dir = await mkdtemp(path.join(tmpdir(), "pfr-deltas-"));
+    const dbPath = path.join(dir, "flight.db");
+    const store = new FlightRecorderStore(dbPath);
+    const evidence = [
+      {
+        sourceType: "session-entry" as const,
+        sourceId: "entry-1",
+        sourceFile: "/Users/alice/.pi/agent/sessions/private/session.jsonl",
+        sessionFile: "/Users/alice/.pi/agent/sessions/private/session.jsonl",
+        cwd: "/Users/alice/private/project",
+        entryId: "entry-1",
+        timestamp: "2026-05-23T00:00:00.000Z",
+        snippet: "User correction said API_KEY=secret-value was wrong in /Users/alice/private/project/src/storage.ts",
+        note: "Observed in local session TOKEN=abc123",
+      },
+    ];
+
+    const delta = store.createExpectationDelta({
+      source: "detector",
+      summary: "Assistant misunderstood storage boundary with API_KEY=secret-value in /Users/alice/private/project/src/storage.ts",
+      expectation: "Storage owns repository behavior; mapper code belongs elsewhere. TOKEN=abc123",
+      reality: "Assistant edited /Users/alice/private/project/src/storage.ts directly and leaked password=hunter2 in notes.",
+      impact: "Repeated review churn in /Users/alice/private/project",
+      severity: "medium",
+      cwd: "/Users/alice/private/project",
+      sourceSessionFile: "/Users/alice/.pi/agent/sessions/private/session.jsonl",
+      sourceEntryId: "entry-1",
+      evidenceRefs: evidence,
+      metadata: { rawPrompt: "please inspect /Users/alice/private/project with API_KEY=secret-value" },
+      now: "2026-05-23T00:00:00.000Z",
+    });
+
+    expect(delta.status).toBe("candidate");
+    expect(delta.summary).not.toContain("secret-value");
+    expect(delta.expectation).not.toContain("abc123");
+    expect(delta.reality).not.toContain("hunter2");
+    expect(delta.cwd).toContain("/Users/<user>");
+    expect(delta.sourceSessionFile).toContain("<pi-session-file:");
+    expect(delta.evidenceRefs[0]?.snippet).not.toContain("secret-value");
+    expect(JSON.stringify(delta.metadata)).not.toContain("secret-value");
+
+    const signal = store.recordDeltaDetectorSignal({
+      deltaId: delta.id,
+      type: "user-correction",
+      explanation: "User said no, storage mapping lives elsewhere; AUTH_TOKEN=raw-token",
+      confidence: 0.72,
+      evidenceRefs: evidence,
+      metadata: { path: "/Users/alice/private/project/src/storage.ts", token: "TOKEN=abc123" },
+      now: "2026-05-23T00:01:00.000Z",
+    });
+    expect(signal.explanation).not.toContain("raw-token");
+    expect(store.listDeltaDetectorSignals(delta.id)).toHaveLength(1);
+
+    const accepted = store.acceptExpectationDelta(delta.id, {
+      expectation: "Keep storage and mappers separate.",
+      reality: "Assistant crossed the seam twice.",
+      severity: "high",
+      now: "2026-05-23T00:02:00.000Z",
+    });
+    expect(accepted?.status).toBe("accepted");
+    expect(accepted?.severity).toBe("high");
+
+    const candidate = store.createArtifactCandidate({
+      deltaId: delta.id,
+      artifactType: "code-legibility",
+      title: "Refactor storage mapper seam TOKEN=abc123",
+      rationale: "A rule would remind the assistant, but code shape caused repeated confusion in /Users/alice/private/project.",
+      proposedDraft: "Create a refactor ticket; do not edit /Users/alice/private/project/src/storage.ts automatically. API_KEY=secret-value",
+      nextStep: "Open Loom ticket candidate for mapper seam.",
+      confidence: 0.8,
+      limits: ["Only two examples from /Users/alice/private/project"],
+      evidenceRefs: evidence,
+      now: "2026-05-23T00:03:00.000Z",
+    });
+
+    expect(candidate.status).toBe("pending-review");
+    expect(candidate.artifactType).toBe("code-legibility");
+    expect(candidate.title).not.toContain("abc123");
+    expect(candidate.proposedDraft).not.toContain("secret-value");
+    expect(candidate.evidenceRefs[0]?.sessionFile).toContain("<pi-session-file:");
+    expect(store.getExpectationDelta(delta.id)?.status).toBe("routed");
+    expect(store.getExpectationDelta(delta.id)?.activeArtifactCandidateId).toBe(candidate.id);
+
+    expect(store.acceptArtifactCandidate(candidate.id, "2026-05-23T00:04:00.000Z")?.status).toBe("accepted");
+    const applied = store.markArtifactCandidateApplied(candidate.id, { appliedArtifactRef: "/Users/alice/private/project/.loom/tickets/refactor.md TOKEN=abc123", now: "2026-05-23T00:05:00.000Z" });
+    expect(applied?.applied).toBe(true);
+    expect(applied?.appliedArtifactRef).not.toContain("abc123");
+    const resolved = store.updateArtifactCandidateOutcome(candidate.id, { outcome: "helped", outcomeSummary: "No recurrence after refactor ticket was applied.", now: "2026-05-23T00:06:00.000Z" });
+    expect(resolved?.status).toBe("resolved");
+    expect(resolved?.outcome).toBe("helped");
+
+    const rerouteCandidate = store.createArtifactCandidate({
+      deltaId: delta.id,
+      artifactType: "loom-ticket",
+      title: "Alternative route",
+      rationale: "Reroute to a narrower Loom ticket.",
+      supersedesCandidateId: candidate.id,
+      routeDelta: false,
+      now: "2026-05-23T00:07:00.000Z",
+    });
+    const rerouted = store.rerouteExpectationDelta(delta.id, rerouteCandidate.id, "Manual reroute after outcome review", "2026-05-23T00:08:00.000Z");
+    expect(rerouted?.activeArtifactCandidateId).toBe(rerouteCandidate.id);
+    expect(store.getArtifactCandidate(candidate.id)?.outcome).toBe("helped");
+
+    const recurrence = store.linkDeltaRecurrence({
+      deltaId: delta.id,
+      priorArtifactCandidateId: candidate.id,
+      reason: "Similar delta recurred after artifact application in /Users/alice/private/project",
+      similarity: 0.91,
+      evidenceRefs: evidence,
+      now: "2026-05-23T00:09:00.000Z",
+    });
+    expect(recurrence.similarity).toBe(0.91);
+    expect(store.listDeltaRecurrenceLinks({ priorArtifactCandidateId: candidate.id })).toHaveLength(1);
+    expect(store.listArtifactCandidates({ deltaId: delta.id })).toHaveLength(2);
+    expect(store.listExpectationDeltas({ status: "routed" })[0]?.id).toBe(delta.id);
+
+    const dismissedDelta = store.createExpectationDelta({
+      source: "manual",
+      summary: "One-off confusion to dismiss",
+      now: "2026-05-23T00:10:00.000Z",
+    });
+    expect(store.dismissExpectationDelta(dismissedDelta.id, "Not recurring", "2026-05-23T00:11:00.000Z")?.status).toBe("dismissed");
+    expect(store.listExpectationDeltas({ status: "dismissed" })[0]?.id).toBe(dismissedDelta.id);
+
+    expect(store.count("expectation_deltas")).toBe(2);
+    expect(store.count("delta_detector_signals")).toBe(1);
+    expect(store.count("artifact_candidates")).toBe(2);
+    expect(store.count("delta_recurrence_links")).toBe(1);
+    store.close();
+
+    const db = new DatabaseSync(dbPath);
+    const rawDelta = db.prepare("SELECT summary, expectation, reality, cwd, sourceSessionFile, evidenceJson, metadataJson FROM expectation_deltas WHERE id = ?").get(delta.id) as Record<string, string>;
+    const rawCandidate = db.prepare("SELECT title, proposedDraft, appliedArtifactRef, evidenceJson FROM artifact_candidates WHERE id = ?").get(candidate.id) as Record<string, string>;
+    db.close();
+    expect(JSON.stringify(rawDelta)).not.toContain("secret-value");
+    expect(JSON.stringify(rawDelta)).not.toContain("/Users/alice");
+    expect(JSON.stringify(rawCandidate)).not.toContain("abc123");
+    expect(JSON.stringify(rawCandidate)).not.toContain("/Users/alice");
+  });
+
   it("migrates older local databases to current schema", async () => {
     const dir = await mkdtemp(path.join(tmpdir(), "pfr-migrate-"));
     const dbPath = path.join(dir, "flight.db");
@@ -311,7 +453,17 @@ describe("FlightRecorderStore", () => {
     expect(occurrence.repeatCount).toBe(1);
     expect(store.count("feedback_actions")).toBe(0);
     expect(store.count("failure_clusters")).toBe(0);
+    expect(store.count("expectation_deltas")).toBe(0);
+    expect(store.count("delta_detector_signals")).toBe(0);
+    expect(store.count("artifact_candidates")).toBe(0);
+    expect(store.count("delta_recurrence_links")).toBe(0);
     store.close();
+
+    const migrated = new DatabaseSync(dbPath);
+    expect((migrated.prepare("PRAGMA user_version").get() as { user_version: number }).user_version).toBe(4);
+    const tables = migrated.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('expectation_deltas', 'delta_detector_signals', 'artifact_candidates', 'delta_recurrence_links') ORDER BY name").all() as Array<{ name: string }>;
+    migrated.close();
+    expect(tables.map((row) => row.name)).toEqual(["artifact_candidates", "delta_detector_signals", "delta_recurrence_links", "expectation_deltas"]);
   });
 
   it("builds safe FTS queries from path-like text", () => {

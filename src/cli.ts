@@ -4,7 +4,7 @@ import type { QueryOptions } from "./query.js";
 import type { SyncOptions } from "./sync.js";
 import type { LiveMode, LiveSuggestionStatus } from "./live-suggestions.js";
 import type { SessionWatchStatus } from "./watch-service.js";
-import type { FeedbackAction } from "./types.js";
+import type { ExpectationDeltaSeverity, ExpectationDeltaStatus, FeedbackAction } from "./types.js";
 
 export interface CliIO {
   stdout: (text: string) => void;
@@ -30,6 +30,8 @@ Usage:
   pi-flight-recorder watch status [--data-dir DIR] [--json]
   pi-flight-recorder watch stop [--data-dir DIR]
   pi-flight-recorder reflect [--data-dir DIR] [--min-count N] [--limit N] [--json]
+  pi-flight-recorder delta capture --data-dir DIR --summary TEXT [--expectation TEXT] [--reality TEXT] [--impact TEXT] [--severity low|medium|high|unknown] [--cwd CWD] [--session-file FILE] [--entry ID] [--evidence TEXT] [--json]
+  pi-flight-recorder delta list [--data-dir DIR] [--status candidate|accepted|dismissed|routed|resolved|recurring] [--limit N] [--json]
   pi-flight-recorder feedback --data-dir DIR --action useful|wrong-match|already-solved|not-useful|snooze|silence-pattern|promote-later|make-rule [--occurrence ID|--cluster ID|--proposal ID|--episode ID|--signature TEXT] [--duration-ms N] [--note TEXT]
   pi-flight-recorder --version
   pi-flight-recorder --help
@@ -85,6 +87,16 @@ function parseNumber(value: string | null): number | undefined {
 
 function parseMode(value: string | null): LiveMode | null {
   if (value === "off" || value === "index-only" || value === "suggest-on-failure") return value;
+  return null;
+}
+
+function parseSeverity(value: string | null): ExpectationDeltaSeverity | null {
+  if (value === "low" || value === "medium" || value === "high" || value === "unknown") return value;
+  return null;
+}
+
+function parseDeltaStatus(value: string | null): ExpectationDeltaStatus | null {
+  if (value === "candidate" || value === "accepted" || value === "dismissed" || value === "routed" || value === "resolved" || value === "recurring") return value;
   return null;
 }
 
@@ -231,6 +243,71 @@ async function runFeedback(args: string[], io: CliIO): Promise<number> {
   return 0;
 }
 
+async function runDelta(args: string[], io: CliIO): Promise<number> {
+  const [subcommand, ...rest] = args;
+  const dataDir = readOption(rest, "--data-dir") ?? undefined;
+  const asJson = rest.includes("--json");
+
+  if (subcommand === "capture") {
+    const summary = readOption(rest, "--summary");
+    if (!summary) {
+      io.stderr("delta capture requires --summary TEXT.");
+      return 2;
+    }
+    const severityOption = readOption(rest, "--severity");
+    const severity = severityOption ? parseSeverity(severityOption) : undefined;
+    if (severityOption && !severity) {
+      io.stderr("--severity must be one of: low, medium, high, unknown.");
+      return 2;
+    }
+    const { captureManualDelta } = await import("./delta-capture.js");
+    const captureInput: Parameters<typeof captureManualDelta>[0] = { summary };
+    if (dataDir !== undefined) captureInput.dataDir = dataDir;
+    if (readOption(rest, "--expectation") !== null) captureInput.expectation = readOption(rest, "--expectation");
+    if (readOption(rest, "--reality") !== null) captureInput.reality = readOption(rest, "--reality");
+    if (readOption(rest, "--impact") !== null) captureInput.impact = readOption(rest, "--impact");
+    if (severity !== undefined && severity !== null) captureInput.severity = severity;
+    if (readOption(rest, "--cwd") !== null) captureInput.cwd = readOption(rest, "--cwd");
+    if (readOption(rest, "--session-file") !== null) captureInput.sessionFile = readOption(rest, "--session-file");
+    if (readOption(rest, "--entry") !== null) captureInput.entryId = readOption(rest, "--entry");
+    if (readOption(rest, "--evidence") !== null) captureInput.evidenceText = readOption(rest, "--evidence");
+    const result = captureManualDelta(captureInput);
+    if (asJson) io.stdout(JSON.stringify(result, null, 2));
+    else io.stdout(`Recorded delta candidate: ${result.delta.id}\nSignal: ${result.signals[0]?.type ?? "none"}\nStatus: ${result.delta.status}`);
+    return 0;
+  }
+
+  if (subcommand === "list") {
+    const statusOption = readOption(rest, "--status");
+    let status: ExpectationDeltaStatus | undefined;
+    if (statusOption) {
+      const parsedStatus = parseDeltaStatus(statusOption);
+      if (!parsedStatus) {
+        io.stderr("--status must be one of: candidate, accepted, dismissed, routed, resolved, recurring.");
+        return 2;
+      }
+      status = parsedStatus;
+    }
+    const limit = parseLimit(readOption(rest, "--limit"));
+    const { defaultDatabasePath, FlightRecorderStore, getDefaultDataDir } = await import("./storage.js");
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir ?? getDefaultDataDir()));
+    try {
+      const options: Parameters<typeof store.listExpectationDeltas>[0] = {};
+      if (status !== undefined) options.status = status;
+      if (limit !== undefined) options.limit = limit;
+      const deltas = store.listExpectationDeltas(options);
+      if (asJson) io.stdout(JSON.stringify({ deltas }, null, 2));
+      else io.stdout(deltas.length === 0 ? "No delta candidates found." : deltas.map((delta) => `${delta.id} [${delta.status}] ${delta.summary}`).join("\n"));
+    } finally {
+      store.close();
+    }
+    return 0;
+  }
+
+  io.stderr("delta requires subcommand: capture or list.");
+  return 2;
+}
+
 async function runStatus(args: string[], io: CliIO): Promise<number> {
   const dataDir = readOption(args, "--data-dir") ?? undefined;
   const asJson = args.includes("--json");
@@ -252,6 +329,8 @@ async function runStatus(args: string[], io: CliIO): Promise<number> {
         occurrences: store.count("failure_occurrences"),
         clusters: store.count("failure_clusters"),
         proposals: store.count("reflection_proposals"),
+        deltas: store.count("expectation_deltas"),
+        artifactCandidates: store.count("artifact_candidates"),
         feedbackActions: store.count("feedback_actions"),
       },
       privacy: {
@@ -266,7 +345,7 @@ async function runStatus(args: string[], io: CliIO): Promise<number> {
         `Data dir: ${resolvedDataDir}`,
         `Mode: ${settings.mode}; autostart=${settings.autoStart}; modelReflection=${settings.modelReflection}`,
         `Watcher: ${watchStatus?.state ?? "stopped"}; last sync ${watchStatus?.lastSyncAt ?? "never"}`,
-        `Counts: episodes=${status.counts.episodes}, occurrences=${status.counts.occurrences}, clusters=${status.counts.clusters}, proposals=${status.counts.proposals}, feedback=${status.counts.feedbackActions}`,
+        `Counts: episodes=${status.counts.episodes}, occurrences=${status.counts.occurrences}, clusters=${status.counts.clusters}, proposals=${status.counts.proposals}, deltas=${status.counts.deltas}, artifacts=${status.counts.artifactCandidates}, feedback=${status.counts.feedbackActions}`,
         "Normal UX: use the Pi extension commands /flight-status and /flight-reflect.",
       ].join("\n"));
     }
@@ -432,6 +511,8 @@ export async function main(argv = process.argv.slice(2), io = defaultIO): Promis
       return runWatch(args, io);
     case "reflect":
       return runReflect(args, io);
+    case "delta":
+      return runDelta(args, io);
     case "feedback":
       return runFeedback(args, io);
     default:

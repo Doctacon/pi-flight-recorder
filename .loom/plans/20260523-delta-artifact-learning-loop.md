@@ -139,9 +139,13 @@ The project has evidence-backed guidance on whether automated artifact routing i
 
 ## Current State
 
-Plan is active. `ticket:20260523-delta-record-data-model` is the first execution unit and is now active. This plan remains a future product arc, not a release-readiness blocker, and still deliberately sequences corpus/manual routing before classifier automation.
+Plan is active. The delta corpus substrate milestone is complete: `ticket:20260523-delta-record-data-model` and `ticket:20260523-delta-capture-signals` are both closed with evidence and audit. The system can locally collect reviewable expectation-delta candidates with evidence and explainable signals.
+
+The next execution unit is `ticket:20260523-manual-artifact-routing-review`, which should expose review/routing UX over candidate deltas without applying artifacts. This plan remains a future product arc, not a release-readiness blocker, and still deliberately sequences corpus/manual routing before classifier automation.
 
 ## Journal
 
 - 2026-05-23: Created plan from operator ideation that the project's power lies in defining “what is a problem?” as expectation delta, then choosing/creating the artifact most likely to bridge that delta. Strategy intentionally chooses corpus/manual routing before classifier automation.
 - 2026-05-23: Started first execution unit, `ticket:20260523-delta-record-data-model`.
+- 2026-05-23: Closed first execution unit with `evidence:20260523-delta-record-data-model-validation` and `audit:20260523-delta-record-data-model-review`; next unit is `ticket:20260523-delta-capture-signals`.
+- 2026-05-23: Closed `ticket:20260523-delta-capture-signals` with `evidence:20260523-delta-capture-signals-validation` and `audit:20260523-delta-capture-signals-review`; next unit is `ticket:20260523-manual-artifact-routing-review`.

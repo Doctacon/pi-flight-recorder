@@ -14,3 +14,4 @@ export * from "./reflection.js";
 export * from "./flight-rules.js";
 export * from "./interactive-review.js";
 export * from "./redact.js";
+export * from "./delta-capture.js";

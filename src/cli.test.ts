@@ -71,6 +71,43 @@ describe("CLI", () => {
     expect(stderr).toEqual([]);
   });
 
+  it("supports explicit manual delta capture and listing", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-delta-cli-data-"));
+    const stdout: string[] = [];
+    const stderr: string[] = [];
+    const io = { stdout: (text: string) => stdout.push(text), stderr: (text: string) => stderr.push(text) };
+
+    await expect(main([
+      "delta",
+      "capture",
+      "--data-dir",
+      dataDir,
+      "--summary",
+      "Assistant used old API TOKEN=abc123 in /Users/alice/private/project/src/api.ts",
+      "--expectation",
+      "Use the new API",
+      "--reality",
+      "The old API was suggested",
+      "--evidence",
+      "No, actually the API works differently with API_KEY=secret-value",
+      "--cwd",
+      "/Users/alice/private/project",
+      "--json",
+    ], io)).resolves.toBe(0);
+    const captured = JSON.parse(stdout.at(-1) ?? "{}");
+    expect(captured.delta.id).toMatch(/^delta_/);
+    expect(captured.delta.status).toBe("candidate");
+    expect(captured.delta.summary).not.toContain("abc123");
+    expect(captured.signals[0].type).toBe("manual-capture");
+
+    stdout.length = 0;
+    await expect(main(["delta", "list", "--data-dir", dataDir, "--status", "candidate", "--json"], io)).resolves.toBe(0);
+    const listed = JSON.parse(stdout.at(-1) ?? "{}");
+    expect(listed.deltas).toHaveLength(1);
+    expect(listed.deltas[0].summary).not.toContain("abc123");
+    expect(stderr).toEqual([]);
+  });
+
   it("prints friendly no-match output", async () => {
     const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-empty-data-"));
     const stdout: string[] = [];
