@@ -367,6 +367,7 @@ export type ArtifactCandidateStatus =
   | "accepted"
   | "routed"
   | "dismissed"
+  | "rejected"
   | "applied"
   | "resolved"
   | "recurring";

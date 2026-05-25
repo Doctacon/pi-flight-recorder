@@ -4,7 +4,7 @@ import type { QueryOptions } from "./query.js";
 import type { SyncOptions } from "./sync.js";
 import type { LiveMode, LiveSuggestionStatus } from "./live-suggestions.js";
 import type { SessionWatchStatus } from "./watch-service.js";
-import type { ExpectationDeltaSeverity, ExpectationDeltaStatus, FeedbackAction } from "./types.js";
+import type { ArtifactCandidateOutcome, ExpectationDeltaSeverity, ExpectationDeltaStatus, FeedbackAction } from "./types.js";
 
 export interface CliIO {
   stdout: (text: string) => void;
@@ -32,6 +32,9 @@ Usage:
   pi-flight-recorder reflect [--data-dir DIR] [--min-count N] [--limit N] [--json]
   pi-flight-recorder delta capture --data-dir DIR --summary TEXT [--expectation TEXT] [--reality TEXT] [--impact TEXT] [--severity low|medium|high|unknown] [--cwd CWD] [--session-file FILE] [--entry ID] [--evidence TEXT] [--json]
   pi-flight-recorder delta list [--data-dir DIR] [--status candidate|accepted|dismissed|routed|resolved|recurring] [--limit N] [--json]
+  pi-flight-recorder delta summary [--data-dir DIR] [--limit N] [--json]
+  pi-flight-recorder delta outcome --data-dir DIR --candidate ID --outcome pending|helped|no-change|worse|superseded|needs-reroute [--note TEXT] [--applied-ref REF] [--json]
+  pi-flight-recorder delta recur --data-dir DIR --delta ID --candidate ID --reason TEXT [--similarity N] [--json]
   pi-flight-recorder feedback --data-dir DIR --action useful|wrong-match|already-solved|not-useful|snooze|silence-pattern|promote-later|make-rule [--occurrence ID|--cluster ID|--proposal ID|--episode ID|--signature TEXT] [--duration-ms N] [--note TEXT]
   pi-flight-recorder --version
   pi-flight-recorder --help
@@ -97,6 +100,11 @@ function parseSeverity(value: string | null): ExpectationDeltaSeverity | null {
 
 function parseDeltaStatus(value: string | null): ExpectationDeltaStatus | null {
   if (value === "candidate" || value === "accepted" || value === "dismissed" || value === "routed" || value === "resolved" || value === "recurring") return value;
+  return null;
+}
+
+function parseArtifactOutcome(value: string | null): ArtifactCandidateOutcome | null {
+  if (value === "pending" || value === "helped" || value === "no-change" || value === "worse" || value === "superseded" || value === "needs-reroute") return value;
   return null;
 }
 
@@ -304,7 +312,85 @@ async function runDelta(args: string[], io: CliIO): Promise<number> {
     return 0;
   }
 
-  io.stderr("delta requires subcommand: capture or list.");
+  if (subcommand === "summary") {
+    const limit = parseLimit(readOption(rest, "--limit"));
+    const { defaultDatabasePath, FlightRecorderStore, getDefaultDataDir } = await import("./storage.js");
+    const { formatDeltaOutcomeSummary, summarizeDeltaOutcomes } = await import("./delta-outcomes.js");
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir ?? getDefaultDataDir()));
+    try {
+      const summary = summarizeDeltaOutcomes(store, limit !== undefined ? { limit } : {});
+      if (asJson) io.stdout(JSON.stringify(summary, null, 2));
+      else io.stdout(formatDeltaOutcomeSummary(summary));
+    } finally {
+      store.close();
+    }
+    return 0;
+  }
+
+  if (subcommand === "outcome") {
+    const candidateId = readOption(rest, "--candidate");
+    const outcome = parseArtifactOutcome(readOption(rest, "--outcome"));
+    if (!candidateId || !outcome) {
+      io.stderr("delta outcome requires --candidate ID and --outcome pending|helped|no-change|worse|superseded|needs-reroute.");
+      return 2;
+    }
+    const { defaultDatabasePath, FlightRecorderStore, getDefaultDataDir } = await import("./storage.js");
+    const { recordArtifactCandidateOutcomeWithStore } = await import("./delta-outcomes.js");
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir ?? getDefaultDataDir()));
+    try {
+      const outcomeInput: Parameters<typeof recordArtifactCandidateOutcomeWithStore>[1] = {
+        candidateId,
+        outcome,
+        outcomeSummary: readOption(rest, "--note"),
+      };
+      const appliedRef = readOption(rest, "--applied-ref");
+      if (appliedRef !== null) outcomeInput.appliedArtifactRef = appliedRef;
+      const result = recordArtifactCandidateOutcomeWithStore(store, outcomeInput);
+      if (!result) {
+        io.stderr(`No artifact candidate found for ${candidateId}.`);
+        return 1;
+      }
+      if (asJson) io.stdout(JSON.stringify(result, null, 2));
+      else io.stdout(`Recorded outcome for ${result.candidate.id}: ${result.candidate.outcome} [${result.candidate.status}].`);
+    } finally {
+      store.close();
+    }
+    return 0;
+  }
+
+  if (subcommand === "recur") {
+    const deltaId = readOption(rest, "--delta");
+    const candidateId = readOption(rest, "--candidate");
+    const reason = readOption(rest, "--reason");
+    if (!deltaId || !candidateId || !reason) {
+      io.stderr("delta recur requires --delta ID --candidate ID --reason TEXT.");
+      return 2;
+    }
+    const { defaultDatabasePath, FlightRecorderStore, getDefaultDataDir } = await import("./storage.js");
+    const { recordDeltaRecurrenceWithStore } = await import("./delta-outcomes.js");
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir ?? getDefaultDataDir()));
+    try {
+      const recurrenceInput: Parameters<typeof recordDeltaRecurrenceWithStore>[1] = {
+        deltaId,
+        priorArtifactCandidateId: candidateId,
+        reason,
+      };
+      const similarity = parseNumber(readOption(rest, "--similarity"));
+      if (similarity !== undefined) recurrenceInput.similarity = similarity;
+      const result = recordDeltaRecurrenceWithStore(store, recurrenceInput);
+      if (!result) {
+        io.stderr(`No matching delta/candidate found for delta=${deltaId} candidate=${candidateId}.`);
+        return 1;
+      }
+      if (asJson) io.stdout(JSON.stringify(result, null, 2));
+      else io.stdout(`Linked recurrence ${result.link.id}: delta ${result.recurringDelta.id} -> candidate ${result.priorArtifactCandidate.id}.`);
+    } finally {
+      store.close();
+    }
+    return 0;
+  }
+
+  io.stderr("delta requires subcommand: capture, list, summary, outcome, or recur.");
   return 2;
 }
 
@@ -312,6 +398,7 @@ async function runStatus(args: string[], io: CliIO): Promise<number> {
   const dataDir = readOption(args, "--data-dir") ?? undefined;
   const asJson = args.includes("--json");
   const { defaultDatabasePath, FlightRecorderStore, getDefaultDataDir } = await import("./storage.js");
+  const { summarizeDeltaOutcomes } = await import("./delta-outcomes.js");
   const { readSettings } = await import("./settings.js");
   const { readPersistedWatchStatus } = await import("./watch-service.js");
   const resolvedDataDir = dataDir ?? getDefaultDataDir();
@@ -319,6 +406,7 @@ async function runStatus(args: string[], io: CliIO): Promise<number> {
   const watchStatus = await readPersistedWatchStatus(resolvedDataDir);
   const store = new FlightRecorderStore(defaultDatabasePath(resolvedDataDir));
   try {
+    const deltaOutcomes = summarizeDeltaOutcomes(store, { limit: 20 });
     const status = {
       dataDir: resolvedDataDir,
       settings,
@@ -333,6 +421,10 @@ async function runStatus(args: string[], io: CliIO): Promise<number> {
         artifactCandidates: store.count("artifact_candidates"),
         feedbackActions: store.count("feedback_actions"),
       },
+      deltaOutcomes: {
+        counts: deltaOutcomes.counts,
+        limits: deltaOutcomes.limits,
+      },
       privacy: {
         localOnlyByDefault: true,
         modelReflectionEnabled: settings.modelReflection,
@@ -346,6 +438,7 @@ async function runStatus(args: string[], io: CliIO): Promise<number> {
         `Mode: ${settings.mode}; autostart=${settings.autoStart}; modelReflection=${settings.modelReflection}`,
         `Watcher: ${watchStatus?.state ?? "stopped"}; last sync ${watchStatus?.lastSyncAt ?? "never"}`,
         `Counts: episodes=${status.counts.episodes}, occurrences=${status.counts.occurrences}, clusters=${status.counts.clusters}, proposals=${status.counts.proposals}, deltas=${status.counts.deltas}, artifacts=${status.counts.artifactCandidates}, feedback=${status.counts.feedbackActions}`,
+        `Delta outcomes: unresolved=${deltaOutcomes.counts.unresolved}, insufficient evidence=${deltaOutcomes.counts["insufficient-evidence"]}, no recurrence observed=${deltaOutcomes.counts["no-recurrence-observed"]}, recurring after applied=${deltaOutcomes.counts["recurring-after-applied"]}`,
         "Normal UX: use the Pi extension commands /flight-status and /flight-reflect.",
       ].join("\n"));
     }

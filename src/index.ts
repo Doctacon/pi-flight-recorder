@@ -15,3 +15,5 @@ export * from "./flight-rules.js";
 export * from "./interactive-review.js";
 export * from "./redact.js";
 export * from "./delta-capture.js";
+export * from "./artifact-drafts.js";
+export * from "./delta-outcomes.js";

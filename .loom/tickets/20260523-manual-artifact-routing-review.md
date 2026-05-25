@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-manual-artifact-routing-review
 Type: Ticket
-Status: open
+Status: closed
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: high - this UX encodes the product judgment about what kinds of artifacts can bridge deltas, and a weak flow would bias users toward rules instead of the right intervention
@@ -68,8 +68,24 @@ UX constraints:
 
 ## Current State
 
-Ready after `ticket:20260523-delta-record-data-model`; it can consume detector candidates when `ticket:20260523-delta-capture-signals` lands, but should also work with manually seeded delta records for vertical testing.
+Closed. The Pi-native manual artifact-routing review slice is implemented and validated.
+
+Closure support:
+
+- ACC-001: `/flight-delta-review` lets a user select a pending delta and review/refine expectation, reality, impact, signals, and evidence before routing.
+- ACC-002: the guided flow stores route type and rationale as an accepted but unapplied artifact candidate, marks the delta routed, and does not create Flight Rules or other durable artifacts.
+- ACC-003: observe/no-artifact and dismiss paths are supported by `/flight-deltas` fallback commands and preserve evidence refs.
+- ACC-004: no-UI fallback explicitly points to scriptable `/flight-deltas list|show|route|dismiss` commands.
+- ACC-005: final validation passed `npm run typecheck`, `npm test` (15 files / 70 tests), `npm run test:smoke:local`, `npm run build`, and `npm pack --dry-run` (77 files), including existing Flight Rule guided review tests.
+
+Evidence: `evidence:20260523-manual-artifact-routing-review-validation`.
+Audit: `audit:20260523-manual-artifact-routing-review` with verdict `clear` within audited scope.
+
+Residual limits: no real interactive TUI proof for this new delta-review flow, no artifact draft/handoff generation, no durable artifact creation/mutation, no classifier/model route selection, and no long-run route-quality evaluation.
 
 ## Journal
 
 - 2026-05-23: Created to preserve the manual reflective judgment step before any classifier or artifact generator is introduced.
+- 2026-05-23: Implemented `/flight-delta-review` guided routing and `/flight-deltas list|show|route|dismiss` fallback commands with fake-Pi tests.
+- 2026-05-23: Recorded `evidence:20260523-manual-artifact-routing-review-validation`; final validation passed `npm run typecheck`, `npm test`, `npm run test:smoke:local`, `npm run build`, and `npm pack --dry-run`.
+- 2026-05-23: Recorded `audit:20260523-manual-artifact-routing-review` with verdict `clear`; closed with artifact drafting/application and classifier/model behavior explicitly out of scope.

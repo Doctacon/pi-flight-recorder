@@ -47,6 +47,8 @@ describe("Pi extension wrapper", () => {
     expect(commands.has("flight-reflect")).toBe(true);
     expect(commands.has("flight-review")).toBe(true);
     expect(commands.has("flight-rules")).toBe(true);
+    expect(commands.has("flight-delta-review")).toBe(true);
+    expect(commands.has("flight-deltas")).toBe(true);
     expect(events.has("session_start")).toBe(true);
     expect(events.has("tool_result")).toBe(true);
     expect(events.has("user_bash")).toBe(true);
@@ -395,6 +397,210 @@ describe("Pi extension wrapper", () => {
       afterCancel.close();
     }
     expect(notifications.join("\n")).toContain("cancelled");
+  });
+
+  it("routes an expectation delta through guided review without applying artifacts", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-delta-review-data-"));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    let deltaId = "";
+    try {
+      const delta = store.createExpectationDelta({
+        source: "detector",
+        summary: "Assistant repeatedly treats storage as mapper owner",
+        expectation: "Mapper/sanitization seams should stay separate from repository storage behavior.",
+        reality: "Assistant edited storage directly and missed the mapper seam twice.",
+        impact: "Repeated review churn before implementation.",
+        severity: "medium",
+        cwd: "/repo",
+        evidenceRefs: [{ sourceType: "session-entry", sourceId: "u-correct", sourceFile: "session.jsonl", sessionFile: "session.jsonl", cwd: "/repo", entryId: "u-correct", timestamp: "2026-05-23T01:00:00.000Z", snippet: "No, actually the mapper owns that behavior", note: "User correction" }],
+      });
+      deltaId = delta.id;
+      store.recordDeltaDetectorSignal({ deltaId, type: "user-correction", explanation: "User correction language matched a conservative phrase.", confidence: 0.68, evidenceRefs: delta.evidenceRefs });
+    } finally {
+      store.close();
+    }
+
+    const notifications: string[] = [];
+    const selectPrompts: string[] = [];
+    const selectChoices: string[][] = [];
+    const editorPrompts: string[] = [];
+    const editorPrefills: string[] = [];
+    const ctx = {
+      cwd: "/repo",
+      ui: {
+        notify: (message: string) => notifications.push(message),
+        select: (message: string, choices: string[]) => {
+          selectPrompts.push(message);
+          selectChoices.push(choices);
+          if (message.includes("Choose an expectation delta")) return choices[0];
+          if (message.includes("Route expectation delta")) return choices.find((choice) => choice.startsWith("Code legibility"));
+          return undefined;
+        },
+        editor: (message: string, prefilled: string) => {
+          editorPrompts.push(message);
+          editorPrefills.push(prefilled);
+          if (message.includes("Review expectation delta")) return prefilled.replace("Repeated review churn before implementation.", "Repeated review churn and stale route choices.");
+          if (message.includes("Routing rationale")) return "The code seam is the repeated confusion source; draft a refactor ticket later.";
+          return undefined;
+        },
+      },
+      sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
+    };
+
+    await commands.get("flight-delta-review")?.handler(`--data-dir ${dataDir}`, ctx);
+
+    expect(selectChoices[0]?.[0]).toContain(deltaId);
+    expect(selectPrompts.find((prompt) => prompt.includes("Route expectation delta"))).toContain("Signals:");
+    expect(selectPrompts.find((prompt) => prompt.includes("Route expectation delta"))).toContain("Evidence:");
+    expect(selectChoices[1]?.some((choice) => choice.startsWith("Code legibility"))).toBe(true);
+    expect(selectChoices[1]?.some((choice) => choice.startsWith("Flight Rule"))).toBe(true);
+    expect(selectChoices[1]?.some((choice) => choice.startsWith("Test/check"))).toBe(true);
+    expect(selectChoices[1]?.some((choice) => choice.startsWith("Observe/no artifact"))).toBe(true);
+    expect(editorPrompts).toContain("Review expectation delta");
+    expect(editorPrefills[0]).toContain("Expectation:");
+    expect(editorPrefills[0]).toContain("Reality:");
+    expect(editorPrefills[0]).toContain("Signals:");
+    expect(editorPrefills[0]).toContain("Evidence:");
+
+    const check = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    try {
+      const routed = check.getExpectationDelta(deltaId);
+      expect(routed?.status).toBe("routed");
+      expect(routed?.impact).toContain("stale route choices");
+      const candidate = check.listArtifactCandidates({ deltaId })[0];
+      expect(candidate?.artifactType).toBe("code-legibility");
+      expect(candidate?.status).toBe("accepted");
+      expect(candidate?.applied).toBe(false);
+      expect(candidate?.rationale).toContain("code seam");
+      expect(candidate?.proposedDraft).toContain("Code-legibility/refactor ticket candidate");
+      expect(candidate?.nextStep).toContain("Loom ticket");
+      expect(check.count("rule_candidates")).toBe(0);
+      expect(check.count("flight_rules")).toBe(0);
+    } finally {
+      check.close();
+    }
+    expect(notifications.join("\n")).toContain("Draft/handoff text was stored locally");
+    expect(notifications.join("\n")).toContain("No artifact was created or applied");
+  });
+
+  it("supports explicit fallback delta routing, observe, no-ui guidance, and dismiss", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-delta-fallback-data-"));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    let observeDeltaId = "";
+    let dismissDeltaId = "";
+    try {
+      observeDeltaId = store.createExpectationDelta({ source: "manual", summary: "One route to observe", evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/repo", entryId: null, timestamp: null, snippet: "keep this evidence", note: "manual" }] }).id;
+      dismissDeltaId = store.createExpectationDelta({ source: "manual", summary: "One route to dismiss", evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/repo", entryId: null, timestamp: null, snippet: "dismiss evidence", note: "manual" }] }).id;
+    } finally {
+      store.close();
+    }
+
+    const notifications: string[] = [];
+    const ctx = { cwd: "/repo", ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => null } };
+
+    await commands.get("flight-delta-review")?.handler(`--data-dir ${dataDir}`, ctx);
+    expect(notifications.join("\n")).toContain("/flight-deltas list");
+    let check = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    try {
+      expect(check.getExpectationDelta(observeDeltaId)?.status).toBe("candidate");
+      expect(check.count("artifact_candidates")).toBe(0);
+    } finally {
+      check.close();
+    }
+
+    notifications.length = 0;
+    await commands.get("flight-deltas")?.handler(`route --data-dir ${dataDir} --delta ${observeDeltaId} --type observe --rationale "Observe recurrence before creating an artifact"`, ctx);
+    check = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    try {
+      const candidate = check.listArtifactCandidates({ deltaId: observeDeltaId })[0];
+      expect(candidate?.artifactType).toBe("observe");
+      expect(candidate?.status).toBe("accepted");
+      expect(candidate?.applied).toBe(false);
+      expect(candidate?.proposedDraft).toContain("Observe/no-artifact decision");
+      expect(check.getExpectationDelta(observeDeltaId)?.evidenceRefs[0]?.snippet).toContain("keep this evidence");
+    } finally {
+      check.close();
+    }
+    expect(notifications.join("\n")).toContain("No artifact was created or applied");
+
+    notifications.length = 0;
+    await commands.get("flight-deltas")?.handler(`show --data-dir ${dataDir} --delta ${observeDeltaId}`, ctx);
+    expect(notifications.join("\n")).toContain("Draft:");
+    expect(notifications.join("\n")).toContain("Observe/no-artifact decision");
+
+    notifications.length = 0;
+    await commands.get("flight-deltas")?.handler(`dismiss --data-dir ${dataDir} --delta ${dismissDeltaId} --reason "Not recurring"`, ctx);
+    check = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    try {
+      const dismissed = check.getExpectationDelta(dismissDeltaId);
+      expect(dismissed?.status).toBe("dismissed");
+      expect(dismissed?.evidenceRefs[0]?.snippet).toContain("dismiss evidence");
+    } finally {
+      check.close();
+    }
+    expect(notifications.join("\n")).toContain("Dismissed expectation delta");
+  });
+
+  it("records delta outcomes and recurrence through fallback commands", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-delta-outcome-data-"));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    let candidateId = "";
+    let laterDeltaId = "";
+    try {
+      const delta = store.createExpectationDelta({ source: "manual", summary: "Assistant misses the validation check" });
+      const candidate = store.acceptArtifactCandidate(store.createArtifactCandidate({
+        deltaId: delta.id,
+        artifactType: "test-check",
+        title: "Add validation check",
+        rationale: "A test/check route should catch this expectation delta.",
+      }).id)!;
+      candidateId = candidate.id;
+    } finally {
+      store.close();
+    }
+
+    const notifications: string[] = [];
+    const ctx = { cwd: "/repo", ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => null } };
+
+    await commands.get("flight-deltas")?.handler(`apply --data-dir ${dataDir} --candidate ${candidateId} --ref tests/validation.test.ts`, ctx);
+    expect(notifications.join("\n")).toContain("Marked artifact candidate");
+
+    notifications.length = 0;
+    await commands.get("flight-deltas")?.handler(`outcome --data-dir ${dataDir} --candidate ${candidateId} --outcome helped --note "No linked recurrence observed yet"`, ctx);
+    expect(notifications.join("\n")).toContain("Recorded outcome");
+
+    notifications.length = 0;
+    await commands.get("flight-deltas")?.handler(`summary --data-dir ${dataDir}`, ctx);
+    expect(notifications.join("\n")).toContain("No recurrence observed since applied");
+    expect(notifications.join("\n")).toContain("not proof");
+
+    const laterStore = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    try {
+      laterDeltaId = laterStore.createExpectationDelta({ source: "manual", summary: "Assistant misses the validation check again" }).id;
+    } finally {
+      laterStore.close();
+    }
+
+    notifications.length = 0;
+    await commands.get("flight-deltas")?.handler(`recur --data-dir ${dataDir} --delta ${laterDeltaId} --candidate ${candidateId} --reason "Similar delta recurred after application" --similarity 0.9`, ctx);
+    expect(notifications.join("\n")).toContain("Linked recurrence");
+    const check = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    try {
+      expect(check.getArtifactCandidate(candidateId)?.outcome).toBe("needs-reroute");
+      expect(check.getExpectationDelta(laterDeltaId)?.status).toBe("recurring");
+    } finally {
+      check.close();
+    }
+
+    notifications.length = 0;
+    await commands.get("flight-deltas")?.handler(`summary --data-dir ${dataDir}`, ctx);
+    expect(notifications.join("\n")).toContain("Recurring after applied");
   });
 
   it("guides proposal review into an approved Flight Rule and injects then disables it", async () => {

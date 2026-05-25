@@ -1,4 +1,6 @@
 import { writeFile } from "node:fs/promises";
+import { buildArtifactCandidateDraft } from "./artifact-drafts.js";
+import { formatDeltaOutcomeSummary, recordArtifactCandidateOutcomeWithStore, recordDeltaRecurrenceWithStore, summarizeDeltaOutcomes } from "./delta-outcomes.js";
 import { formatFlightRule, formatRuleCandidate, formatRuleInjectionBlock, formatRulesMarkdown } from "./flight-rules.js";
 import { askReviewChoice, askReviewEditor, fallbackMessage, type ReviewChoice } from "./interactive-review.js";
 import { compactSnippet } from "./redact.js";
@@ -11,7 +13,7 @@ import type { LiveExtensionState, PiCommandContext, PiLike } from "./pi-extensio
 import type { QueryOptions } from "./query.js";
 import type { SyncOptions } from "./sync.js";
 import { defaultDatabasePath, FlightRecorderStore, getDefaultDataDir } from "./storage.js";
-import type { FeedbackAction, FeedbackTargetType, FlightRuleScope, NewFailureOccurrence, ReflectionProposal, SuggestionOutcome } from "./types.js";
+import type { ArtifactCandidate, ArtifactCandidateOutcome, ArtifactCandidateType, DeltaDetectorSignal, ExpectationDelta, FeedbackAction, FeedbackTargetType, FlightRuleScope, NewFailureOccurrence, ReflectionProposal, SuggestionOutcome } from "./types.js";
 
 function stateDataDir(state: LiveExtensionState): string {
   return state.dataDir ?? getDefaultDataDir();
@@ -371,6 +373,8 @@ async function handleFlightStatus(argsText: string, ctx: PiCommandContext, state
     const recentFeedback = store.getFeedbackActions({ limit: 3 });
     const activeRuleCount = store.listFlightRules({ status: "active", limit: 100 }).length;
     const pendingRuleCount = store.listRuleCandidates({ status: "draft", limit: 100 }).length;
+    const pendingDeltaCount = store.listExpectationDeltas({ status: "candidate", limit: 1_000 }).length;
+    const deltaOutcomes = summarizeDeltaOutcomes(store, { limit: 20 });
     const lines = [
       `Flight recorder: ${state.mode} (${state.autoStart ? "autostart on" : "autostart off"})`,
       `Data dir: ${dataDir}`,
@@ -379,6 +383,8 @@ async function handleFlightStatus(argsText: string, ctx: PiCommandContext, state
       `Suggestions: minConfidence=${engineStatus.minConfidence.toFixed(2)}, emittedInWindow=${engineStatus.emittedInWindow}, last=${engineStatus.lastSuggestion?.episodeId ?? "none"}, last suppression=${state.lastSuppressionReason ?? "none"}`,
       `Reflection: session-end=${state.reflectionOnSessionEnd}, daily=${state.dailyDigest}, model=${state.modelReflection ? "enabled" : "disabled"}`,
       `Flight Rules: active=${activeRuleCount}, pending=${pendingRuleCount}, last injected=${state.lastInjectedRuleIds.join(", ") || "none"}`,
+      `Deltas: pending=${pendingDeltaCount}, artifact candidates=${store.count("artifact_candidates")}`,
+      `Delta outcomes: unresolved=${deltaOutcomes.counts.unresolved}, insufficient evidence=${deltaOutcomes.counts["insufficient-evidence"]}, no recurrence observed=${deltaOutcomes.counts["no-recurrence-observed"]}, recurring after applied=${deltaOutcomes.counts["recurring-after-applied"]}`,
       `User-bash capture: disabled (Pi user_bash is pre-execution; command semantics are not wrapped).`,
       `Errors: ${state.lastBootstrapError ?? (watchStatus?.state === "watched-by-another-process" ? null : watchStatus?.lastError) ?? "none"}`,
       `Recent feedback: ${recentFeedback.map((item) => `${item.action}:${item.targetType}/${item.targetId}`).join(", ") || "none"}`,
@@ -546,6 +552,386 @@ async function handleMakeRuleProposal(store: FlightRecorderStore, proposal: Refl
     return;
   }
   notify(ctx, `Approved Flight Rule ${rule.id} (${rule.scope}). It will be considered for future turns.`, "success");
+}
+
+type DeltaRouteChoice = ArtifactCandidateType | "dismiss" | "cancel";
+
+const ARTIFACT_ROUTE_CHOICES: Array<ReviewChoice<DeltaRouteChoice>> = [
+  { value: "code-legibility", label: "Code legibility", description: "Create a refactor/readability route when code shape causes repeated confusion" },
+  { value: "test-check", label: "Test/check", description: "Route to a missing or weak validation check" },
+  { value: "loom-ticket", label: "Loom ticket", description: "Route to bounded implementation or cleanup work" },
+  { value: "flight-rule", label: "Flight Rule", description: "Route to reusable assistant guidance, still requiring rule approval later" },
+  { value: "loom-spec", label: "Loom spec", description: "Route to intended-behavior clarification" },
+  { value: "loom-research", label: "Loom research", description: "Route to investigation before implementation" },
+  { value: "loom-knowledge", label: "Loom knowledge", description: "Route to reusable project understanding" },
+  { value: "prompt-context", label: "Prompt/context", description: "Route to project prompt or context documentation" },
+  { value: "skill-or-template", label: "Skill/template", description: "Route to a reusable workflow or prompt template" },
+  { value: "observe", label: "Observe/no artifact", description: "Keep evidence and watch recurrence without creating an artifact" },
+  { value: "dismiss", label: "Dismiss", description: "Not a useful delta; keep evidence but close this candidate" },
+  { value: "cancel", label: "Cancel", description: "Leave this delta unchanged" },
+];
+
+function artifactTypeFromText(value: string | null): ArtifactCandidateType | null {
+  switch ((value ?? "").toLowerCase()) {
+    case "flight-rule":
+    case "rule":
+      return "flight-rule";
+    case "loom-ticket":
+    case "ticket":
+      return "loom-ticket";
+    case "loom-spec":
+    case "spec":
+      return "loom-spec";
+    case "loom-research":
+    case "research":
+      return "loom-research";
+    case "loom-knowledge":
+    case "knowledge":
+      return "loom-knowledge";
+    case "test-check":
+    case "test":
+    case "check":
+      return "test-check";
+    case "prompt-context":
+    case "prompt":
+    case "context":
+      return "prompt-context";
+    case "skill-or-template":
+    case "skill":
+    case "template":
+      return "skill-or-template";
+    case "code-legibility":
+    case "code":
+    case "refactor":
+      return "code-legibility";
+    case "observe":
+    case "no-artifact":
+    case "none":
+      return "observe";
+    default:
+      return null;
+  }
+}
+
+function artifactRouteLabel(type: ArtifactCandidateType): string {
+  return ARTIFACT_ROUTE_CHOICES.find((choice) => choice.value === type)?.label ?? type;
+}
+
+function artifactOutcomeFromText(value: string | null): ArtifactCandidateOutcome | null {
+  switch ((value ?? "").toLowerCase()) {
+    case "pending":
+    case "helped":
+    case "no-change":
+    case "worse":
+    case "superseded":
+    case "needs-reroute":
+      return value as ArtifactCandidateOutcome;
+    default:
+      return null;
+  }
+}
+
+function formatDeltaEvidence(delta: ExpectationDelta): string[] {
+  if (delta.evidenceRefs.length === 0) return ["- no evidence refs recorded"];
+  return delta.evidenceRefs.slice(0, 4).map((ref) => {
+    const source = [ref.sourceType, ref.sourceId ?? ref.entryId].filter(Boolean).join("/") || ref.sourceType;
+    const where = [ref.cwd, ref.sessionFile].filter(Boolean).join("; ") || "local source unknown";
+    const snippet = ref.snippet ? ` :: ${compactSnippet(ref.snippet.replace(/\s+/g, " "), 160)}` : "";
+    return `- ${source} (${where})${snippet}`;
+  });
+}
+
+function formatDeltaSignals(signals: DeltaDetectorSignal[]): string[] {
+  if (signals.length === 0) return ["- no detector signal recorded"];
+  return signals.slice(0, 4).map((signal) => `- ${signal.type}${signal.confidence !== null ? ` (${signal.confidence.toFixed(2)})` : ""}: ${compactSnippet(signal.explanation.replace(/\s+/g, " "), 180)}`);
+}
+
+function deltaChoiceLabel(delta: ExpectationDelta, index: number): string {
+  return `${index + 1}. ${delta.summary} [${delta.id}; ${delta.status}]`;
+}
+
+function deltaReviewText(delta: ExpectationDelta, signals: DeltaDetectorSignal[]): string {
+  return [
+    `Summary: ${delta.summary}`,
+    "",
+    "Expectation:",
+    delta.expectation ?? "unknown",
+    "",
+    "Reality:",
+    delta.reality ?? "unknown",
+    "",
+    "Impact:",
+    delta.impact ?? "unknown",
+    "",
+    "Signals:",
+    ...formatDeltaSignals(signals),
+    "",
+    "Evidence:",
+    ...formatDeltaEvidence(delta),
+  ].join("\n");
+}
+
+function sectionFromDraft(text: string, header: "Expectation" | "Reality" | "Impact"): string | null {
+  const match = new RegExp(`^${header}:\\n([\\s\\S]*?)(?=\\n\\n(?:Expectation|Reality|Impact|Signals|Evidence):|$)`, "m").exec(text);
+  const value = match?.[1]?.trim();
+  return value && value !== "unknown" ? value : null;
+}
+
+function deltaFallbackUsage(deltaId?: string): string {
+  const target = deltaId ? ` --delta ${deltaId}` : " --delta <id>";
+  return `Use /flight-deltas list, /flight-deltas show${target}, /flight-deltas route${target} --type code-legibility --rationale "...", or /flight-deltas dismiss${target} --reason "...".`;
+}
+
+function deltaRouteTitle(delta: ExpectationDelta, signals: DeltaDetectorSignal[]): string {
+  return [
+    "Route expectation delta",
+    `Delta: ${delta.summary}`,
+    `Expectation: ${compactSnippet((delta.expectation ?? "unknown").replace(/\s+/g, " "), 180)}`,
+    `Reality: ${compactSnippet((delta.reality ?? "unknown").replace(/\s+/g, " "), 180)}`,
+    "Signals:",
+    ...formatDeltaSignals(signals),
+    "Evidence:",
+    ...formatDeltaEvidence(delta).slice(0, 3),
+  ].join("\n");
+}
+
+function acceptDeltaRefinement(store: FlightRecorderStore, delta: ExpectationDelta, reviewText: string): ExpectationDelta {
+  const update: Parameters<typeof store.acceptExpectationDelta>[1] = {};
+  const expectation = sectionFromDraft(reviewText, "Expectation");
+  const reality = sectionFromDraft(reviewText, "Reality");
+  const impact = sectionFromDraft(reviewText, "Impact");
+  if (expectation !== null) update.expectation = expectation;
+  if (reality !== null) update.reality = reality;
+  if (impact !== null) update.impact = impact;
+  return store.acceptExpectationDelta(delta.id, update) ?? delta;
+}
+
+function storeDeltaRoute(store: FlightRecorderStore, delta: ExpectationDelta, artifactType: ArtifactCandidateType, rationale: string, reviewText: string): ArtifactCandidate {
+  const refined = acceptDeltaRefinement(store, delta, reviewText);
+  const draft = buildArtifactCandidateDraft({ delta: refined, artifactType, rationale });
+  const title = `${artifactRouteLabel(artifactType)}: ${refined.summary}`;
+  const candidate = store.createArtifactCandidate({
+    deltaId: refined.id,
+    artifactType,
+    title,
+    rationale,
+    proposedDraft: draft.proposedDraft,
+    nextStep: draft.nextStep,
+    confidence: draft.confidence,
+    limits: draft.limits,
+    evidenceRefs: refined.evidenceRefs,
+  });
+  return store.acceptArtifactCandidate(candidate.id) ?? candidate;
+}
+
+async function handleFlightDeltaReview(argsText: string, ctx: PiCommandContext, state: LiveExtensionState): Promise<void> {
+  const args = splitArgs(argsText);
+  const dataDir = readOption(args, "--data-dir");
+  await switchDataDir(state, dataDir);
+  await ensureBootstrapped(ctx, state, "command", false);
+  const explicitDeltaId = readOption(args, "--delta");
+  const limit = parseLimit(readOption(args, "--limit")) ?? 8;
+  const store = new FlightRecorderStore(defaultDatabasePath(stateDataDir(state)));
+  try {
+    const deltas = explicitDeltaId ? [store.getExpectationDelta(explicitDeltaId)].filter((delta): delta is ExpectationDelta => Boolean(delta)) : store.listExpectationDeltas({ status: "candidate", limit });
+    if (deltas.length === 0) {
+      notify(ctx, explicitDeltaId ? `No expectation delta found for ${explicitDeltaId}.` : "No pending expectation delta candidates are ready for review.", "warning");
+      return;
+    }
+    let delta = deltas[0]!;
+    if (!explicitDeltaId || deltas.length > 1) {
+      const choice = await askReviewChoice(ctx, "Choose an expectation delta", deltas.map((item, index) => ({ value: item.id, label: deltaChoiceLabel(item, index) })));
+      if (choice.kind === "cancelled") {
+        notify(ctx, fallbackMessage(choice.reason, deltaFallbackUsage()), choice.reason === "no-ui" ? "warning" : "info");
+        return;
+      }
+      delta = deltas.find((item) => item.id === choice.value) ?? delta;
+    }
+    const signals = store.listDeltaDetectorSignals(delta.id, 5);
+    const review = await askReviewEditor(ctx, "Review expectation delta", deltaReviewText(delta, signals));
+    if (review.kind === "cancelled") {
+      notify(ctx, fallbackMessage(review.reason, deltaFallbackUsage(delta.id)), review.reason === "no-ui" ? "warning" : "info");
+      return;
+    }
+    const route = await askReviewChoice(ctx, deltaRouteTitle(delta, signals), ARTIFACT_ROUTE_CHOICES);
+    if (route.kind === "cancelled" || route.value === "cancel") {
+      notify(ctx, route.kind === "cancelled" ? fallbackMessage(route.reason, deltaFallbackUsage(delta.id)) : "Delta review cancelled; no changes were applied.", route.kind === "cancelled" && route.reason === "no-ui" ? "warning" : "info");
+      return;
+    }
+    if (route.value === "dismiss") {
+      const dismissed = store.dismissExpectationDelta(delta.id, "Dismissed during manual delta review");
+      notify(ctx, dismissed ? `Dismissed expectation delta ${dismissed.id}; evidence provenance remains stored locally.` : `No expectation delta found for ${delta.id}.`, dismissed ? "success" : "error");
+      return;
+    }
+    const rationale = await askReviewEditor(ctx, "Routing rationale", route.value === "observe" ? "Observe/no artifact: keep evidence and watch recurrence before creating an artifact." : `Route to ${artifactRouteLabel(route.value)} because ...`);
+    if (rationale.kind === "cancelled") {
+      notify(ctx, fallbackMessage(rationale.reason, `/flight-deltas route --delta ${delta.id} --type ${route.value} --rationale "..."`), rationale.reason === "no-ui" ? "warning" : "info");
+      return;
+    }
+    const candidate = storeDeltaRoute(store, delta, route.value, rationale.text, review.text);
+    notify(ctx, [`Routed expectation delta ${delta.id} to ${artifactRouteLabel(candidate.artifactType)}.`, `Artifact candidate: ${candidate.id} [${candidate.status}; applied=${candidate.applied}]`, `Next step: ${candidate.nextStep ?? "review candidate draft"}`, "Draft/handoff text was stored locally. No artifact was created or applied."].join("\n"), "success");
+  } finally {
+    store.close();
+  }
+}
+
+function formatArtifactCandidateDetail(candidate: ArtifactCandidate | null, recurrenceCount = 0): string[] {
+  if (!candidate) return ["Artifact candidate: none"];
+  return [
+    `Artifact candidate: ${candidate.id} [${candidate.artifactType}; ${candidate.status}; applied=${candidate.applied}]`,
+    `Outcome: ${candidate.outcome}${candidate.outcomeSummary ? ` — ${candidate.outcomeSummary}` : ""}`,
+    `Applied artifact: ${candidate.appliedArtifactRef ?? "none"}; applied at: ${candidate.appliedAt ?? "not recorded"}`,
+    `Linked recurrences: ${recurrenceCount}`,
+    `Rationale: ${candidate.rationale}`,
+    `Next step: ${candidate.nextStep ?? "unknown"}`,
+    "Draft:",
+    candidate.proposedDraft ?? "No draft stored.",
+    "Limits:",
+    ...(candidate.limits.length > 0 ? candidate.limits.map((limit) => `- ${limit}`) : ["- none recorded"]),
+  ];
+}
+
+function formatArtifactCandidateWithRecurrence(store: FlightRecorderStore, candidate: ArtifactCandidate | null): string[] {
+  const recurrenceCount = candidate ? store.listDeltaRecurrenceLinks({ priorArtifactCandidateId: candidate.id, limit: 1_000 }).length : 0;
+  return formatArtifactCandidateDetail(candidate, recurrenceCount);
+}
+
+function formatDeltaDetail(store: FlightRecorderStore, delta: ExpectationDelta): string {
+  const signals = store.listDeltaDetectorSignals(delta.id, 5);
+  const activeCandidate = delta.activeArtifactCandidateId ? store.getArtifactCandidate(delta.activeArtifactCandidateId) : null;
+  return [
+    `${delta.id} [${delta.status}]`,
+    delta.summary,
+    `Expectation: ${delta.expectation ?? "unknown"}`,
+    `Reality: ${delta.reality ?? "unknown"}`,
+    `Impact: ${delta.impact ?? "unknown"}`,
+    `Active route: ${delta.activeArtifactCandidateId ?? "none"}`,
+    ...formatArtifactCandidateWithRecurrence(store, activeCandidate),
+    "Signals:",
+    ...formatDeltaSignals(signals),
+    "Evidence:",
+    ...formatDeltaEvidence(delta),
+  ].join("\n");
+}
+
+async function handleFlightDeltas(argsText: string, ctx: PiCommandContext, state: LiveExtensionState): Promise<void> {
+  const args = splitArgs(argsText);
+  const dataDir = readOption(args, "--data-dir");
+  await switchDataDir(state, dataDir);
+  await ensureBootstrapped(ctx, state, "command", false);
+  const subcommand = args[0] ?? "list";
+  const store = new FlightRecorderStore(defaultDatabasePath(stateDataDir(state)));
+  try {
+    if (subcommand === "list") {
+      const status = readOption(args, "--status") as ExpectationDelta["status"] | null;
+      const limit = parseLimit(readOption(args, "--limit")) ?? 10;
+      const deltas = store.listExpectationDeltas({ ...(status ? { status } : { status: "candidate" }), limit });
+      notify(ctx, deltas.length === 0 ? "No expectation deltas found." : ["Expectation deltas:", ...deltas.map((delta, index) => `- ${deltaChoiceLabel(delta, index)}`)].join("\n"), "info");
+      return;
+    }
+    if (subcommand === "show") {
+      const id = readOption(args, "--delta") ?? args[1];
+      if (!id) {
+        notify(ctx, "Usage: /flight-deltas show --delta delta_...", "error");
+        return;
+      }
+      const delta = store.getExpectationDelta(id);
+      notify(ctx, delta ? formatDeltaDetail(store, delta) : `No expectation delta found for ${id}.`, delta ? "info" : "error");
+      return;
+    }
+    if (subcommand === "summary") {
+      const limit = parseLimit(readOption(args, "--limit")) ?? 20;
+      notify(ctx, formatDeltaOutcomeSummary(summarizeDeltaOutcomes(store, { limit })), "info");
+      return;
+    }
+    if (subcommand === "apply") {
+      const candidateId = readOption(args, "--candidate") ?? args[1];
+      if (!candidateId) {
+        notify(ctx, "Usage: /flight-deltas apply --candidate artifact_cand_... [--ref artifact-ref]", "error");
+        return;
+      }
+      const candidate = store.markArtifactCandidateApplied(candidateId, { appliedArtifactRef: readOption(args, "--ref") });
+      notify(ctx, candidate ? `Marked artifact candidate ${candidate.id} applied; outcome still requires recurrence evidence.` : `No artifact candidate found for ${candidateId}.`, candidate ? "success" : "error");
+      return;
+    }
+    if (subcommand === "outcome") {
+      const candidateId = readOption(args, "--candidate") ?? args[1];
+      const outcome = artifactOutcomeFromText(readOption(args, "--outcome"));
+      if (!candidateId || !outcome) {
+        notify(ctx, "Usage: /flight-deltas outcome --candidate artifact_cand_... --outcome pending|helped|no-change|worse|superseded|needs-reroute [--note \"...\"] [--applied-ref ref]", "error");
+        return;
+      }
+      const outcomeInput: Parameters<typeof recordArtifactCandidateOutcomeWithStore>[1] = { candidateId, outcome, outcomeSummary: readOption(args, "--note") };
+      const appliedRef = readOption(args, "--applied-ref");
+      if (appliedRef !== null) outcomeInput.appliedArtifactRef = appliedRef;
+      const result = recordArtifactCandidateOutcomeWithStore(store, outcomeInput);
+      notify(ctx, result ? `Recorded outcome for ${result.candidate.id}: ${result.candidate.outcome} [${result.candidate.status}]. Evidence/rationale history remains stored.` : `No artifact candidate found for ${candidateId}.`, result ? "success" : "error");
+      return;
+    }
+    if (subcommand === "recur") {
+      const deltaId = readOption(args, "--delta");
+      const candidateId = readOption(args, "--candidate");
+      const reason = readOption(args, "--reason");
+      if (!deltaId || !candidateId || !reason) {
+        notify(ctx, "Usage: /flight-deltas recur --delta delta_... --candidate artifact_cand_... --reason \"similar evidence\" [--similarity 0.8]", "error");
+        return;
+      }
+      const recurrenceInput: Parameters<typeof recordDeltaRecurrenceWithStore>[1] = { deltaId, priorArtifactCandidateId: candidateId, reason };
+      const similarity = parseNumber(readOption(args, "--similarity"));
+      if (similarity !== undefined) recurrenceInput.similarity = similarity;
+      const result = recordDeltaRecurrenceWithStore(store, recurrenceInput);
+      notify(ctx, result ? `Linked recurrence ${result.link.id}; this is evidence of recurrence after application only if timestamps support it.` : `No matching delta/candidate found for delta=${deltaId} candidate=${candidateId}.`, result ? "success" : "error");
+      return;
+    }
+    if (subcommand === "reject") {
+      const candidateId = readOption(args, "--candidate") ?? args[1];
+      const reason = readOption(args, "--reason") ?? "Rejected through fallback command";
+      if (!candidateId) {
+        notify(ctx, "Usage: /flight-deltas reject --candidate artifact_cand_... --reason \"...\"", "error");
+        return;
+      }
+      const candidate = store.rejectArtifactCandidate(candidateId, reason);
+      notify(ctx, candidate ? `Rejected artifact candidate ${candidate.id}; original route/evidence/rationale remain stored.` : `No artifact candidate found for ${candidateId}.`, candidate ? "success" : "error");
+      return;
+    }
+    if (subcommand === "dismiss") {
+      const id = readOption(args, "--delta") ?? args[1];
+      const reason = readOption(args, "--reason") ?? "Dismissed through fallback command";
+      if (!id) {
+        notify(ctx, "Usage: /flight-deltas dismiss --delta delta_... --reason \"...\"", "error");
+        return;
+      }
+      const delta = store.dismissExpectationDelta(id, reason);
+      notify(ctx, delta ? `Dismissed expectation delta ${delta.id}; evidence remains stored locally.` : `No expectation delta found for ${id}.`, delta ? "success" : "error");
+      return;
+    }
+    if (subcommand === "route") {
+      const id = readOption(args, "--delta") ?? args[1];
+      const artifactType = artifactTypeFromText(readOption(args, "--type"));
+      const rationale = readOption(args, "--rationale");
+      if (!id || !artifactType || !rationale) {
+        notify(ctx, "Usage: /flight-deltas route --delta delta_... --type code-legibility|test-check|loom-ticket|flight-rule|loom-spec|loom-research|loom-knowledge|prompt-context|skill-or-template|observe --rationale \"...\"", "error");
+        return;
+      }
+      const delta = store.getExpectationDelta(id);
+      if (!delta) {
+        notify(ctx, `No expectation delta found for ${id}.`, "error");
+        return;
+      }
+      const reviewText = deltaReviewText({
+        ...delta,
+        expectation: readOption(args, "--expectation") ?? delta.expectation,
+        reality: readOption(args, "--reality") ?? delta.reality,
+        impact: readOption(args, "--impact") ?? delta.impact,
+      }, store.listDeltaDetectorSignals(delta.id, 5));
+      const candidate = storeDeltaRoute(store, delta, artifactType, rationale, reviewText);
+      notify(ctx, [`Routed expectation delta ${delta.id} to ${artifactRouteLabel(candidate.artifactType)}.`, `Artifact candidate: ${candidate.id} [${candidate.status}; applied=${candidate.applied}]`, `Next step: ${candidate.nextStep ?? "review candidate draft"}`, "Draft/handoff text was stored locally. No artifact was created or applied."].join("\n"), "success");
+      return;
+    }
+    notify(ctx, "Usage: /flight-deltas list|show|summary|route|apply|outcome|recur|reject|dismiss or /flight-delta-review for guided review.", "error");
+  } finally {
+    store.close();
+  }
 }
 
 async function handleFlightFeedback(argsText: string, ctx: PiCommandContext, state: LiveExtensionState): Promise<void> {
@@ -900,6 +1286,16 @@ export default function piFlightRecorderExtension(pi: PiLike): void {
   pi.registerCommand?.("flight-review", {
     description: "Interactively review Flight Recorder reflection proposals and choose actions",
     handler: (args, ctx) => handleFlightReview(args, ctx, state),
+  });
+
+  pi.registerCommand?.("flight-delta-review", {
+    description: "Interactively review expectation-delta candidates and choose an artifact route without applying artifacts",
+    handler: (args, ctx) => handleFlightDeltaReview(args, ctx, state),
+  });
+
+  pi.registerCommand?.("flight-deltas", {
+    description: "List, show, route, or dismiss expectation-delta candidates without applying artifacts",
+    handler: (args, ctx) => handleFlightDeltas(args, ctx, state),
   });
 
   pi.registerCommand?.("flight-rules", {

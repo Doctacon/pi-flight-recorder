@@ -108,6 +108,59 @@ describe("CLI", () => {
     expect(stderr).toEqual([]);
   });
 
+  it("reports cautious delta outcome summaries and recurrence links", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-delta-outcome-cli-data-"));
+    const stdout: string[] = [];
+    const stderr: string[] = [];
+    const io = { stdout: (text: string) => stdout.push(text), stderr: (text: string) => stderr.push(text) };
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    let candidateId = "";
+    let laterDeltaId = "";
+    try {
+      const delta = store.createExpectationDelta({ source: "manual", summary: "Repeated validation expectation delta" });
+      const candidate = store.acceptArtifactCandidate(store.createArtifactCandidate({
+        deltaId: delta.id,
+        artifactType: "test-check",
+        title: "Add validation check",
+        rationale: "A missing check allowed repeated validation misses.",
+      }).id)!;
+      candidateId = candidate.id;
+    } finally {
+      store.close();
+    }
+
+    await expect(main(["delta", "outcome", "--data-dir", dataDir, "--candidate", candidateId, "--outcome", "helped", "--note", "No linked recurrence observed yet", "--applied-ref", "tests/validation.test.ts", "--json"], io)).resolves.toBe(0);
+    const outcome = JSON.parse(stdout.at(-1) ?? "{}");
+    expect(outcome.candidate.applied).toBe(true);
+    expect(outcome.candidate.status).toBe("resolved");
+
+    stdout.length = 0;
+    await expect(main(["delta", "summary", "--data-dir", dataDir], io)).resolves.toBe(0);
+    expect(stdout.join("\n")).toContain("No recurrence observed since applied");
+    expect(stdout.join("\n")).toContain("not proof");
+    expect(stdout.join("\n")).not.toMatch(/fixed forever|\bsolved\b/i);
+
+    const laterStore = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    try {
+      laterDeltaId = laterStore.createExpectationDelta({ source: "manual", summary: "Repeated validation expectation delta happened again" }).id;
+    } finally {
+      laterStore.close();
+    }
+
+    stdout.length = 0;
+    await expect(main(["delta", "recur", "--data-dir", dataDir, "--delta", laterDeltaId, "--candidate", candidateId, "--reason", "Similar validation delta recurred after the check was applied", "--similarity", "0.9", "--json"], io)).resolves.toBe(0);
+    const recurrence = JSON.parse(stdout.at(-1) ?? "{}");
+    expect(recurrence.link.similarity).toBe(0.9);
+    expect(recurrence.priorArtifactCandidate.outcome).toBe("needs-reroute");
+
+    stdout.length = 0;
+    await expect(main(["delta", "summary", "--data-dir", dataDir, "--json"], io)).resolves.toBe(0);
+    const summary = JSON.parse(stdout.at(-1) ?? "{}");
+    expect(summary.counts["recurring-after-applied"]).toBe(1);
+    expect(summary.limits.join("\n")).toContain("not proof");
+    expect(stderr).toEqual([]);
+  });
+
   it("prints friendly no-match output", async () => {
     const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-empty-data-"));
     const stdout: string[] = [];

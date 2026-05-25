@@ -1,0 +1,41 @@
+{
+  "observedAt": "2026-05-25T23:03:49.158Z",
+  "source": "default local pi-flight-recorder SQLite database (~/.pi/flight-recorder/flight-recorder.db); aggregate-only query",
+  "privacy": "No raw prompts, snippets, session paths, commands, rationale text, drafts, or evidence refs were exported.",
+  "tablePresence": {
+    "expectation_deltas": false,
+    "delta_detector_signals": false,
+    "artifact_candidates": false,
+    "delta_recurrence_links": false
+  },
+  "counts": {
+    "expectationDeltas": 0,
+    "detectorSignals": 0,
+    "artifactCandidates": 0,
+    "distinctDeltasWithArtifactCandidates": 0,
+    "acceptedOrLaterArtifactCandidates": 0,
+    "appliedArtifactCandidates": 0,
+    "outcomeLabeledArtifactCandidates": 0,
+    "appliedWithOutcomeArtifactCandidates": 0,
+    "recurrenceLinks": 0
+  },
+  "distributions": {
+    "deltaStatus": [],
+    "deltaSource": [],
+    "artifactType": [],
+    "artifactStatus": [],
+    "artifactOutcome": [],
+    "artifactApplied": []
+  },
+  "thresholdCheck": {
+    "recommendedMinimumRoutedDeltas": "30-50 manually routed deltas with some outcome labels",
+    "routedDeltaCount": 0,
+    "outcomeLabeledArtifactCandidates": 0,
+    "appliedWithOutcomeArtifactCandidates": 0,
+    "recurrenceLinks": 0,
+    "meetsMinimumRoutedDeltas": false,
+    "hasOutcomeCoverage": false,
+    "hasAppliedOutcomeCoverage": false,
+    "hasRecurrenceEvidence": false
+  }
+}

@@ -887,6 +887,16 @@ export class FlightRecorderStore {
     return this.getArtifactCandidate(id);
   }
 
+  rejectArtifactCandidate(id: string, reason: string | null = null, now = new Date().toISOString()): ArtifactCandidate | null {
+    const existing = this.getArtifactCandidate(id);
+    if (!existing) return null;
+    const storedReason = sanitizeOptionalText(reason, 700);
+    const metadata = storedReason ? sanitizeMetadata({ ...existing.metadata, rejectReason: storedReason }) : existing.metadata;
+    this.db.prepare("UPDATE artifact_candidates SET status = 'rejected', outcomeSummary = COALESCE(?, outcomeSummary), metadataJson = ?, dismissedAt = COALESCE(dismissedAt, ?), updatedAt = ? WHERE id = ?")
+      .run(storedReason, json(metadata), now, now, id);
+    return this.getArtifactCandidate(id);
+  }
+
   markArtifactCandidateApplied(id: string, options: { appliedArtifactRef?: string | null; now?: string } = {}): ArtifactCandidate | null {
     const now = options.now ?? new Date().toISOString();
     this.db.prepare("UPDATE artifact_candidates SET status = 'applied', applied = 1, appliedArtifactRef = ?, appliedAt = COALESCE(appliedAt, ?), updatedAt = ? WHERE id = ?")

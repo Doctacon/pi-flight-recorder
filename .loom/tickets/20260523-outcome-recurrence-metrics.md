@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-outcome-recurrence-metrics
 Type: Ticket
-Status: open
+Status: closed
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: medium - recurrence metrics can become misleading if they imply causality without enough evidence, but bounded/local status can still provide useful learning signals
@@ -66,8 +66,25 @@ Metric constraints:
 
 ## Current State
 
-Waiting on `ticket:20260523-artifact-candidate-drafts`. The first implementation should favor simple inspectable recurrence links over clever scoring.
+Closed. Local outcome/recurrence metrics are implemented with cautious summaries, inspectable recurrence links, and history-preserving reroutes.
+
+Closure support:
+
+- ACC-001: `src/delta-outcomes.ts` plus storage tests/helpers mark candidates accepted/applied/rejected and record outcome notes while preserving original route/evidence/rationale.
+- ACC-002: `recordDeltaRecurrenceWithStore` links later deltas to prior artifact candidates and marks recurrence after applied only when timestamps support that category.
+- ACC-003: CLI/Pi summary/status surfaces report `unresolved`, `insufficient evidence`, `no recurrence observed`, and `recurring after applied` with explicit local-observation limits and no causal success claim.
+- ACC-004: fixture tests reroute after recurrence to a new candidate while preserving prior candidate rationale and recurrence history.
+- ACC-005: final validation passed `npm run typecheck`, `npm test` (17 files / 76 tests), `npm run test:smoke:local`, `npm run build`, and `npm pack --dry-run` (83 files).
+
+Evidence: `evidence:20260523-outcome-recurrence-metrics-validation`.
+Audit: `audit:20260523-outcome-recurrence-metrics-review` with verdict `clear` within audited scope.
+
+Residual limits: no real interactive Pi TUI proof for the new fallback commands, no long-run corpus proof, no classifier, no automatic route/artifact mutation, and no causal proof that any artifact improved behavior.
 
 ## Journal
 
 - 2026-05-23: Created to preserve the idea that a solution is an observed outcome, not merely an artifact draft.
+- 2026-05-23: Set active after `ticket:20260523-artifact-candidate-drafts` closed; starting bounded implementation for outcome status, recurrence links, cautious summaries, and reroute-history preservation.
+- 2026-05-23: Implemented local outcome/recurrence helpers, reject status support, CLI/Pi summary/outcome/recurrence surfaces, and focused tests.
+- 2026-05-23: Recorded `evidence:20260523-outcome-recurrence-metrics-validation`; validation passed typecheck, focused tests, full tests, local smoke, build, and pack dry-run. Moved to review for audit.
+- 2026-05-23: Recorded `audit:20260523-outcome-recurrence-metrics-review` with verdict `clear` within audited scope; closed with real-TUI, long-run corpus, classifier, and causal-effectiveness proof explicitly out of scope.

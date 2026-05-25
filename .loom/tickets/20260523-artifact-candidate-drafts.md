@@ -2,7 +2,7 @@
 
 ID: ticket:20260523-artifact-candidate-drafts
 Type: Ticket
-Status: open
+Status: closed
 Created: 2026-05-23
 Updated: 2026-05-23
 Risk: high - draft generation sits close to source/Loom/rule mutation, so it must preserve candidate-only behavior and explicit approval boundaries
@@ -69,8 +69,25 @@ Must not change:
 
 ## Current State
 
-Waiting on `ticket:20260523-manual-artifact-routing-review`. The first execution should keep drafts candidate-only even if it is tempting to directly create Loom files.
+Closed. Safe deterministic draft/handoff text is generated and stored for the first artifact set without mutating durable artifacts or active behavior.
+
+Closure support:
+
+- ACC-001: `src/artifact-drafts.ts` generates bounded candidate drafts/next steps/limits for `flight-rule`, `loom-ticket`, `code-legibility`, `test-check`, and `observe`; tests assert evidence refs, rationale, status, and limits are present.
+- ACC-002: focused tests snapshot a temp project and `.loom/tickets` directory and assert no project/Loom files are written; candidates remain `applied=false`.
+- ACC-003: Flight Rule handoff candidates remain local artifact candidates, do not create rule candidates or active rules, and point to the existing explicit `/flight-review`/`/flight-rules` approval workflow.
+- ACC-004: draft text is bounded/redacted; tests assert representative secret-like values and raw `/Users/...` paths are absent from serialized candidates.
+- ACC-005: final validation passed `npm run typecheck`, `npm test` (16 files / 72 tests), `npm run test:smoke:local`, `npm run build`, and `npm pack --dry-run` (80 files).
+
+Evidence: `evidence:20260523-artifact-candidate-drafts-validation`.
+Audit: `audit:20260523-artifact-candidate-drafts-review` with verdict `clear` within audited scope.
+
+Residual limits: deterministic templates only, no actual Loom/source/docs/test/skill/prompt artifact writing, no active Flight Rule approval/injection bypass, no model/classifier drafting, no real-TUI proof for this new draft display path, and no outcome/recurrence evaluation.
 
 ## Journal
 
 - 2026-05-23: Created to make artifact creation safe and explicit: candidates first, durable files/rules only through later approval workflows.
+- 2026-05-23: Set active after `ticket:20260523-manual-artifact-routing-review` closed; implementing candidate-only draft/handoff text for the first artifact set.
+- 2026-05-23: Added `src/artifact-drafts.ts`, candidate-draft tests, index export, and Pi delta route/show integration that stores and displays draft/handoff text without applying artifacts.
+- 2026-05-23: Recorded `evidence:20260523-artifact-candidate-drafts-validation`; final validation passed `npm run typecheck`, `npm test`, `npm run test:smoke:local`, `npm run build`, and `npm pack --dry-run`.
+- 2026-05-23: Recorded `audit:20260523-artifact-candidate-drafts-review` with verdict `clear`; closed with actual artifact creation and classifier/model behavior explicitly out of scope.

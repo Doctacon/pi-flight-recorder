@@ -2,9 +2,9 @@
 
 ID: ticket:20260523-classifier-readiness-evaluation
 Type: Ticket
-Status: open
+Status: closed
 Created: 2026-05-23
-Updated: 2026-05-23
+Updated: 2026-05-25
 Risk: high - an LLM classifier can look useful while routing deltas by vibes, so readiness must be evidence-backed before any default automation is accepted
 Priority: low - intentionally sequenced after corpus/outcome data exists
 Depends On: ticket:20260523-outcome-recurrence-metrics
@@ -63,8 +63,25 @@ Evaluation questions:
 
 ## Current State
 
-Blocked by sequencing, not by uncertainty: wait until `ticket:20260523-outcome-recurrence-metrics` closes and enough manually routed deltas exist. Current recommended threshold from `spec:delta-artifact-learning-loop` is 30-50 manually routed deltas with some outcome labels before serious classifier evaluation.
+Closed. Aggregate corpus evidence, research recommendation, and audit are complete.
+
+Closure support:
+
+- ACC-001: `evidence:20260525-classifier-readiness-corpus-counts` records aggregate-only local SQLite counts and label/outcome coverage. The read-only observation found no delta/artifact tables in the default database and therefore `0` expectation deltas, `0` artifact candidates, `0` outcome-labeled candidates, and `0` recurrence links available for classifier evaluation.
+- ACC-002: `research:20260525-classifier-readiness-evaluation` compares manual-only routing, advisory classifier suggestions, and opt-in classifier prototype options with tradeoffs and rejected paths.
+- ACC-003: the recommendation is **not ready**: continue manual-only routing; do not create a classifier implementation ticket/plan; revisit after threshold evidence exists. No classifier was implemented.
+- ACC-004: thresholds are not met; the research names the next data needed: 30-50 manually routed deltas, outcome-labeled/applied candidates, recurrence links, artifact-type diversity, and baseline comparisons.
+
+Audit: `audit:20260525-classifier-readiness-evaluation-review` with verdict `clear` within audited scope.
+
+No application source/package/prompt/classifier/model changes were made. No raw sessions, raw prompts, snippets, commands, rationale text, drafts, evidence refs, or unredacted session paths were exported.
+
+Residual limits: this is a point-in-time aggregate over the default local DB, not a long-run corpus study; missing delta/artifact tables support `not ready` but do not diagnose why the corpus has not accumulated.
 
 ## Journal
 
 - 2026-05-23: Created to preserve the operator/LLM insight that a classifier may be useful, but only after corpus and outcome data exist.
+- 2026-05-23: Set active after `ticket:20260523-outcome-recurrence-metrics` closed; starting aggregate-only corpus evaluation and research recommendation. No source/classifier/model changes are in scope.
+- 2026-05-25: Recorded `evidence:20260525-classifier-readiness-corpus-counts`; aggregate local corpus counts are all zero for deltas, artifact candidates, outcome labels, and recurrence links, with delta/artifact tables absent in the read-only default DB observation.
+- 2026-05-25: Completed `research:20260525-classifier-readiness-evaluation` with recommendation `not ready`; moved to review for audit.
+- 2026-05-25: Recorded `audit:20260525-classifier-readiness-evaluation-review` with verdict `clear`; closed without source/classifier/model changes.

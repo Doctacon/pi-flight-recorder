@@ -465,6 +465,7 @@ function artifactStatus(value: string): ArtifactCandidateStatus {
     value === "accepted" ||
     value === "routed" ||
     value === "dismissed" ||
+    value === "rejected" ||
     value === "applied" ||
     value === "resolved" ||
     value === "recurring"
