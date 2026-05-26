@@ -85,6 +85,36 @@ function routeLabel(choice: FlightLearnRouteChoice): string {
   return choice.label.replace("/no artifact", "");
 }
 
+function issueTitle(delta: ExpectationDelta): string {
+  return normalizeText(delta.summary)
+    .replace(/^repeated failure pattern:\s*/i, "")
+    .replace(/^expectation delta:\s*/i, "")
+    .replace(/^repeated local friction:\s*/i, "")
+    .trim() || normalizeText(delta.summary);
+}
+
+function unknownExpectation(value: string): boolean {
+  return value.toLowerCase() === "unknown";
+}
+
+function atAGlanceLines(delta: ExpectationDelta, fields: Record<EditableField, string>, signals: DeltaDetectorSignal[]): string[] {
+  const expectation = normalizeText(fields.expectation);
+  const reality = normalizeText(fields.reality);
+  const impact = normalizeText(fields.impact);
+  const signalSummary = signals.length > 0 ? `${signals[0]!.type}${signals[0]!.confidence !== null ? ` ${signals[0]!.confidence.toFixed(2)}` : ""}` : "none recorded";
+  return [
+    `Issue: ${issueTitle(delta)}`,
+    `What happened: ${reality}`,
+    `Why it matters: ${impact}`,
+    `Expected: ${unknownExpectation(expectation) ? "unknown — press e to add what should have happened" : expectation}`,
+    `Signal: ${signalSummary}; evidence refs: ${delta.evidenceRefs.length}`,
+  ];
+}
+
+function routeGuideLine(): string {
+  return "Guide: Rule=behavior reminder | Code=confusing source | Test=missing check | Ticket=larger follow-up | Observe=unsure";
+}
+
 function signalLine(signal: DeltaDetectorSignal): string {
   const confidence = signal.confidence !== null ? ` (${signal.confidence.toFixed(2)})` : "";
   return `${signal.type}${confidence}: ${compactSnippet(signal.explanation.replace(/\s+/g, " "), 110)}`;
@@ -322,7 +352,7 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
       const leftWidth = Math.max(24, Math.min(34, Math.floor(width * 0.34)));
       const rightWidth = Math.max(1, width - leftWidth - 1);
       const left = box("Items", listLines, leftWidth, 12);
-      const right = box("Delta", detailLines, rightWidth, 12);
+      const right = box("Delta", detailLines, rightWidth, 14);
       const rowCount = Math.max(left.length, right.length);
       for (let index = 0; index < rowCount; index += 1) {
         lines.push(clip(`${pad(left[index] ?? "", leftWidth)} ${right[index] ?? ""}`, width));
@@ -342,7 +372,7 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
   private itemListLines(): string[] {
     return this.items.map((item, index) => {
       const prefix = index === this.selectedItemIndex ? "> " : "  ";
-      return `${prefix}${item.delta.summary} [${item.delta.status}]`;
+      return `${prefix}${issueTitle(item.delta)} · ${item.delta.evidenceRefs.length} ref${item.delta.evidenceRefs.length === 1 ? "" : "s"} · ${item.delta.status}`;
     });
   }
 
@@ -353,11 +383,8 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
     const hiddenEvidence = Math.max(0, delta.evidenceRefs.length - evidence.length);
     const signals = item.signals.slice(0, 3);
     return [
-      `Summary: ${delta.summary}`,
-      `Status: ${delta.status}; id=${delta.id}`,
-      `Expectation: ${normalizeText(fields.expectation)}`,
-      `Reality: ${normalizeText(fields.reality)}`,
-      `Impact: ${normalizeText(fields.impact)}`,
+      ...atAGlanceLines(delta, fields, item.signals),
+      `Record: ${delta.status}; id=${delta.id}`,
       "Signals:",
       ...(signals.length > 0 ? signals.map((signal) => `- ${signalLine(signal)}`) : ["- no detector signal recorded"]),
       "Evidence:",
@@ -389,6 +416,9 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
       current = `${indent}${safeCard}`;
     }
     if (current.trim().length > 0) lines.push(clip(current, width));
+    const selected = this.currentRouteChoice();
+    lines.push(clip(`Selected follow-up: ${routeLabel(selected)} — ${selected.description ?? "human-reviewed follow-up choice"}`, width));
+    lines.push(clip(routeGuideLine(), width));
     return lines.length > 0 ? lines : [clip("Route cards: none visible", width)];
   }
 

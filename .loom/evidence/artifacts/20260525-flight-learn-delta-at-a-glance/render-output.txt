@@ -1,0 +1,18 @@
+Flight Learn - 3 pending deltas - Review 3/3
++ Items -------------------------+ + Delta ------------------------------------------------------------+
+| stale edit block · 2 refs ... | | Issue: exact-text edit mismatches |
+| validation retry loop · 2 ... | | What happened: Observed 2 related failure occurrences in refle... |
+| > exact-text edit mismatche... | | Why it matters: Repeated local friction across tools/cwds: edit. |
++--------------------------------+ | Expected: unknown — press e to add what should have happened |
+ | Signal: reflection-cluster 0.55; evidence refs: 2 |
+ | Record: candidate; id=delta_caa338683303e0cf |
+ | Signals: |
+ | - reflection-cluster (0.55): Reflection cluster grouped exact-... |
+ | Evidence: |
+ | - occurrence/occ_afc4b65f47f76b78 (/Users/<user>/Code/personal... |
+ | - occurrence/occ_4bc412ca95e98183 (/Users/<user>/Code/personal... |
+ +-------------------------------------------------------------------+
+Route cards: 1 Code legibility 2 Test/check [3 Loom ticket] 4 Flight Rule 5 Observe
+Selected follow-up: Loom ticket — Route to bounded implementation or cleanup work
+Guide: Rule=behavior reminder | Code=confusing source | Test=missing check | Ticket=larger follow-up ...
+Keys: up/down item | left/right route | 1-9/0 route | enter/r route | e edit | v evidence | d dismiss...

@@ -59,7 +59,7 @@ function fixtureSignal(deltaId: string): DeltaDetectorSignal {
 }
 
 function fixtureInput(): FlightLearnDeltaInboxInput {
-  const first = fixtureDelta("delta-one", "Assistant repeatedly treats storage as mapper owner with a very long summary that must be clipped safely");
+  const first = fixtureDelta("delta-one", "Repeated failure pattern: exact-text edit mismatches with a very long summary that must be clipped safely");
   const second = fixtureDelta("delta-two", "Validation seam missed after edits");
   return {
     items: [
@@ -97,9 +97,12 @@ describe("Flight Learn custom inbox component", () => {
     expect(output).toContain("Flight Learn - 2 pending deltas - Review 1/2");
     expect(output).toContain("Items");
     expect(output).toContain("Delta");
-    expect(output).toContain("Expectation:");
-    expect(output).toContain("Reality:");
-    expect(output).toContain("Impact:");
+    expect(output).toContain("Issue:");
+    expect(output).toContain("exact-text edit mismatches");
+    expect(output).not.toContain("> Repeated failure pattern:");
+    expect(output).toContain("What happened:");
+    expect(output).toContain("Why it matters:");
+    expect(output).toContain("Expected:");
     expect(output).toContain("Signals:");
     expect(output).toContain("Evidence:");
     expect(output).toContain("Route cards:");
@@ -109,6 +112,8 @@ describe("Flight Learn custom inbox component", () => {
     expect(output).toContain("Prompt/context");
     expect(output).toContain("Skill/template");
     expect(output).toContain("Observe");
+    expect(output).toContain("Selected follow-up:");
+    expect(output).toContain("Guide: Rule=behavior reminder");
     expect(output).toContain("Keys: up/down item");
     expect(results).toEqual([]);
   });

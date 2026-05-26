@@ -90,6 +90,7 @@ The UI should preserve all existing safety boundaries: candidate generation can 
 - REQ-011: Non-interactive/no-custom-UI modes MUST degrade honestly to existing subcommand or primitive-dialog fallback behavior, with guidance pointing at `/flight-learn` and `/flight-status` paths that exist by default.
 - REQ-012: Artifact candidate follow-up SHOULD use the same inbox design language as delta review, even if implemented in a later slice.
 - REQ-013: The inbox MUST not introduce default model/provider calls, hosted services, classifier automation, or automatic source/docs/Loom/rule/skill/prompt mutation.
+- REQ-014: The selected delta view SHOULD include a plain-language at-a-glance summary of the issue, what happened, why it matters, expected behavior if known, and the currently selected follow-up route guidance so the operator can route without decoding internal record fields.
 
 ## Scenarios
 
