@@ -81,12 +81,12 @@ The normal pair to remember is:
 /flight-learn
 ```
 
-Advanced fallback commands such as `/flight-delta-review` and `/flight-deltas outcome ...` still exist for debugging/recovery, but they are not the normal workflow.
+Advanced/debug actions use subcommands under the same pair, for example `/flight-learn delta-review`, `/flight-learn deltas outcome ...`, `/flight-status mode ...`, and `/flight-status sync ...`. Legacy top-level aliases can be enabled only for developer recovery by starting Pi with `PI_FLIGHT_RECORDER_LEGACY_COMMANDS=1`.
 
 ## 5. Ask directly when needed
 
 ```text
-/seen-this-before --cwd current npm test Cannot find module src/config/app.ts
+/flight-learn seen --cwd current npm test Cannot find module src/config/app.ts
 ```
 
 A good match separates:
@@ -105,47 +105,47 @@ If no passing validation was detected after a failure, the episode is shown as u
 Manual reflection:
 
 ```text
-/flight-reflect
-/flight-reflect --min-count 3
-/flight-review
-/flight-reflect --interactive
+/flight-learn reflect
+/flight-learn reflect --min-count 3
+/flight-learn review
+/flight-learn reflect --interactive
 ```
 
-For corpus-building, prefer `/flight-learn`; it wraps the review/outcome path so you do not need to remember the lower-level delta commands.
+For corpus-building, prefer plain `/flight-learn`; it wraps the review/outcome path so you do not need to remember lower-level delta subcommands.
 
 Optional model-assisted reflection, only when requested and Pi exposes a model completion surface:
 
 ```text
-/flight-reflect --model
+/flight-learn reflect --model
 ```
 
-Reflection groups repeated local failures and proposes one pattern-level next step with evidence, confidence, limits, and actions. Use `/flight-review` for a guided keyboard-driven review: pick a proposal, pick an action, and optionally draft/edit/approve a scoped Flight Rule.
+Reflection groups repeated local failures and proposes one pattern-level next step with evidence, confidence, limits, and actions. Use `/flight-learn review` for a guided keyboard-driven review: pick a proposal, pick an action, and optionally draft/edit/approve a scoped Flight Rule.
 
 ## 7. Give feedback
 
 Examples:
 
 ```text
-/flight-feedback --action useful --proposal refl_...
-/flight-feedback --action wrong-match --occurrence occ_...
-/flight-feedback --action snooze --occurrence occ_...
-/flight-feedback --action silence-pattern --signature "npm test cannot find module paths"
-/flight-feedback --action promote-later --cluster cluster_...
-/flight-feedback --action make-rule --cluster cluster_...
-/flight-rules status
+/flight-learn feedback --action useful --proposal refl_...
+/flight-learn feedback --action wrong-match --occurrence occ_...
+/flight-learn feedback --action snooze --occurrence occ_...
+/flight-learn feedback --action silence-pattern --signature "npm test cannot find module paths"
+/flight-learn feedback --action promote-later --cluster cluster_...
+/flight-learn feedback --action make-rule --cluster cluster_...
+/flight-learn rules status
 ```
 
-Feedback is local SQLite state. `promote-later` records user intent. `make-rule` creates a draft candidate; a Flight Rule affects future turns only after explicit approval, and `/flight-rules disable` turns it off.
+Feedback is local SQLite state. `promote-later` records user intent. `make-rule` creates a draft candidate; a Flight Rule affects future turns only after explicit approval, and `/flight-learn rules disable` turns it off.
 
 ## 8. Control mode
 
 ```text
-/flight-mode status
-/flight-mode pause
-/flight-mode resume
-/flight-mode disable
-/flight-mode index-only
-/flight-mode suggest-on-failure --min-confidence 0.8 --cooldown-ms 300000
+/flight-status mode status
+/flight-status mode pause
+/flight-status mode resume
+/flight-status mode disable
+/flight-status mode index-only
+/flight-status mode suggest-on-failure --min-confidence 0.8 --cooldown-ms 300000
 ```
 
 Modes:
@@ -176,6 +176,7 @@ The source-checkout local smoke command proves a deterministic fake-Pi path with
 
 Still-unproven release edges:
 
+- real interactive Pi TUI validation of the collapsed `/flight-status` + `/flight-learn` command palette;
 - model-assisted reflection with a real provider;
 - long-run reflection precision/noise tuning over a mature occurrence corpus.
 

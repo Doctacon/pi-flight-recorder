@@ -17,9 +17,10 @@ Implemented:
 - shared watcher behavior for multiple simultaneous Pi sessions in the same project/source set;
 - live failure occurrence ledger for quiet/no-match/suppressed failures;
 - high-confidence live suggestion gates with prior-resolution requirement, specificity gate, cooldown, and silence/snooze feedback;
-- local repeated-failure clustering and `/flight-reflect` pattern proposals;
+- local repeated-failure clustering and `/flight-learn reflect` pattern proposals;
 - optional model-assisted reflection only when explicitly requested and a provider is available;
-- Pi commands: `/flight-status`, `/flight-learn`, `/flight-mode`, `/flight-feedback`, `/flight-reflect`, `/flight-review`, `/flight-delta-review`, `/flight-deltas`, `/flight-rules`, `/flight-sync`, `/seen-this-before`, `/flight-watch`;
+- normal visible Pi commands: `/flight-status`, `/flight-learn`;
+- advanced Pi subcommands under `/flight-status` and `/flight-learn`, with legacy slash aliases available only via explicit developer opt-in;
 - debug CLI commands: `status`, `sync`, `query`, `seen-this-before`, `watch`, `reflect`, `feedback`.
 
 ## Requirements
@@ -49,38 +50,43 @@ Build the package, install/enable it as a Pi extension, then work normally in Pi
 ~/.pi/flight-recorder/
 ```
 
-Useful Pi commands:
+The normal visible Pi commands are:
 
 ```text
 /flight-status
 /flight-learn
-/seen-this-before --cwd current Cannot find module src/config/app.ts
-/flight-reflect
-/flight-review
-/flight-rules status
-/flight-mode status
-/flight-mode pause
-/flight-mode resume
-/flight-mode disable
-/flight-feedback --action snooze --occurrence occ_...
 ```
 
-For the delta/artifact learning loop, the normal commands to remember are just:
+For the delta/artifact learning loop and daily use, those are the commands to remember:
 
 ```text
 /flight-status   # check whether capture is alive and how many items exist
 /flight-learn    # review the next delta or artifact outcome item
 ```
 
-Advanced `/flight-delta-review` and `/flight-deltas ...` commands remain available for debugging/recovery, but they are not the normal path.
+Advanced behavior is routed through subcommands instead of extra visible slash commands:
+
+```text
+/flight-learn seen --cwd current Cannot find module src/config/app.ts
+/flight-learn reflect --min-count 3
+/flight-learn review
+/flight-learn feedback --action snooze --occurrence occ_...
+/flight-learn deltas list|show|summary|route|apply|outcome|recur|reject|dismiss
+/flight-learn rules status|pending|show|approve|reject|disable|export
+/flight-status mode status|pause|resume|disable|off|index-only|suggest-on-failure
+/flight-status sync --source DIR --data-dir DIR
+/flight-status watch status|stop|start
+```
+
+Legacy slash aliases such as `/flight-reflect` and `/flight-deltas` are not registered by default because they clutter Pi command discovery. Developers can opt them in for recovery/debug with `PI_FLIGHT_RECORDER_LEGACY_COMMANDS=1` before starting Pi.
 
 Default behavior:
 
 - autostart is on after the extension is enabled;
 - mode defaults to `suggest-on-failure`, but live nudges require conservative gates;
 - no-match, low-confidence, cooldown, broad-match, and silenced failures are buffered quietly;
-- `/flight-reflect` groups repeated buffered failures into pattern-level proposals;
-- model-assisted reflection is disabled by default and only used for `/flight-reflect --model` when Pi provides a model completion surface;
+- `/flight-learn reflect` groups repeated buffered failures into pattern-level proposals;
+- model-assisted reflection is disabled by default and only used for `/flight-learn reflect --model` when Pi provides a model completion surface;
 - if another Pi session already owns the watcher lock, this session uses the shared watcher/index and continues live occurrence capture without an autostart warning.
 
 ## Immediate suggestions
@@ -102,8 +108,8 @@ The extension does **not** mutate Pi tool results. `user_bash` remains disabled 
 Repeated quiet failures are stored as local occurrences, mined into clusters, and summarized as pattern proposals:
 
 ```text
-/flight-reflect --min-count 3
-/flight-reflect --model   # explicit, bounded/redacted model assistance if available
+/flight-learn reflect --min-count 3
+/flight-learn reflect --model   # explicit, bounded/redacted model assistance if available
 ```
 
 Reflection proposals include:
@@ -115,9 +121,9 @@ Reflection proposals include:
 - confidence and limits;
 - actions: `useful`, `wrong-match`, `snooze`, `silence-pattern`, `promote-later`, `make-rule`.
 
-Use `/flight-review` or `/flight-reflect --interactive` for the older guided reflection/Flight Rule proposal flow. `make-rule` drafts a Flight Rule candidate, lets you edit/approve scope, and only approved rules are injected into future turns. `/flight-rules status|pending|show|disable|export` keeps rules inspectable and reversible.
+Use `/flight-learn review` or `/flight-learn reflect --interactive` for the guided reflection/Flight Rule proposal flow. `make-rule` drafts a Flight Rule candidate, lets you edit/approve scope, and only approved rules are injected into future turns. `/flight-learn rules status|pending|show|disable|export` keeps rules inspectable and reversible.
 
-Use `/flight-learn` for the newer expectation-delta learning inbox. It prepares local delta candidates from existing signals, routes one pending delta through human review, or follows up on one artifact candidate outcome without requiring you to remember candidate IDs. It never applies source/docs/Loom/rules/skills/prompts by itself.
+Use plain `/flight-learn` for the expectation-delta learning inbox. It prepares local delta candidates from existing signals, routes one pending delta through human review, or follows up on one artifact candidate outcome without requiring you to remember candidate IDs. It never applies source/docs/Loom/rules/skills/prompts by itself.
 
 ## Debug CLI usage
 
@@ -146,6 +152,7 @@ The foreground watcher intentionally does not install launchd/systemd services.
 
 Current validation includes automated tests, the source-checkout local smoke command, build/package dry-run, installed project-local Pi package smoke in a disposable TUI, selected prior real Pi TUI smoke for status/live capture/reflection, real interactive TUI evidence for guided Flight Rule promotion, and real TUI evidence for visible high-confidence prior-resolved suggestion text. The following remain explicit limits rather than proven release claims:
 
+- collapsed `/flight-status` + `/flight-learn` command-palette visibility still needs fresh real interactive Pi TUI validation;
 - model-assisted reflection has only fake-provider/bounded-context validation unless you explicitly run it with a real provider;
 - long-run reflection precision/noise tuning needs a mature local occurrence corpus.
 

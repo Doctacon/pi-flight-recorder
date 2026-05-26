@@ -28,7 +28,7 @@ async function makeSessionSource(): Promise<{ root: string; dataDir: string }> {
 }
 
 describe("Pi extension wrapper", () => {
-  it("registers commands, live hooks, and a query tool", () => {
+  it("registers only the two normal visible commands, live hooks, and a query tool by default", () => {
     const commands = new Map<string, unknown>();
     const events = new Map<string, unknown>();
     const tools: unknown[] = [];
@@ -38,23 +38,40 @@ describe("Pi extension wrapper", () => {
       on: (eventName, handler) => events.set(eventName, handler),
     });
 
-    expect(commands.has("flight-sync")).toBe(true);
-    expect(commands.has("seen-this-before")).toBe(true);
-    expect(commands.has("flight-mode")).toBe(true);
-    expect(commands.has("flight-watch")).toBe(true);
-    expect(commands.has("flight-status")).toBe(true);
-    expect(commands.has("flight-feedback")).toBe(true);
-    expect(commands.has("flight-reflect")).toBe(true);
-    expect(commands.has("flight-review")).toBe(true);
-    expect(commands.has("flight-learn")).toBe(true);
-    expect(commands.has("flight-rules")).toBe(true);
-    expect(commands.has("flight-delta-review")).toBe(true);
-    expect(commands.has("flight-deltas")).toBe(true);
+    expect([...commands.keys()].sort()).toEqual(["flight-learn", "flight-status"]);
+    expect(commands.has("flight-sync")).toBe(false);
+    expect(commands.has("seen-this-before")).toBe(false);
+    expect(commands.has("flight-mode")).toBe(false);
+    expect(commands.has("flight-watch")).toBe(false);
+    expect(commands.has("flight-feedback")).toBe(false);
+    expect(commands.has("flight-reflect")).toBe(false);
+    expect(commands.has("flight-review")).toBe(false);
+    expect(commands.has("flight-rules")).toBe(false);
+    expect(commands.has("flight-delta-review")).toBe(false);
+    expect(commands.has("flight-deltas")).toBe(false);
     expect(events.has("session_start")).toBe(true);
     expect(events.has("tool_result")).toBe(true);
     expect(events.has("user_bash")).toBe(true);
     expect(events.has("before_agent_start")).toBe(true);
     expect(tools).toHaveLength(1);
+  });
+
+  it("registers legacy slash aliases only when explicitly opted in", () => {
+    const commands = new Map<string, unknown>();
+    const flags = new Map<string, unknown>();
+    extension({
+      registerCommand: (name, command) => commands.set(name, command),
+      registerFlag: (name, options) => flags.set(name, options),
+      getFlag: (name) => (name === "flight-recorder-legacy-commands" ? true : undefined),
+    });
+
+    expect(flags.has("flight-recorder-legacy-commands")).toBe(true);
+    expect(commands.has("flight-status")).toBe(true);
+    expect(commands.has("flight-learn")).toBe(true);
+    expect(commands.has("flight-sync")).toBe(true);
+    expect(commands.has("seen-this-before")).toBe(true);
+    expect(commands.has("flight-deltas")).toBe(true);
+    expect(commands.has("flight-rules")).toBe(true);
   });
 
   it("autostarts quiet local capture on session_start and reports status without CLI", async () => {
@@ -150,14 +167,26 @@ describe("Pi extension wrapper", () => {
     const notifications: string[] = [];
     const ctx = { ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo" } };
 
-    await commands.get("flight-sync")?.handler(`--source ${root} --data-dir ${dataDir}`, ctx);
+    await commands.get("flight-status")?.handler(`sync --source ${root} --data-dir ${dataDir}`, ctx);
     expect(notifications.join("\n")).toContain("episodes 1");
 
     notifications.length = 0;
-    await commands.get("seen-this-before")?.handler(`--data-dir ${dataDir} --cwd current Cannot find module`, ctx);
+    await commands.get("flight-learn")?.handler(`seen --data-dir ${dataDir} --cwd current Cannot find module`, ctx);
     const output = notifications.join("\n");
     expect(output).toContain("Seen before");
     expect(output).toContain("entry fail0001");
+  });
+
+  it("routes watcher status through flight-status subcommands", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-watch-status-data-"));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    const notifications: string[] = [];
+    const ctx = { ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo" } };
+
+    await commands.get("flight-status")?.handler(`watch status --data-dir ${dataDir}`, ctx);
+
+    expect(notifications.join("\n")).toContain("Capture/index: not watching");
   });
 
   it("queries through the registered tool", async () => {
@@ -168,7 +197,7 @@ describe("Pi extension wrapper", () => {
       registerCommand: (name, command) => commands.set(name, command),
       registerTool: (tool) => tools.push(tool as (typeof tools)[number]),
     });
-    await commands.get("flight-sync")?.handler(`--source ${root} --data-dir ${dataDir}`, { ui: { notify: () => undefined } });
+    await commands.get("flight-status")?.handler(`sync --source ${root} --data-dir ${dataDir}`, { ui: { notify: () => undefined } });
 
     const response = await tools[0]?.execute("call-1", { query: "Cannot find module", dataDir });
     expect(response?.details.resultCount).toBe(1);
@@ -196,8 +225,8 @@ describe("Pi extension wrapper", () => {
       },
       sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
     };
-    await commands.get("flight-sync")?.handler(`--source ${root} --data-dir ${dataDir}`, ctx);
-    await commands.get("flight-mode")?.handler(`suggest-on-failure --data-dir ${dataDir}`, ctx);
+    await commands.get("flight-status")?.handler(`sync --source ${root} --data-dir ${dataDir}`, ctx);
+    await commands.get("flight-status")?.handler(`mode suggest-on-failure --data-dir ${dataDir}`, ctx);
     notifications.length = 0;
     const event = { toolName: "bash", input: { command: "npm test" }, isError: true, content: [{ type: "text", text: "Error: Cannot find module '../paths' at src/config/app.ts:12" }], details: { exitCode: 1 } };
     const before = JSON.stringify(event);
@@ -233,7 +262,7 @@ describe("Pi extension wrapper", () => {
       on: (eventName, handler) => events.set(eventName, handler),
     });
     const ctx = { cwd: "/repo", ui: { notify: () => undefined }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => sessionFile } };
-    await commands.get("flight-mode")?.handler(`index-only --data-dir ${dataDir}`, ctx);
+    await commands.get("flight-status")?.handler(`mode index-only --data-dir ${dataDir}`, ctx);
 
     await events.get("tool_result")?.({ toolName: "bash", input: { command: "npm test" }, isError: true, content: "Error: Cannot find module", details: { exitCode: 1 } }, ctx);
     await new Promise((resolve) => setTimeout(resolve, 650));
@@ -256,7 +285,7 @@ describe("Pi extension wrapper", () => {
     });
     const notifications: string[] = [];
     const ctx = { cwd: "/repo", ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => null } };
-    await commands.get("flight-mode")?.handler(`suggest-on-failure --data-dir ${dataDir} --cooldown-ms 0`, ctx);
+    await commands.get("flight-status")?.handler(`mode suggest-on-failure --data-dir ${dataDir} --cooldown-ms 0`, ctx);
     notifications.length = 0;
 
     await events.get("tool_result")?.({ toolName: "bash", input: { command: "npm test" }, isError: true, content: "Novel Error: frobnicator exploded", details: { exitCode: 1 }, id: "tool-live-1" }, ctx);
@@ -268,15 +297,15 @@ describe("Pi extension wrapper", () => {
       expect(occurrence?.suggestion?.kind).toBe("suppressed");
       expect(occurrence?.suggestion?.reason).toBe("no-match");
       if (!occurrence) throw new Error("missing occurrence");
-      await commands.get("flight-feedback")?.handler(`--action snooze --occurrence ${occurrence.id}`, ctx);
+      await commands.get("flight-learn")?.handler(`feedback --action snooze --occurrence ${occurrence.id}`, ctx);
       expect(store.hasActiveSignatureSuppression(occurrence.signature)?.action).toBe("snooze");
       const feedbackCount = store.count("feedback_actions");
       notifications.length = 0;
-      await commands.get("flight-feedback")?.handler("--action snooze --occurrence occ_missing", ctx);
+      await commands.get("flight-learn")?.handler("feedback --action snooze --occurrence occ_missing", ctx);
       expect(notifications.join("\n")).toContain("No failure occurrence found");
       expect(store.count("feedback_actions")).toBe(feedbackCount);
       notifications.length = 0;
-      await commands.get("flight-feedback")?.handler(`--action snooze --occurrence ${occurrence.id} --signature ${occurrence.signature}`, ctx);
+      await commands.get("flight-learn")?.handler(`feedback --action snooze --occurrence ${occurrence.id} --signature ${occurrence.signature}`, ctx);
       expect(notifications.join("\n")).toContain("requires exactly one target");
       expect(store.count("feedback_actions")).toBe(feedbackCount);
     } finally {
@@ -300,9 +329,9 @@ describe("Pi extension wrapper", () => {
     const notifications: string[] = [];
     const ctx = { cwd: "/repo", ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => null } };
 
-    await commands.get("flight-feedback")?.handler(`--data-dir ${dataDir} --action silence-pattern --occurrence ${occurrenceId}`, ctx);
+    await commands.get("flight-learn")?.handler(`feedback --data-dir ${dataDir} --action silence-pattern --occurrence ${occurrenceId}`, ctx);
     notifications.length = 0;
-    await commands.get("flight-reflect")?.handler(`--data-dir ${dataDir} --min-count 2`, ctx);
+    await commands.get("flight-learn")?.handler(`reflect --data-dir ${dataDir} --min-count 2`, ctx);
 
     expect(notifications.join("\n")).toContain("no repeated failure patterns ready");
   });
@@ -321,7 +350,7 @@ describe("Pi extension wrapper", () => {
     const notifications: string[] = [];
     const ctx = { cwd: "/repo", ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => null } };
 
-    await commands.get("flight-feedback")?.handler(`--data-dir ${dataDir} --action make-rule --cluster cluster-cluster-rule`, ctx);
+    await commands.get("flight-learn")?.handler(`feedback --data-dir ${dataDir} --action make-rule --cluster cluster-cluster-rule`, ctx);
 
     const check = new FlightRecorderStore(defaultDatabasePath(dataDir));
     try {
@@ -340,7 +369,7 @@ describe("Pi extension wrapper", () => {
     const notifications: string[] = [];
     const ctx = { cwd: "/repo", ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => null } };
 
-    await commands.get("flight-watch")?.handler(`start --source ${root} --data-dir ${dataDir} --mode index-only --debounce-ms 10`, ctx);
+    await commands.get("flight-status")?.handler(`watch start --source ${root} --data-dir ${dataDir} --mode index-only --debounce-ms 10`, ctx);
     expect(notifications.join("\n")).toContain("watcher active");
     notifications.length = 0;
     await commands.get("flight-status")?.handler(`--data-dir ${otherDataDir}`, ctx);
@@ -379,7 +408,7 @@ describe("Pi extension wrapper", () => {
       sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
     };
 
-    await commands.get("flight-review")?.handler(`--data-dir ${dataDir} --min-count 2`, ctx);
+    await commands.get("flight-learn")?.handler(`review --data-dir ${dataDir} --min-count 2`, ctx);
     const afterUseful = new FlightRecorderStore(defaultDatabasePath(dataDir));
     try {
       expect(afterUseful.getFeedbackActions({ actions: ["useful"], limit: 1 })).toHaveLength(1);
@@ -389,7 +418,7 @@ describe("Pi extension wrapper", () => {
 
     selectedAction = "Make Rule";
     notifications.length = 0;
-    await commands.get("flight-review")?.handler(`--data-dir ${dataDir} --min-count 2`, ctx);
+    await commands.get("flight-learn")?.handler(`review --data-dir ${dataDir} --min-count 2`, ctx);
     const afterCancel = new FlightRecorderStore(defaultDatabasePath(dataDir));
     try {
       expect(afterCancel.count("rule_candidates")).toBe(0);
@@ -450,7 +479,7 @@ describe("Pi extension wrapper", () => {
       sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
     };
 
-    await commands.get("flight-delta-review")?.handler(`--data-dir ${dataDir}`, ctx);
+    await commands.get("flight-learn")?.handler(`delta-review --data-dir ${dataDir}`, ctx);
 
     expect(selectChoices[0]?.[0]).toContain(deltaId);
     expect(selectPrompts.find((prompt) => prompt.includes("Route expectation delta"))).toContain("Signals:");
@@ -631,8 +660,8 @@ describe("Pi extension wrapper", () => {
     const notifications: string[] = [];
     const ctx = { cwd: "/repo", ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => null } };
 
-    await commands.get("flight-delta-review")?.handler(`--data-dir ${dataDir}`, ctx);
-    expect(notifications.join("\n")).toContain("/flight-deltas list");
+    await commands.get("flight-learn")?.handler(`delta-review --data-dir ${dataDir}`, ctx);
+    expect(notifications.join("\n")).toContain("/flight-learn deltas list");
     let check = new FlightRecorderStore(defaultDatabasePath(dataDir));
     try {
       expect(check.getExpectationDelta(observeDeltaId)?.status).toBe("candidate");
@@ -642,7 +671,7 @@ describe("Pi extension wrapper", () => {
     }
 
     notifications.length = 0;
-    await commands.get("flight-deltas")?.handler(`route --data-dir ${dataDir} --delta ${observeDeltaId} --type observe --rationale "Observe recurrence before creating an artifact"`, ctx);
+    await commands.get("flight-learn")?.handler(`deltas route --data-dir ${dataDir} --delta ${observeDeltaId} --type observe --rationale "Observe recurrence before creating an artifact"`, ctx);
     check = new FlightRecorderStore(defaultDatabasePath(dataDir));
     try {
       const candidate = check.listArtifactCandidates({ deltaId: observeDeltaId })[0];
@@ -657,12 +686,12 @@ describe("Pi extension wrapper", () => {
     expect(notifications.join("\n")).toContain("No artifact was created or applied");
 
     notifications.length = 0;
-    await commands.get("flight-deltas")?.handler(`show --data-dir ${dataDir} --delta ${observeDeltaId}`, ctx);
+    await commands.get("flight-learn")?.handler(`deltas show --data-dir ${dataDir} --delta ${observeDeltaId}`, ctx);
     expect(notifications.join("\n")).toContain("Draft:");
     expect(notifications.join("\n")).toContain("Observe/no-artifact decision");
 
     notifications.length = 0;
-    await commands.get("flight-deltas")?.handler(`dismiss --data-dir ${dataDir} --delta ${dismissDeltaId} --reason "Not recurring"`, ctx);
+    await commands.get("flight-learn")?.handler(`deltas dismiss --data-dir ${dataDir} --delta ${dismissDeltaId} --reason "Not recurring"`, ctx);
     check = new FlightRecorderStore(defaultDatabasePath(dataDir));
     try {
       const dismissed = check.getExpectationDelta(dismissDeltaId);
@@ -697,15 +726,15 @@ describe("Pi extension wrapper", () => {
     const notifications: string[] = [];
     const ctx = { cwd: "/repo", ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => null } };
 
-    await commands.get("flight-deltas")?.handler(`apply --data-dir ${dataDir} --candidate ${candidateId} --ref tests/validation.test.ts`, ctx);
+    await commands.get("flight-learn")?.handler(`deltas apply --data-dir ${dataDir} --candidate ${candidateId} --ref tests/validation.test.ts`, ctx);
     expect(notifications.join("\n")).toContain("Marked artifact candidate");
 
     notifications.length = 0;
-    await commands.get("flight-deltas")?.handler(`outcome --data-dir ${dataDir} --candidate ${candidateId} --outcome helped --note "No linked recurrence observed yet"`, ctx);
+    await commands.get("flight-learn")?.handler(`deltas outcome --data-dir ${dataDir} --candidate ${candidateId} --outcome helped --note "No linked recurrence observed yet"`, ctx);
     expect(notifications.join("\n")).toContain("Recorded outcome");
 
     notifications.length = 0;
-    await commands.get("flight-deltas")?.handler(`summary --data-dir ${dataDir}`, ctx);
+    await commands.get("flight-learn")?.handler(`deltas summary --data-dir ${dataDir}`, ctx);
     expect(notifications.join("\n")).toContain("No recurrence observed since applied");
     expect(notifications.join("\n")).toContain("not proof");
 
@@ -717,7 +746,7 @@ describe("Pi extension wrapper", () => {
     }
 
     notifications.length = 0;
-    await commands.get("flight-deltas")?.handler(`recur --data-dir ${dataDir} --delta ${laterDeltaId} --candidate ${candidateId} --reason "Similar delta recurred after application" --similarity 0.9`, ctx);
+    await commands.get("flight-learn")?.handler(`deltas recur --data-dir ${dataDir} --delta ${laterDeltaId} --candidate ${candidateId} --reason "Similar delta recurred after application" --similarity 0.9`, ctx);
     expect(notifications.join("\n")).toContain("Linked recurrence");
     const check = new FlightRecorderStore(defaultDatabasePath(dataDir));
     try {
@@ -728,7 +757,7 @@ describe("Pi extension wrapper", () => {
     }
 
     notifications.length = 0;
-    await commands.get("flight-deltas")?.handler(`summary --data-dir ${dataDir}`, ctx);
+    await commands.get("flight-learn")?.handler(`deltas summary --data-dir ${dataDir}`, ctx);
     expect(notifications.join("\n")).toContain("Recurring after applied");
   });
 
@@ -767,7 +796,7 @@ describe("Pi extension wrapper", () => {
       sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
     };
 
-    await commands.get("flight-review")?.handler(`--data-dir ${dataDir} --min-count 2`, ctx);
+    await commands.get("flight-learn")?.handler(`review --data-dir ${dataDir} --min-count 2`, ctx);
 
     expect(selectChoices[0]?.[0]).toContain("exact-text edit mismatches");
     expect(selectChoices[0]?.[0]).toContain("refl_");
@@ -790,7 +819,7 @@ describe("Pi extension wrapper", () => {
     await commands.get("flight-status")?.handler(`--data-dir ${dataDir}`, ctx);
     expect(notifications.join("\n")).toContain(`last injected=${ruleId}`);
 
-    await commands.get("flight-rules")?.handler(`disable ${ruleId} --data-dir ${dataDir}`, ctx);
+    await commands.get("flight-learn")?.handler(`rules disable ${ruleId} --data-dir ${dataDir}`, ctx);
     const afterDisable = await events.get("before_agent_start")?.({ systemPrompt: "base prompt", systemPromptOptions: { cwd: "/repo" } }, ctx) as { systemPrompt?: string } | undefined;
     expect(afterDisable).toBeUndefined();
   });
@@ -813,16 +842,16 @@ describe("Pi extension wrapper", () => {
     const notifications: string[] = [];
     const ctx = { cwd: "/repo", ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => null } };
 
-    await commands.get("flight-rules")?.handler(`pending --data-dir ${dataDir}`, ctx);
+    await commands.get("flight-learn")?.handler(`rules pending --data-dir ${dataDir}`, ctx);
     expect(notifications.join("\n")).toContain("Pending draft");
     notifications.length = 0;
-    await commands.get("flight-rules")?.handler(`show ${ruleId} --data-dir ${dataDir}`, ctx);
+    await commands.get("flight-learn")?.handler(`rules show ${ruleId} --data-dir ${dataDir}`, ctx);
     expect(notifications.join("\n")).toContain("Flight rule");
     notifications.length = 0;
-    await commands.get("flight-rules")?.handler(`export --data-dir ${dataDir}`, ctx);
+    await commands.get("flight-learn")?.handler(`rules export --data-dir ${dataDir}`, ctx);
     expect(notifications.join("\n")).toContain("# Flight Recorder Rules");
     notifications.length = 0;
-    await commands.get("flight-rules")?.handler(`reject --candidate ${candidateId} --data-dir ${dataDir}`, ctx);
+    await commands.get("flight-learn")?.handler(`rules reject --candidate ${candidateId} --data-dir ${dataDir}`, ctx);
     expect(notifications.join("\n")).toContain("Rejected rule candidate");
   });
 
@@ -840,10 +869,10 @@ describe("Pi extension wrapper", () => {
     const notifications: string[] = [];
     const ctx = { cwd: "/repo", ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => null } };
 
-    await commands.get("flight-reflect")?.handler(`--data-dir ${dataDir} --min-count 2`, ctx);
+    await commands.get("flight-learn")?.handler(`reflect --data-dir ${dataDir} --min-count 2`, ctx);
 
     const output = notifications.join("\n");
     expect(output).toContain("Pattern: exact-text edit mismatches");
-    expect(output).toContain("review interactively: /flight-review");
+    expect(output).toContain("review interactively: /flight-learn review");
   });
 });

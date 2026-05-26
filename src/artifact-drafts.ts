@@ -73,7 +73,7 @@ function flightRuleDraft(delta: ExpectationDelta, rationale: string): ArtifactDr
       "- This is stored only as an artifact candidate draft.",
       "- Create/approve an active Flight Rule only through the existing explicit Flight Rule workflow.",
     ]),
-    nextStep: "If this should become guidance, review the proposed rule text and create/approve a Flight Rule through the existing `/flight-review` or `/flight-rules` approval workflow. Until then it is not injected.",
+    nextStep: "If this should become guidance, review the proposed rule text and create/approve a Flight Rule through `/flight-learn review` or `/flight-learn rules` approval workflow. Until then it is not injected.",
     limits: commonLimits(["This draft is not an approved Flight Rule and will not be injected into future turns."]),
     confidence: 0.55,
   };

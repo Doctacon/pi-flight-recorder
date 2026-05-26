@@ -15,6 +15,23 @@ import type { SyncOptions } from "./sync.js";
 import { defaultDatabasePath, FlightRecorderStore, getDefaultDataDir } from "./storage.js";
 import type { ArtifactCandidate, ArtifactCandidateOutcome, ArtifactCandidateType, DeltaDetectorSignal, ExpectationDelta, FeedbackAction, FeedbackTargetType, FlightRuleScope, NewFailureOccurrence, ReflectionProposal, SuggestionOutcome } from "./types.js";
 
+const LEGACY_COMMAND_ALIASES_ENV = "PI_FLIGHT_RECORDER_LEGACY_COMMANDS";
+const LEGACY_COMMAND_ALIASES_FLAG = "flight-recorder-legacy-commands";
+
+function truthyOptIn(value: boolean | string | undefined): boolean {
+  if (value === true) return true;
+  if (typeof value !== "string") return false;
+  return ["1", "true", "yes", "on"].includes(value.trim().toLowerCase());
+}
+
+function legacyCommandAliasesEnabled(pi: PiLike): boolean {
+  return truthyOptIn(process.env[LEGACY_COMMAND_ALIASES_ENV]) || truthyOptIn(pi.getFlag?.(LEGACY_COMMAND_ALIASES_FLAG));
+}
+
+function restAfterSubcommand(argsText: string, subcommand: string): string {
+  return argsText.trimStart().slice(subcommand.length).trimStart();
+}
+
 function stateDataDir(state: LiveExtensionState): string {
   return state.dataDir ?? getDefaultDataDir();
 }
@@ -254,7 +271,7 @@ async function handleSeenThisBefore(argsText: string, ctx: PiCommandContext): Pr
   const query = optionlessText(args, ["--data-dir", "--cwd", "--limit"]);
 
   if (!query) {
-    notify(ctx, "Usage: /seen-this-before [--data-dir DIR] [--cwd current|PATH] [--limit N] <error text>", "error");
+    notify(ctx, "Usage: /flight-learn seen [--data-dir DIR] [--cwd current|PATH] [--limit N] <error text>", "error");
     return;
   }
 
@@ -306,13 +323,40 @@ async function handleFlightMode(argsText: string, ctx: PiCommandContext, state: 
       state.watcher = null;
     }
   } else if (subcommand !== "status") {
-    notify(ctx, "Usage: /flight-mode status|pause|resume|disable|off|index-only|suggest-on-failure [--data-dir DIR] [--min-confidence N] [--cooldown-ms N]", "error");
+    notify(ctx, "Usage: /flight-status mode status|pause|resume|disable|off|index-only|suggest-on-failure [--data-dir DIR] [--min-confidence N] [--cooldown-ms N]", "error");
     return;
   }
 
   await persistSettingsFromState(state);
   const engine = await getLiveEngine(state);
   notify(ctx, `Flight recorder mode: ${state.mode}; autoStart=${state.autoStart}; data dir: ${stateDataDir(state)}; suggestions emitted=${engine.status().emittedInWindow}.`, "info");
+}
+
+function flightStatusHelp(): string {
+  return [
+    "Flight Status commands:",
+    "- /flight-status [status]                Show capture/index/suggestion/rule/delta status",
+    "- /flight-status mode status|pause|resume|disable|off|index-only|suggest-on-failure",
+    "- /flight-status sync --source DIR ...    Manually index local Pi sessions",
+    "- /flight-status watch status|stop|start  Inspect or control the local watcher",
+    "- /flight-status rules status|pending|show|export",
+    "Normal action/review command: /flight-learn",
+  ].join("\n");
+}
+
+function flightLearnHelp(): string {
+  return [
+    "Flight Learn commands:",
+    "- /flight-learn                           Guided learning inbox",
+    "- /flight-learn seen <error text>          Search prior local fixes",
+    "- /flight-learn reflect [--model]          Reflect on repeated local failures",
+    "- /flight-learn review                     Guided reflection/rule review",
+    "- /flight-learn delta-review               Guided expectation-delta routing",
+    "- /flight-learn deltas ...                 Advanced delta list/show/route/outcome/recur/reject",
+    "- /flight-learn feedback ...               Record suggestion/reflection feedback",
+    "- /flight-learn rules ...                  Manage Flight Rule candidates and active rules",
+    "Inspection/control command: /flight-status",
+  ].join("\n");
 }
 
 async function handleFlightWatch(argsText: string, ctx: PiCommandContext, state: LiveExtensionState): Promise<void> {
@@ -328,7 +372,7 @@ async function handleFlightWatch(argsText: string, ctx: PiCommandContext, state:
   if (requestedMode) state.mode = requestedMode;
 
   if (subcommand === "status") {
-    await handleFlightStatus(argsText, ctx, state);
+    await handleFlightStatus(restAfterSubcommand(argsText, subcommand), ctx, state);
     return;
   }
 
@@ -340,7 +384,7 @@ async function handleFlightWatch(argsText: string, ctx: PiCommandContext, state:
   }
 
   if (subcommand !== "start") {
-    notify(ctx, "Usage: /flight-watch start|stop|status [--source DIR ...] [--data-dir DIR] [--mode off|index-only|suggest-on-failure]", "error");
+    notify(ctx, "Usage: /flight-status watch start|stop|status [--source DIR ...] [--data-dir DIR] [--mode off|index-only|suggest-on-failure]", "error");
     return;
   }
 
@@ -361,6 +405,36 @@ async function handleFlightWatch(argsText: string, ctx: PiCommandContext, state:
 
 async function handleFlightStatus(argsText: string, ctx: PiCommandContext, state: LiveExtensionState): Promise<void> {
   const args = splitArgs(argsText);
+  const subcommand = args[0];
+  if (subcommand && !subcommand.startsWith("--")) {
+    const rest = restAfterSubcommand(argsText, subcommand);
+    if (subcommand === "help") {
+      notify(ctx, flightStatusHelp(), "info");
+      return;
+    }
+    if (subcommand === "status") {
+      await handleFlightStatus(rest, ctx, state);
+      return;
+    }
+    if (subcommand === "sync") {
+      await handleFlightSync(rest, ctx);
+      return;
+    }
+    if (subcommand === "mode") {
+      await handleFlightMode(rest || "status", ctx, state);
+      return;
+    }
+    if (subcommand === "watch") {
+      await handleFlightWatch(rest || "status", ctx, state);
+      return;
+    }
+    if (subcommand === "rules") {
+      await handleFlightRules(rest || "status", ctx, state);
+      return;
+    }
+    notify(ctx, flightStatusHelp(), "error");
+    return;
+  }
   const dataDirArg = readOption(args, "--data-dir");
   await switchDataDir(state, dataDirArg);
   await ensureBootstrapped(ctx, state, "command", false);
@@ -389,7 +463,7 @@ async function handleFlightStatus(argsText: string, ctx: PiCommandContext, state
       `User-bash capture: disabled (Pi user_bash is pre-execution; command semantics are not wrapped).`,
       `Errors: ${state.lastBootstrapError ?? (watchStatus?.state === "watched-by-another-process" ? null : watchStatus?.lastError) ?? "none"}`,
       `Recent feedback: ${recentFeedback.map((item) => `${item.action}:${item.targetType}/${item.targetId}`).join(", ") || "none"}`,
-      "Privacy: local SQLite only by default; no model calls unless `/flight-reflect --model` or model reflection is enabled.",
+      "Privacy: local SQLite only by default; no model calls unless `/flight-learn reflect --model` or model reflection is enabled.",
     ];
     notify(ctx, lines.join("\n"), state.lastBootstrapError ? "warning" : "info");
   } finally {
@@ -509,7 +583,7 @@ async function draftCandidateForProposal(store: FlightRecorderStore, proposal: R
 async function handleMakeRuleProposal(store: FlightRecorderStore, proposal: ReflectionProposal, ctx: PiCommandContext, interactive: boolean, recordFeedback = false): Promise<void> {
   if (!interactive) {
     const candidate = await draftCandidateForProposal(store, proposal, ctx);
-    notify(ctx, [`Flight rule candidate created: ${candidate.id}`, `Draft: ${candidate.draftText}`, `Next: /flight-rules approve --candidate ${candidate.id} --scope ${candidate.proposedScope}`].join("\n"), "success");
+    notify(ctx, [`Flight rule candidate created: ${candidate.id}`, `Draft: ${candidate.draftText}`, `Next: /flight-learn rules approve --candidate ${candidate.id} --scope ${candidate.proposedScope}`].join("\n"), "success");
     return;
   }
 
@@ -517,7 +591,7 @@ async function handleMakeRuleProposal(store: FlightRecorderStore, proposal: Refl
   const draft = draftRuleFromProposal(proposal);
   const edit = await askReviewEditor(ctx, "Review Flight Rule draft", draft.text);
   if (edit.kind === "cancelled") {
-    notify(ctx, fallbackMessage(edit.reason, `No rule candidate was created. Use /flight-feedback --action make-rule --proposal ${proposal.id} as a fallback.`), edit.reason === "no-ui" ? "warning" : "info");
+    notify(ctx, fallbackMessage(edit.reason, `No rule candidate was created. Use /flight-learn feedback --action make-rule --proposal ${proposal.id} as a fallback.`), edit.reason === "no-ui" ? "warning" : "info");
     return;
   }
   const scope = await askReviewChoice(ctx, "Approve this Flight Rule?", [
@@ -680,7 +754,7 @@ function sectionFromDraft(text: string, header: "Expectation" | "Reality" | "Imp
 
 function deltaFallbackUsage(deltaId?: string): string {
   const target = deltaId ? ` --delta ${deltaId}` : " --delta <id>";
-  return `Use /flight-deltas list, /flight-deltas show${target}, /flight-deltas route${target} --type code-legibility --rationale "...", or /flight-deltas dismiss${target} --reason "...".`;
+  return `Use /flight-learn deltas list, /flight-learn deltas show${target}, /flight-learn deltas route${target} --type code-legibility --rationale "...", or /flight-learn deltas dismiss${target} --reason "...".`;
 }
 
 function deltaRouteTitle(delta: ExpectationDelta, signals: DeltaDetectorSignal[]): string {
@@ -776,7 +850,7 @@ async function handleFlightDeltaReview(argsText: string, ctx: PiCommandContext, 
     }
     const rationale = await askReviewEditor(ctx, "Routing rationale", route.value === "observe" ? "Observe/no artifact: keep evidence and watch recurrence before creating an artifact." : `Route to ${artifactRouteLabel(route.value)} because ...`);
     if (rationale.kind === "cancelled") {
-      notify(ctx, fallbackMessage(rationale.reason, `/flight-deltas route --delta ${delta.id} --type ${route.value} --rationale "..."`), rationale.reason === "no-ui" ? "warning" : "info");
+      notify(ctx, fallbackMessage(rationale.reason, `/flight-learn deltas route --delta ${delta.id} --type ${route.value} --rationale "..."`), rationale.reason === "no-ui" ? "warning" : "info");
       return;
     }
     const candidate = storeDeltaRoute(store, delta, route.value, rationale.text, review.text);
@@ -861,7 +935,7 @@ async function handleLearningFollowup(store: FlightRecorderStore, candidates: Ar
     label: learningFollowupChoiceLabel(store, candidate, index),
   })));
   if (choice.kind === "cancelled") {
-    notify(ctx, fallbackMessage(choice.reason, "Run /flight-learn in interactive Pi, or use advanced /flight-deltas apply|outcome|reject fallback commands."), choice.reason === "no-ui" ? "warning" : "info");
+    notify(ctx, fallbackMessage(choice.reason, "Run /flight-learn in interactive Pi, use /flight-learn deltas apply|outcome|reject, or use the CLI delta debug commands."), choice.reason === "no-ui" ? "warning" : "info");
     return;
   }
   const candidate = candidates.find((item) => item.id === choice.value);
@@ -880,7 +954,7 @@ async function handleLearningFollowup(store: FlightRecorderStore, candidates: Ar
   if (action.value === "mark-applied") {
     const appliedRef = await askReviewEditor(ctx, "Applied artifact reference", candidate.appliedArtifactRef ?? "");
     if (appliedRef.kind === "cancelled") {
-      notify(ctx, fallbackMessage(appliedRef.reason, `/flight-deltas apply --candidate ${candidate.id}`), appliedRef.reason === "no-ui" ? "warning" : "info");
+      notify(ctx, fallbackMessage(appliedRef.reason, `/flight-learn deltas apply --candidate ${candidate.id}`), appliedRef.reason === "no-ui" ? "warning" : "info");
       return;
     }
     const updated = store.markArtifactCandidateApplied(candidate.id, { appliedArtifactRef: appliedRef.text.trim() || null });
@@ -890,7 +964,7 @@ async function handleLearningFollowup(store: FlightRecorderStore, candidates: Ar
   if (action.value === "reject") {
     const reason = await askReviewEditor(ctx, "Reject reason", "Why is this not the right artifact route?");
     if (reason.kind === "cancelled") {
-      notify(ctx, fallbackMessage(reason.reason, `/flight-deltas reject --candidate ${candidate.id} --reason "..."`), reason.reason === "no-ui" ? "warning" : "info");
+      notify(ctx, fallbackMessage(reason.reason, `/flight-learn deltas reject --candidate ${candidate.id} --reason "..."`), reason.reason === "no-ui" ? "warning" : "info");
       return;
     }
     const rejected = store.rejectArtifactCandidate(candidate.id, reason.text.trim() || "Rejected through /flight-learn");
@@ -899,7 +973,7 @@ async function handleLearningFollowup(store: FlightRecorderStore, candidates: Ar
   }
   const note = await askReviewEditor(ctx, "Outcome note", learningOutcomePrefill(action.value));
   if (note.kind === "cancelled") {
-    notify(ctx, fallbackMessage(note.reason, `/flight-deltas outcome --candidate ${candidate.id} --outcome ${action.value}`), note.reason === "no-ui" ? "warning" : "info");
+    notify(ctx, fallbackMessage(note.reason, `/flight-learn deltas outcome --candidate ${candidate.id} --outcome ${action.value}`), note.reason === "no-ui" ? "warning" : "info");
     return;
   }
   const result = recordArtifactCandidateOutcomeWithStore(store, {
@@ -931,6 +1005,44 @@ function formatDeltaDetail(store: FlightRecorderStore, delta: ExpectationDelta):
 
 async function handleFlightLearn(argsText: string, ctx: PiCommandContext, state: LiveExtensionState): Promise<void> {
   const args = splitArgs(argsText);
+  const subcommand = args[0];
+  if (subcommand && !subcommand.startsWith("--")) {
+    const rest = restAfterSubcommand(argsText, subcommand);
+    if (subcommand === "help") {
+      notify(ctx, flightLearnHelp(), "info");
+      return;
+    }
+    if (subcommand === "seen" || subcommand === "query" || subcommand === "seen-this-before") {
+      await handleSeenThisBefore(rest, ctx);
+      return;
+    }
+    if (subcommand === "feedback") {
+      await handleFlightFeedback(rest, ctx, state);
+      return;
+    }
+    if (subcommand === "reflect") {
+      await handleFlightReflect(rest, ctx, state);
+      return;
+    }
+    if (subcommand === "review") {
+      await handleFlightReview(rest, ctx, state);
+      return;
+    }
+    if (subcommand === "delta-review") {
+      await handleFlightDeltaReview(rest, ctx, state);
+      return;
+    }
+    if (subcommand === "deltas") {
+      await handleFlightDeltas(rest, ctx, state);
+      return;
+    }
+    if (subcommand === "rules") {
+      await handleFlightRules(rest, ctx, state);
+      return;
+    }
+    notify(ctx, flightLearnHelp(), "error");
+    return;
+  }
   const dataDir = readOption(args, "--data-dir");
   await switchDataDir(state, dataDir);
   await ensureBootstrapped(ctx, state, "command", false);
@@ -974,7 +1086,7 @@ async function handleFlightDeltas(argsText: string, ctx: PiCommandContext, state
     if (subcommand === "show") {
       const id = readOption(args, "--delta") ?? args[1];
       if (!id) {
-        notify(ctx, "Usage: /flight-deltas show --delta delta_...", "error");
+        notify(ctx, "Usage: /flight-learn deltas show --delta delta_...", "error");
         return;
       }
       const delta = store.getExpectationDelta(id);
@@ -989,7 +1101,7 @@ async function handleFlightDeltas(argsText: string, ctx: PiCommandContext, state
     if (subcommand === "apply") {
       const candidateId = readOption(args, "--candidate") ?? args[1];
       if (!candidateId) {
-        notify(ctx, "Usage: /flight-deltas apply --candidate artifact_cand_... [--ref artifact-ref]", "error");
+        notify(ctx, "Usage: /flight-learn deltas apply --candidate artifact_cand_... [--ref artifact-ref]", "error");
         return;
       }
       const candidate = store.markArtifactCandidateApplied(candidateId, { appliedArtifactRef: readOption(args, "--ref") });
@@ -1000,7 +1112,7 @@ async function handleFlightDeltas(argsText: string, ctx: PiCommandContext, state
       const candidateId = readOption(args, "--candidate") ?? args[1];
       const outcome = artifactOutcomeFromText(readOption(args, "--outcome"));
       if (!candidateId || !outcome) {
-        notify(ctx, "Usage: /flight-deltas outcome --candidate artifact_cand_... --outcome pending|helped|no-change|worse|superseded|needs-reroute [--note \"...\"] [--applied-ref ref]", "error");
+        notify(ctx, "Usage: /flight-learn deltas outcome --candidate artifact_cand_... --outcome pending|helped|no-change|worse|superseded|needs-reroute [--note \"...\"] [--applied-ref ref]", "error");
         return;
       }
       const outcomeInput: Parameters<typeof recordArtifactCandidateOutcomeWithStore>[1] = { candidateId, outcome, outcomeSummary: readOption(args, "--note") };
@@ -1015,7 +1127,7 @@ async function handleFlightDeltas(argsText: string, ctx: PiCommandContext, state
       const candidateId = readOption(args, "--candidate");
       const reason = readOption(args, "--reason");
       if (!deltaId || !candidateId || !reason) {
-        notify(ctx, "Usage: /flight-deltas recur --delta delta_... --candidate artifact_cand_... --reason \"similar evidence\" [--similarity 0.8]", "error");
+        notify(ctx, "Usage: /flight-learn deltas recur --delta delta_... --candidate artifact_cand_... --reason \"similar evidence\" [--similarity 0.8]", "error");
         return;
       }
       const recurrenceInput: Parameters<typeof recordDeltaRecurrenceWithStore>[1] = { deltaId, priorArtifactCandidateId: candidateId, reason };
@@ -1029,7 +1141,7 @@ async function handleFlightDeltas(argsText: string, ctx: PiCommandContext, state
       const candidateId = readOption(args, "--candidate") ?? args[1];
       const reason = readOption(args, "--reason") ?? "Rejected through fallback command";
       if (!candidateId) {
-        notify(ctx, "Usage: /flight-deltas reject --candidate artifact_cand_... --reason \"...\"", "error");
+        notify(ctx, "Usage: /flight-learn deltas reject --candidate artifact_cand_... --reason \"...\"", "error");
         return;
       }
       const candidate = store.rejectArtifactCandidate(candidateId, reason);
@@ -1040,7 +1152,7 @@ async function handleFlightDeltas(argsText: string, ctx: PiCommandContext, state
       const id = readOption(args, "--delta") ?? args[1];
       const reason = readOption(args, "--reason") ?? "Dismissed through fallback command";
       if (!id) {
-        notify(ctx, "Usage: /flight-deltas dismiss --delta delta_... --reason \"...\"", "error");
+        notify(ctx, "Usage: /flight-learn deltas dismiss --delta delta_... --reason \"...\"", "error");
         return;
       }
       const delta = store.dismissExpectationDelta(id, reason);
@@ -1052,7 +1164,7 @@ async function handleFlightDeltas(argsText: string, ctx: PiCommandContext, state
       const artifactType = artifactTypeFromText(readOption(args, "--type"));
       const rationale = readOption(args, "--rationale");
       if (!id || !artifactType || !rationale) {
-        notify(ctx, "Usage: /flight-deltas route --delta delta_... --type code-legibility|test-check|loom-ticket|flight-rule|loom-spec|loom-research|loom-knowledge|prompt-context|skill-or-template|observe --rationale \"...\"", "error");
+        notify(ctx, "Usage: /flight-learn deltas route --delta delta_... --type code-legibility|test-check|loom-ticket|flight-rule|loom-spec|loom-research|loom-knowledge|prompt-context|skill-or-template|observe --rationale \"...\"", "error");
         return;
       }
       const delta = store.getExpectationDelta(id);
@@ -1070,7 +1182,7 @@ async function handleFlightDeltas(argsText: string, ctx: PiCommandContext, state
       notify(ctx, [`Routed expectation delta ${delta.id} to ${artifactRouteLabel(candidate.artifactType)}.`, `Artifact candidate: ${candidate.id} [${candidate.status}; applied=${candidate.applied}]`, `Next step: ${candidate.nextStep ?? "review candidate draft"}`, "Draft/handoff text was stored locally. No artifact was created or applied."].join("\n"), "success");
       return;
     }
-    notify(ctx, "Usage: /flight-deltas list|show|summary|route|apply|outcome|recur|reject|dismiss or /flight-delta-review for guided review.", "error");
+    notify(ctx, "Usage: /flight-learn deltas list|show|summary|route|apply|outcome|recur|reject|dismiss or /flight-learn delta-review for guided review.", "error");
   } finally {
     store.close();
   }
@@ -1085,7 +1197,7 @@ async function handleFlightFeedback(argsText: string, ctx: PiCommandContext, sta
   const note = readOption(args, "--note");
   const durationMs = parseNumber(readOption(args, "--duration-ms"));
   if (!action) {
-    notify(ctx, "Usage: /flight-feedback --action useful|wrong-match|snooze|silence-pattern|promote-later|make-rule [--occurrence ID|--cluster ID|--proposal ID|--episode ID|--signature TEXT]", "error");
+    notify(ctx, "Usage: /flight-learn feedback --action useful|wrong-match|snooze|silence-pattern|promote-later|make-rule [--occurrence ID|--cluster ID|--proposal ID|--episode ID|--signature TEXT]", "error");
     return;
   }
   const store = new FlightRecorderStore(defaultDatabasePath(stateDataDir(state)));
@@ -1164,7 +1276,7 @@ async function handleFlightReview(argsText: string, ctx: PiCommandContext, state
     label: proposalChoiceLabel(proposal, index),
   })));
   if (proposalChoice.kind === "cancelled") {
-    notify(ctx, fallbackMessage(proposalChoice.reason, "Use /flight-feedback --action <action> --proposal <id> as a fallback."), proposalChoice.reason === "no-ui" ? "warning" : "info");
+    notify(ctx, fallbackMessage(proposalChoice.reason, "Use /flight-learn feedback --action <action> --proposal <id> as a fallback."), proposalChoice.reason === "no-ui" ? "warning" : "info");
     return;
   }
   const proposal = proposals.find((item) => item.id === proposalChoice.value);
@@ -1174,7 +1286,7 @@ async function handleFlightReview(argsText: string, ctx: PiCommandContext, state
   }
   const actionChoice = await askReviewChoice(ctx, proposalReviewTitle(proposal), actionChoices(true));
   if (actionChoice.kind === "cancelled") {
-    notify(ctx, fallbackMessage(actionChoice.reason, `Use /flight-feedback --action <action> --proposal ${proposal.id} as a fallback.`), actionChoice.reason === "no-ui" ? "warning" : "info");
+    notify(ctx, fallbackMessage(actionChoice.reason, `Use /flight-learn feedback --action <action> --proposal ${proposal.id} as a fallback.`), actionChoice.reason === "no-ui" ? "warning" : "info");
     return;
   }
 
@@ -1254,7 +1366,7 @@ async function handleFlightRules(argsText: string, ctx: PiCommandContext, state:
     if (subcommand === "show") {
       const id = args[1] ?? readOption(args, "--candidate") ?? readOption(args, "--rule");
       if (!id) {
-        notify(ctx, "Usage: /flight-rules show <candidate-or-rule-id>", "error");
+        notify(ctx, "Usage: /flight-learn rules show <candidate-or-rule-id>", "error");
         return;
       }
       const candidate = store.getRuleCandidate(id);
@@ -1270,7 +1382,7 @@ async function handleFlightRules(argsText: string, ctx: PiCommandContext, state:
       const candidateId = readOption(args, "--candidate") ?? args[1];
       const scope = scopeFromText(readOption(args, "--scope")) ?? "global";
       if (!candidateId) {
-        notify(ctx, "Usage: /flight-rules approve --candidate rule_cand_... --scope global|project", "error");
+        notify(ctx, "Usage: /flight-learn rules approve --candidate rule_cand_... --scope global|project", "error");
         return;
       }
       const candidate = store.getRuleCandidate(candidateId);
@@ -1286,7 +1398,7 @@ async function handleFlightRules(argsText: string, ctx: PiCommandContext, state:
     if (subcommand === "reject") {
       const candidateId = readOption(args, "--candidate") ?? args[1];
       if (!candidateId) {
-        notify(ctx, "Usage: /flight-rules reject --candidate rule_cand_...", "error");
+        notify(ctx, "Usage: /flight-learn rules reject --candidate rule_cand_...", "error");
         return;
       }
       const candidate = store.rejectRuleCandidate(candidateId);
@@ -1297,7 +1409,7 @@ async function handleFlightRules(argsText: string, ctx: PiCommandContext, state:
     if (subcommand === "disable") {
       const ruleId = readOption(args, "--rule") ?? args[1];
       if (!ruleId) {
-        notify(ctx, "Usage: /flight-rules disable --rule rule_...", "error");
+        notify(ctx, "Usage: /flight-learn rules disable --rule rule_...", "error");
         return;
       }
       const rule = store.disableFlightRule(ruleId);
@@ -1318,7 +1430,7 @@ async function handleFlightRules(argsText: string, ctx: PiCommandContext, state:
       }
       return;
     }
-    notify(ctx, "Usage: /flight-rules pending|status|show|approve|reject|disable|export", "error");
+    notify(ctx, "Usage: /flight-learn rules pending|status|show|approve|reject|disable|export", "error");
   } finally {
     store.close();
   }
@@ -1390,65 +1502,73 @@ export default function piFlightRecorderExtension(pi: PiLike): void {
     lastInjectedRuleIds: [],
   };
 
-  pi.registerCommand?.("flight-sync", {
-    description: "Debug/manual: index local Pi sessions into pi-flight-recorder failure memory",
-    handler: handleFlightSync,
-  });
-
-  pi.registerCommand?.("seen-this-before", {
-    description: "Search prior Pi session failures for this error or command output",
-    handler: handleSeenThisBefore,
-  });
-
-  pi.registerCommand?.("flight-mode", {
-    description: "Inspect or set pi-flight-recorder mode: status, pause, resume, disable, off, index-only, or suggest-on-failure",
-    handler: (args, ctx) => handleFlightMode(args, ctx, state),
-  });
-
-  pi.registerCommand?.("flight-watch", {
-    description: "Debug/manual: start, stop, or inspect pi-flight-recorder live session watching",
-    handler: (args, ctx) => handleFlightWatch(args, ctx, state),
+  pi.registerFlag?.(LEGACY_COMMAND_ALIASES_FLAG, {
+    description: `Developer/debug opt-in: register legacy pi-flight-recorder slash command aliases. Environment alternative: ${LEGACY_COMMAND_ALIASES_ENV}=1`,
+    type: "boolean",
+    default: false,
   });
 
   pi.registerCommand?.("flight-status", {
-    description: "Show pi-flight-recorder capture, suggestion, feedback, reflection, and privacy status",
+    description: "Show pi-flight-recorder status; subcommands: help, sync, mode, watch, rules",
     handler: (args, ctx) => handleFlightStatus(args, ctx, state),
   });
 
-  pi.registerCommand?.("flight-feedback", {
-    description: "Record feedback for a flight-recorder suggestion, occurrence, cluster, proposal, episode, or signature",
-    handler: (args, ctx) => handleFlightFeedback(args, ctx, state),
-  });
-
-  pi.registerCommand?.("flight-reflect", {
-    description: "Reflect on repeated local failure patterns without a model call unless --model is requested; add --interactive for guided review",
-    handler: (args, ctx) => handleFlightReflect(args, ctx, state),
-  });
-
-  pi.registerCommand?.("flight-review", {
-    description: "Interactively review Flight Recorder reflection proposals and choose actions",
-    handler: (args, ctx) => handleFlightReview(args, ctx, state),
-  });
-
   pi.registerCommand?.("flight-learn", {
-    description: "One-command learning inbox: prepare local delta candidates, review routes, and record artifact outcomes",
+    description: "Guided learning inbox; subcommands: help, seen, reflect, review, delta-review, deltas, feedback, rules",
     handler: (args, ctx) => handleFlightLearn(args, ctx, state),
   });
 
-  pi.registerCommand?.("flight-delta-review", {
-    description: "Interactively review expectation-delta candidates and choose an artifact route without applying artifacts",
-    handler: (args, ctx) => handleFlightDeltaReview(args, ctx, state),
-  });
+  if (legacyCommandAliasesEnabled(pi)) {
+    pi.registerCommand?.("flight-sync", {
+      description: "Legacy/debug alias for /flight-status sync",
+      handler: handleFlightSync,
+    });
 
-  pi.registerCommand?.("flight-deltas", {
-    description: "List, show, route, or dismiss expectation-delta candidates without applying artifacts",
-    handler: (args, ctx) => handleFlightDeltas(args, ctx, state),
-  });
+    pi.registerCommand?.("seen-this-before", {
+      description: "Legacy/debug alias for /flight-learn seen",
+      handler: handleSeenThisBefore,
+    });
 
-  pi.registerCommand?.("flight-rules", {
-    description: "Manage approved Flight Recorder rules: pending, status, show, approve, reject, disable, export",
-    handler: (args, ctx) => handleFlightRules(args, ctx, state),
-  });
+    pi.registerCommand?.("flight-mode", {
+      description: "Legacy/debug alias for /flight-status mode",
+      handler: (args, ctx) => handleFlightMode(args, ctx, state),
+    });
+
+    pi.registerCommand?.("flight-watch", {
+      description: "Legacy/debug alias for /flight-status watch",
+      handler: (args, ctx) => handleFlightWatch(args, ctx, state),
+    });
+
+    pi.registerCommand?.("flight-feedback", {
+      description: "Legacy/debug alias for /flight-learn feedback",
+      handler: (args, ctx) => handleFlightFeedback(args, ctx, state),
+    });
+
+    pi.registerCommand?.("flight-reflect", {
+      description: "Legacy/debug alias for /flight-learn reflect",
+      handler: (args, ctx) => handleFlightReflect(args, ctx, state),
+    });
+
+    pi.registerCommand?.("flight-review", {
+      description: "Legacy/debug alias for /flight-learn review",
+      handler: (args, ctx) => handleFlightReview(args, ctx, state),
+    });
+
+    pi.registerCommand?.("flight-delta-review", {
+      description: "Legacy/debug alias for /flight-learn delta-review",
+      handler: (args, ctx) => handleFlightDeltaReview(args, ctx, state),
+    });
+
+    pi.registerCommand?.("flight-deltas", {
+      description: "Legacy/debug alias for /flight-learn deltas",
+      handler: (args, ctx) => handleFlightDeltas(args, ctx, state),
+    });
+
+    pi.registerCommand?.("flight-rules", {
+      description: "Legacy/debug alias for /flight-learn rules",
+      handler: (args, ctx) => handleFlightRules(args, ctx, state),
+    });
+  }
 
   pi.on?.("session_start", (_event, ctx) => {
     scheduleBootstrap(ctx, state, "session_start");

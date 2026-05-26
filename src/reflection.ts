@@ -231,10 +231,10 @@ export function formatReflectionDigest(result: RunReflectionResult): string {
     lines.push("Limits:");
     for (const limit of proposal.limits.slice(0, 3)) lines.push(`- ${limit}`);
     lines.push("Actions:");
-    lines.push(`- review interactively: /flight-review`);
-    lines.push(`- mark useful: /flight-feedback --action useful --proposal ${proposal.id}`);
-    lines.push(`- draft rule: /flight-feedback --action make-rule --proposal ${proposal.id}`);
-    lines.push(`- silence: /flight-feedback --action silence-pattern --proposal ${proposal.id}`);
+    lines.push(`- review interactively: /flight-learn review`);
+    lines.push(`- mark useful: /flight-learn feedback --action useful --proposal ${proposal.id}`);
+    lines.push(`- draft rule: /flight-learn feedback --action make-rule --proposal ${proposal.id}`);
+    lines.push(`- silence: /flight-learn feedback --action silence-pattern --proposal ${proposal.id}`);
     lines.push(`Proposal: ${proposal.id}`);
   }
   return lines.join("\n");

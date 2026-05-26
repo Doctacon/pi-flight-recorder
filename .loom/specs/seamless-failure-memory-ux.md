@@ -4,7 +4,7 @@ ID: spec:seamless-failure-memory-ux
 Type: Spec
 Status: active
 Created: 2026-05-23
-Updated: 2026-05-23
+Updated: 2026-05-25
 
 ## Summary
 
@@ -71,7 +71,7 @@ Failures that do not clear immediate-suggestion gates enter a reflection buffer.
 - REQ-007: Low-confidence/no-match/cooldown-suppressed failures MUST be retained for reflection without user interruption.
 - REQ-008: The system MUST maintain a local reflection buffer that can group failure occurrences into clusters by normalized signature, command/tool, error tokens, cwd/project, files, and attempted remedies.
 - REQ-009: Reflection MUST produce pattern-level proposals, not one proposal per one-off error, unless the user explicitly asks about a single failure.
-- REQ-010: Reflection triggers MUST be controllable and non-disruptive: manual `/flight-reflect`, cluster threshold, session-end/idle, and optional daily digest are in scope.
+- REQ-010: Reflection triggers MUST be controllable and non-disruptive: manual reflection through the visible learning command, cluster threshold, session-end/idle, and optional daily digest are in scope.
 - REQ-011: Reflection proposals MUST include pattern summary, affected commands/tools, representative evidence refs, likely durable fix or next investigation step, confidence, limits, and feedback actions.
 - REQ-012: Model-assisted reflection MUST be opt-in or user-initiated, must send only bounded redacted snippets/evidence, and must clearly disclose when the active Pi model/provider is used. Local deterministic clustering MUST work without model calls.
 - REQ-013: Feedback actions MUST let the user mark suggestions/reflections as useful, wrong match, snooze, silence pattern, already solved, promote-later, or make-rule/remember.
@@ -114,7 +114,7 @@ AND the occurrences are available for cluster-level reflection.
 Exercises: REQ-008, REQ-009, REQ-010, REQ-011, REQ-013
 
 GIVEN three or more failures share an edit-oldText mismatch signature across a session
-WHEN reflection runs at idle/session-end or via `/flight-reflect`
+WHEN reflection runs at idle/session-end or via `/flight-learn reflect`
 THEN the digest shows one grouped pattern proposal
 AND proposes a durable behavior/rule or next investigation step
 AND offers useful/wrong/snooze/silence/promote/make-rule actions.
@@ -128,7 +128,7 @@ WHEN reflection runs automatically
 THEN no model call is made and local deterministic pattern summaries are used
 AND status says model reflection is disabled.
 
-GIVEN the user invokes model-assisted `/flight-reflect --model` or enables it
+GIVEN the user invokes model-assisted `/flight-learn reflect --model` or enables it
 WHEN reflection prepares context
 THEN only bounded redacted evidence snippets are sent through the active Pi model/provider
 AND the proposal states that model assistance was used.
@@ -170,12 +170,12 @@ Every failure triggers a generic popup or background model call.
 
 ## Interface Contract
 
-Expected extension-facing surfaces:
+Expected extension-facing behavior surfaces:
 
-- `/flight-status` or `/flight-watch status` - current capture/index/reflection state.
-- `/flight-mode` - off/index-only/suggest-on-failure/reflection settings.
-- `/flight-reflect` - manual pattern reflection.
-- `/flight-feedback` or inline action commands - mark suggestion/reflection outcomes.
+- visible command surface is owned by `spec:visible-command-surface`; normal Pi usage should expose `/flight-status` and `/flight-learn` rather than every fallback/debug action as a top-level command.
+- status/control behavior: current capture/index/reflection state and off/index-only/suggest-on-failure/reflection settings remain inspectable or adjustable through the simplified command surface or CLI/debug recovery.
+- reflection behavior: manual pattern reflection remains available through the learning flow rather than requiring a separately visible `/flight-reflect` command.
+- feedback behavior: suggestion/reflection outcomes remain recordable through inline/guided actions or advanced routes under the simplified command surface.
 - Optional settings storage under the local data dir and/or Pi settings, with safe defaults.
 
 Expected local data surfaces:
@@ -202,3 +202,4 @@ Expected local data surfaces:
 - `spec:live-failure-monitoring` - current live watcher/suggestion foundation.
 - `research:20260522-live-failure-watcher-inspiration` - watcher/event-hook tradeoffs.
 - `plan:20260523-seamless-failure-memory-ux` - implementation decomposition for this spec.
+- `spec:visible-command-surface` - owns the top-level Pi command visibility contract for these behavior surfaces.

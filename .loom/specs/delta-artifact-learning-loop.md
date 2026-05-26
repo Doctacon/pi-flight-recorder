@@ -74,7 +74,7 @@ A “problem” is an expectation delta: the difference between what the user wa
 - REQ-009: The system MUST track whether a chosen artifact was accepted/applied and whether similar deltas recur afterward, so the user can distinguish solved old categories from emerging frontier categories.
 - REQ-010: Automated artifact classification MUST NOT become the default until enough manually routed deltas with outcomes exist to evaluate it. A model may assist drafting or suggest a route only with bounded/redacted local evidence and explicit disclosure.
 - REQ-011: All delta, routing, artifact-candidate, and outcome state MUST stay local by default and respect existing redaction/privacy constraints.
-- REQ-012: The normal corpus-building UX MUST fit under a small command model. A user should be able to repeatedly run one primary learning command to prepare local candidates, review/route the next pending delta, and record artifact follow-up/outcome decisions without memorizing artifact candidate IDs or the advanced fallback command set.
+- REQ-012: The normal corpus-building UX MUST fit under a small command model. A user should be able to repeatedly run one primary learning command to prepare local candidates, review/route the next pending delta, and record artifact follow-up/outcome decisions without memorizing artifact candidate IDs or visible advanced fallback commands. Top-level command visibility is owned by `spec:visible-command-surface`.
 
 ## Scenarios
 
@@ -186,7 +186,7 @@ Expected Pi/user surfaces:
 - manual capture command/action for “record this as a delta”;
 - routing choices that can store candidates without applying them;
 - status/export surfaces that show unresolved, recurring, and solved categories;
-- advanced fallback commands for listing/showing/routing/applying/outcome/rejecting records when UI review is unavailable.
+- advanced fallback behavior for listing/showing/routing/applying/outcome/rejecting records when UI review is unavailable, exposed through the command surface defined by `spec:visible-command-surface` rather than as normal visible top-level commands.
 
 Side effects:
 
@@ -230,3 +230,4 @@ Non-examples:
 - `spec:failure-memory-mvp` - original failure/fix episode model and evidence-backed answer shape.
 - `spec:seamless-failure-memory-ux` - reflection proposals and feedback actions this spec generalizes.
 - `plan:20260523-reflection-rule-promotion-ux` - existing Flight Rule artifact path this spec should not replace.
+- `spec:visible-command-surface` - owns which Pi slash commands should be visible by default while this spec owns the learning-loop behavior behind them.

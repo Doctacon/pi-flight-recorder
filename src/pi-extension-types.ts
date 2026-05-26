@@ -3,6 +3,8 @@ import type { SessionWatchService } from "./watch-service.js";
 
 export interface PiLike {
   registerCommand?: (name: string, command: { description: string; handler: (args: string, ctx: PiCommandContext) => Promise<void> }) => void;
+  registerFlag?: (name: string, options: { description?: string; type: "boolean" | "string"; default?: boolean | string }) => void;
+  getFlag?: (name: string) => boolean | string | undefined;
   registerTool?: (tool: unknown) => void;
   on?: (eventName: string, handler: (event: unknown, ctx: PiCommandContext) => Promise<unknown> | unknown) => void;
 }

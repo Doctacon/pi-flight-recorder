@@ -39,7 +39,7 @@ describe("reflection", () => {
     expect(result.proposals).toHaveLength(1);
     expect(result.proposals[0]?.mode).toBe("local");
     expect(result.proposals[0]?.likelyFix).toContain("Prior local resolution observed");
-    expect(formatReflectionDigest(result)).toContain("review interactively: /flight-review");
+    expect(formatReflectionDigest(result)).toContain("review interactively: /flight-learn review");
   });
 
   it("allows expired snooze feedback to become eligible again", async () => {

@@ -439,7 +439,7 @@ async function runStatus(args: string[], io: CliIO): Promise<number> {
         `Watcher: ${watchStatus?.state ?? "stopped"}; last sync ${watchStatus?.lastSyncAt ?? "never"}`,
         `Counts: episodes=${status.counts.episodes}, occurrences=${status.counts.occurrences}, clusters=${status.counts.clusters}, proposals=${status.counts.proposals}, deltas=${status.counts.deltas}, artifacts=${status.counts.artifactCandidates}, feedback=${status.counts.feedbackActions}`,
         `Delta outcomes: unresolved=${deltaOutcomes.counts.unresolved}, insufficient evidence=${deltaOutcomes.counts["insufficient-evidence"]}, no recurrence observed=${deltaOutcomes.counts["no-recurrence-observed"]}, recurring after applied=${deltaOutcomes.counts["recurring-after-applied"]}`,
-        "Normal UX: use the Pi extension commands /flight-status and /flight-reflect.",
+        "Normal UX: use the Pi extension commands /flight-status and /flight-learn."
       ].join("\n"));
     }
   } finally {

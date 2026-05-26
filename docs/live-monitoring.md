@@ -11,7 +11,7 @@ failed Pi tool_result
   -> search prior resolved evidence
   -> notify only when high-confidence gates pass
 quiet failures
-  -> cluster for /flight-reflect
+  -> cluster for /flight-learn reflect
 ```
 
 ## Modes
@@ -26,21 +26,29 @@ The Pi extension defaults to `suggest-on-failure` with conservative gates. Most 
 
 ## Pi commands
 
+Normal visible commands:
+
 ```text
 /flight-status
 /flight-learn
-/flight-mode status|pause|resume|disable|off|index-only|suggest-on-failure
-/flight-feedback --action snooze --occurrence occ_...
-/flight-reflect [--min-count N] [--limit N] [--model] [--interactive]
-/flight-review
-/flight-delta-review
-/flight-deltas list|show|summary|route|apply|outcome|recur|reject|dismiss
-/flight-rules status|pending|show|approve|reject|disable|export
-/flight-watch status
-/flight-watch stop
 ```
 
-`/flight-watch start` remains available as a manual/debug command inside Pi, but normal extension startup does not require it.
+Advanced/debug subcommands stay under the same visible pair:
+
+```text
+/flight-status mode status|pause|resume|disable|off|index-only|suggest-on-failure
+/flight-status watch status|stop|start
+/flight-status sync --source DIR --data-dir DIR
+/flight-learn seen <error text>
+/flight-learn feedback --action snooze --occurrence occ_...
+/flight-learn reflect [--min-count N] [--limit N] [--model] [--interactive]
+/flight-learn review
+/flight-learn delta-review
+/flight-learn deltas list|show|summary|route|apply|outcome|recur|reject|dismiss
+/flight-learn rules status|pending|show|approve|reject|disable|export
+```
+
+Legacy top-level aliases such as `/flight-watch` and `/flight-reflect` are not registered by default. For developer recovery only, start Pi with `PI_FLIGHT_RECORDER_LEGACY_COMMANDS=1` to opt them back in.
 
 ## Multiple Pi sessions
 
@@ -88,8 +96,8 @@ This ledger is the reflection buffer. Low-confidence/no-match failures are inten
 ## Reflection
 
 ```text
-/flight-reflect
-/flight-reflect --min-count 3
+/flight-learn reflect
+/flight-learn reflect --min-count 3
 ```
 
 Reflection mines local occurrence clusters and emits pattern-level proposals with evidence, likely durable fix or next investigation step, confidence, limits, and actions.
@@ -100,22 +108,22 @@ For the newer expectation-delta learning loop, prefer:
 /flight-learn
 ```
 
-`/flight-learn` is the one-command learning inbox: it prepares local candidates from existing signals, routes one pending delta through human review, or records one artifact candidate follow-up/outcome without requiring candidate IDs. Advanced `/flight-delta-review` and `/flight-deltas ...` commands remain available when the guided UI is unavailable.
+`/flight-learn` is the one-command learning inbox: it prepares local candidates from existing signals, routes one pending delta through human review, or records one artifact candidate follow-up/outcome without requiring candidate IDs. Advanced delta actions remain available as `/flight-learn delta-review` and `/flight-learn deltas ...` when the guided UI is unavailable.
 
-`/flight-reflect --model` is explicit. It uses bounded redacted snippets only when Pi exposes a model provider; otherwise deterministic local reflection is used and labeled.
+`/flight-learn reflect --model` is explicit. It uses bounded redacted snippets only when Pi exposes a model provider; otherwise deterministic local reflection is used and labeled.
 
 ## Feedback
 
 ```text
-/flight-feedback --action useful --proposal refl_...
-/flight-feedback --action wrong-match --occurrence occ_...
-/flight-feedback --action snooze --occurrence occ_...
-/flight-feedback --action silence-pattern --signature "..."
-/flight-feedback --action promote-later --cluster cluster_...
-/flight-feedback --action make-rule --cluster cluster_...
+/flight-learn feedback --action useful --proposal refl_...
+/flight-learn feedback --action wrong-match --occurrence occ_...
+/flight-learn feedback --action snooze --occurrence occ_...
+/flight-learn feedback --action silence-pattern --signature "..."
+/flight-learn feedback --action promote-later --cluster cluster_...
+/flight-learn feedback --action make-rule --cluster cluster_...
 ```
 
-Snooze and silence affect future live suggestions/reflection. `promote-later` stores user intent. `make-rule` creates a draft Flight Rule candidate; only explicit approval through the guided review flow or `/flight-rules approve` activates a rule for future turns.
+Snooze and silence affect future live suggestions/reflection. `promote-later` stores user intent. `make-rule` creates a draft Flight Rule candidate; only explicit approval through the guided review flow or `/flight-learn rules approve` activates a rule for future turns.
 
 ## Debug CLI
 
@@ -131,8 +139,9 @@ Foreground CLI watch still uses local polling, debounce, a local lock, and stop-
 
 ## Validation limits
 
-Automated tests and local smoke cover live occurrence capture, quiet buffering, reflection, feedback/rule paths, and bounded prompt injection in fake-Pi/source-checkout contexts. Real Pi evidence now covers `/flight-status`, failed `tool_result` capture, `/flight-reflect` rendering, disposable project-local package startup, guided Flight Rule promotion, and visible prior-resolved high-confidence suggestion text. Release evidence still does not prove:
+Automated tests and local smoke cover live occurrence capture, quiet buffering, reflection, feedback/rule paths, and bounded prompt injection in fake-Pi/source-checkout contexts. Real Pi evidence now covers `/flight-status`, failed `tool_result` capture, legacy `/flight-reflect` rendering from earlier builds, disposable project-local package startup, guided Flight Rule promotion, and visible prior-resolved high-confidence suggestion text. Release evidence still does not prove:
 
+- real interactive Pi TUI validation of the collapsed `/flight-status` + `/flight-learn` command palette;
 - model-assisted reflection with a real provider;
 - long-run precision/noise tuning over a mature local occurrence corpus.
 

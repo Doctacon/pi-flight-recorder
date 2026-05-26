@@ -83,7 +83,7 @@ describe("local release smoke", () => {
       expect(notifications.join("\n")).toContain("Capture/index: not watching");
 
       notifications.length = 0;
-      await commands.get("flight-mode")?.handler(`index-only --data-dir ${dataDir}`, ctx);
+      await commands.get("flight-status")?.handler(`mode index-only --data-dir ${dataDir}`, ctx);
       let store = new FlightRecorderStore(defaultDatabasePath(dataDir));
       try {
         expect(store.count("episodes")).toBe(0);
@@ -93,11 +93,11 @@ describe("local release smoke", () => {
       }
 
       notifications.length = 0;
-      await commands.get("flight-sync")?.handler(`--source ${sourceRoot} --data-dir ${dataDir}`, ctx);
+      await commands.get("flight-status")?.handler(`sync --source ${sourceRoot} --data-dir ${dataDir}`, ctx);
       expect(notifications.join("\n")).toContain("episodes 1");
 
       notifications.length = 0;
-      await commands.get("seen-this-before")?.handler(`--data-dir ${dataDir} --cwd current Cannot find module`, ctx);
+      await commands.get("flight-learn")?.handler(`seen --data-dir ${dataDir} --cwd current Cannot find module`, ctx);
       expect(notifications.join("\n")).toContain("Seen before");
       expect(notifications.join("\n")).toContain("entry smoke-fail");
 
@@ -111,7 +111,7 @@ describe("local release smoke", () => {
       expect(cliStatus.counts.episodes).toBe(1);
 
       notifications.length = 0;
-      await commands.get("flight-mode")?.handler(`suggest-on-failure --data-dir ${dataDir} --cooldown-ms 0`, ctx);
+      await commands.get("flight-status")?.handler(`mode suggest-on-failure --data-dir ${dataDir} --cooldown-ms 0`, ctx);
       await events.get("tool_result")?.({ toolName: "edit", input: { command: "edit src/app.ts" }, isError: true, content: "Edit failed: oldText not found in src/app.ts", details: { exitCode: 1 }, id: "smoke-live-1" }, ctx);
       await events.get("tool_result")?.({ toolName: "edit", input: { command: "edit src/app.ts" }, isError: true, content: "Edit failed: oldText not found in src/app.ts", details: { exitCode: 1 }, id: "smoke-live-2" }, ctx);
 
@@ -124,12 +124,12 @@ describe("local release smoke", () => {
       }
 
       notifications.length = 0;
-      await commands.get("flight-reflect")?.handler(`--data-dir ${dataDir} --min-count 2`, ctx);
+      await commands.get("flight-learn")?.handler(`reflect --data-dir ${dataDir} --min-count 2`, ctx);
       expect(notifications.join("\n")).toContain("Flight Recorder reflection");
       expect(notifications.join("\n")).toContain("Pattern: exact-text edit mismatches");
 
       notifications.length = 0;
-      await commands.get("flight-review")?.handler(`--data-dir ${dataDir} --min-count 2`, ctx);
+      await commands.get("flight-learn")?.handler(`review --data-dir ${dataDir} --min-count 2`, ctx);
       expect(selectPrompts.some((prompt) => prompt.includes("Action for Flight Recorder proposal"))).toBe(true);
 
       store = new FlightRecorderStore(defaultDatabasePath(dataDir));
@@ -147,7 +147,7 @@ describe("local release smoke", () => {
       expect(injected?.systemPrompt).toContain(ruleId);
 
       notifications.length = 0;
-      await commands.get("flight-rules")?.handler(`status --data-dir ${dataDir}`, ctx);
+      await commands.get("flight-learn")?.handler(`rules status --data-dir ${dataDir}`, ctx);
       expect(notifications.join("\n")).toContain(`[active; global; injected 1]`);
       expect(notifications.join("\n")).toContain(ruleId);
     } finally {

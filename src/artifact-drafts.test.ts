@@ -106,7 +106,7 @@ describe("artifact candidate drafts", () => {
 
       expect(candidate?.artifactType).toBe("flight-rule");
       expect(candidate?.proposedDraft).toContain("Flight Rule handoff candidate");
-      expect(candidate?.nextStep).toContain("/flight-review");
+      expect(candidate?.nextStep).toContain("/flight-learn review");
       expect(candidate?.limits.join("\n")).toContain("not an approved Flight Rule");
       expect(candidate?.applied).toBe(false);
       expect(store.listActiveFlightRulesForCwd("/Users/alice/private/project")).toHaveLength(0);
