@@ -195,3 +195,4 @@ Compatibility:
 - `spec:seamless-failure-memory-ux` - owns failure memory/reflection behavior that must be routed through the smaller command surface.
 - `spec:delta-artifact-learning-loop` - owns learning-loop behavior and already requires a small command model for corpus building.
 - `ticket:20260525-streamlined-learning-inbox-command` - implemented `/flight-learn` but left legacy commands visible, which this spec corrects.
+- `spec:flight-learn-inbox-ux` - owns the visual/interactive quality of the `/flight-learn` workflow after this spec establishes it as a default visible command.

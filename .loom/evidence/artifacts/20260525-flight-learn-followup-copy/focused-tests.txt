@@ -1,0 +1,17 @@
+
+> pi-flight-recorder@0.1.0 test
+> vitest run src/artifact-drafts.test.ts src/flight-learn-inbox.test.ts src/pi-extension.test.ts
+
+
+ RUN  v4.1.7 /Users/crlough/Code/personal/pi-flight-recorder
+
+(node:84230) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:84229) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  3 passed (3)
+      Tests  34 passed (34)
+   Start at  22:45:48
+   Duration  2.28s (transform 378ms, setup 0ms, import 436ms, tests 2.03s, environment 0ms)
+

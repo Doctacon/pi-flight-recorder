@@ -1,0 +1,44 @@
+===== width 56 =====
+Flight Learn - 2 pending deltas - Review 1/2
++ Items -----------------------------------------------+
+| > Assistant repeatedly treats storage as mapper o... |
+| Validation seam missed after edits [candidate] |
++------------------------------------------------------+
++ Delta -----------------------------------------------+
+| Summary: Assistant repeatedly treats storage as m... |
+| Status: candidate; id=delta-one |
+| Expectation: The assistant should identify the st... |
+| Reality: The assistant edited repository storage ... |
+| Impact: Repeated review churn before any useful i... |
+| Signals: |
+| - user-correction (0.68): User correction languag... |
+| Evidence: |
+| - session-entry/entry-1 (/repo; session.jsonl) ::... |
+| - manual (/repo) :: The same seam confusion happe... |
++------------------------------------------------------+
+Route cards: [1 Code legibility] 2 Test/check
+ 3 Loom ticket 4 Flight Rule 5 Loom spec
+ 6 Loom research 7 Loom knowledge
+ 8 Prompt/context 9 Skill/template
+ 0 Observe
+Keys: up/down item | left/right route | 1-9/0 route |...
+
+===== width 104 =====
+Flight Learn - 2 pending deltas - Review 1/2
++ Items -------------------------+ + Delta ------------------------------------------------------------+
+| > Assistant repeatedly trea... | | Summary: Assistant repeatedly treats storage as mapper owner w... |
+| Validation seam missed aft... | | Status: candidate; id=delta-one |
++--------------------------------+ | Expectation: The assistant should identify the storage/mapper ... |
+ | Reality: The assistant edited repository storage and missed ma... |
+ | Impact: Repeated review churn before any useful implementation. |
+ | Signals: |
+ | - user-correction (0.68): User correction language matched a c... |
+ | Evidence: |
+ | - session-entry/entry-1 (/repo; session.jsonl) :: No, actually... |
+ | - manual (/repo) :: The same seam confusion happened again in ... |
+ | - 1 more evidence ref; press v to expand |
+ +-------------------------------------------------------------------+
+Route cards: [1 Code legibility] 2 Test/check 3 Loom ticket 4 Flight Rule 5 Loom spec
+ 6 Loom research 7 Loom knowledge 8 Prompt/context 9 Skill/template 0 Observe
+Keys: up/down item | left/right route | 1-9/0 route | enter/r route | e edit | v evidence | d dismiss...
+

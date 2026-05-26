@@ -35,7 +35,7 @@ function baseContext(delta: ExpectationDelta, rationale: string): string[] {
     `Expectation: ${safe(delta.expectation, 360)}`,
     `Reality: ${safe(delta.reality, 360)}`,
     `Impact: ${safe(delta.impact, 260)}`,
-    `Routing rationale: ${safe(rationale, 500)}`,
+    `Why this follow-up: ${safe(rationale, 500)}`,
     "Evidence:",
     ...evidenceBullets(delta.evidenceRefs),
   ];
@@ -150,7 +150,7 @@ function testCheckDraft(delta: ExpectationDelta, rationale: string): ArtifactDra
       "- Add or update the smallest regression test, smoke check, fixture, or validation command that would have exposed this delta earlier.",
       "- Keep the check local/open-source and runnable without hosted services.",
       "",
-      "Routing rationale:",
+      "Why this follow-up:",
       safe(rationale, 500),
       "",
       "Evidence:",

@@ -1,0 +1,15 @@
+
+> pi-flight-recorder@0.1.0 test:smoke:local
+> vitest run src/local-smoke.test.ts
+
+
+ RUN  v4.1.7 /Users/crlough/Code/personal/pi-flight-recorder
+
+(node:33061) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  20:07:35
+   Duration  382ms (transform 169ms, setup 0ms, import 171ms, tests 113ms, environment 0ms)
+

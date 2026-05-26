@@ -1,6 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { buildArtifactCandidateDraft } from "./artifact-drafts.js";
 import { formatDeltaOutcomeSummary, recordArtifactCandidateOutcomeWithStore, recordDeltaRecurrenceWithStore, summarizeDeltaOutcomes } from "./delta-outcomes.js";
+import { askFlightLearnDeltaInbox, type FlightLearnDeltaInboxItem, type FlightLearnDeltaInboxResult } from "./flight-learn-inbox.js";
 import { formatFlightRule, formatRuleCandidate, formatRuleInjectionBlock, formatRulesMarkdown } from "./flight-rules.js";
 import { askReviewChoice, askReviewEditor, fallbackMessage, type ReviewChoice } from "./interactive-review.js";
 import { compactSnippet } from "./redact.js";
@@ -799,6 +800,62 @@ function storeDeltaRoute(store: FlightRecorderStore, delta: ExpectationDelta, ar
   return store.acceptArtifactCandidate(candidate.id) ?? candidate;
 }
 
+function deltaInboxItems(store: FlightRecorderStore, deltas: ExpectationDelta[]): FlightLearnDeltaInboxItem[] {
+  return deltas.map((delta) => ({ delta, signals: store.listDeltaDetectorSignals(delta.id, 5) }));
+}
+
+type DeltaInboxRouteResult = Extract<FlightLearnDeltaInboxResult, { kind: "routed" | "route-selected" }>;
+
+function reviewTextFromInboxResult(delta: ExpectationDelta, signals: DeltaDetectorSignal[], result: DeltaInboxRouteResult): string {
+  return deltaReviewText({ ...delta, expectation: result.expectation, reality: result.reality, impact: result.impact }, signals);
+}
+
+function followupReasonPrefill(artifactType: ArtifactCandidateType): string {
+  return artifactType === "observe"
+    ? "I chose Observe because this may not need a durable follow-up yet; keep the evidence and watch whether it recurs."
+    : `I chose ${artifactRouteLabel(artifactType)} because ...`;
+}
+
+function applyDeltaInboxResult(store: FlightRecorderStore, result: Exclude<FlightLearnDeltaInboxResult, { kind: "unavailable" | "route-selected" }>, ctx: PiCommandContext): void {
+  if (result.kind === "cancelled") {
+    notify(ctx, "Flight Learn inbox cancelled; no changes were applied.", "info");
+    return;
+  }
+  if (result.kind === "skipped") {
+    notify(ctx, `Skipped expectation delta ${result.deltaId}; no changes were recorded.`, "info");
+    return;
+  }
+  if (result.kind === "dismissed") {
+    const dismissed = store.dismissExpectationDelta(result.deltaId, result.reason);
+    notify(ctx, dismissed ? `Dismissed expectation delta ${dismissed.id}; evidence provenance remains stored locally.` : `No expectation delta found for ${result.deltaId}.`, dismissed ? "success" : "error");
+    return;
+  }
+  const delta = store.getExpectationDelta(result.deltaId);
+  if (!delta) {
+    notify(ctx, `No expectation delta found for ${result.deltaId}.`, "error");
+    return;
+  }
+  const signals = store.listDeltaDetectorSignals(delta.id, 5);
+  const candidate = storeDeltaRoute(store, delta, result.artifactType, result.rationale, reviewTextFromInboxResult(delta, signals, result));
+  notify(ctx, [`Routed expectation delta ${delta.id} to ${artifactRouteLabel(candidate.artifactType)}.`, `Artifact candidate: ${candidate.id} [${candidate.status}; applied=${candidate.applied}]`, `Next step: ${candidate.nextStep ?? "review candidate draft"}`, "Draft/handoff text was stored locally. No artifact was created or applied."].join("\n"), "success");
+}
+
+async function maybeHandleDeltaInbox(store: FlightRecorderStore, deltas: ExpectationDelta[], ctx: PiCommandContext): Promise<boolean> {
+  const result = await askFlightLearnDeltaInbox(ctx, { items: deltaInboxItems(store, deltas), routeChoices: ARTIFACT_ROUTE_CHOICES });
+  if (result.kind === "unavailable") return false;
+  if (result.kind === "route-selected") {
+    const rationale = await askReviewEditor(ctx, "Why this follow-up?", followupReasonPrefill(result.artifactType));
+    if (rationale.kind === "cancelled") {
+      notify(ctx, fallbackMessage(rationale.reason, `/flight-learn deltas route --delta ${result.deltaId} --type ${result.artifactType} --rationale "..."`), rationale.reason === "no-ui" ? "warning" : "info");
+      return true;
+    }
+    applyDeltaInboxResult(store, { ...result, kind: "routed", rationale: rationale.text }, ctx);
+    return true;
+  }
+  applyDeltaInboxResult(store, result, ctx);
+  return true;
+}
+
 async function prepareLearningDeltaCandidates(args: string[], state: LiveExtensionState): Promise<{ created: number; total: number }> {
   const minCount = parseLimit(readOption(args, "--min-count"));
   const limit = parseLimit(readOption(args, "--limit"));
@@ -823,6 +880,7 @@ async function handleFlightDeltaReview(argsText: string, ctx: PiCommandContext, 
       notify(ctx, explicitDeltaId ? `No expectation delta found for ${explicitDeltaId}.` : "No pending expectation delta candidates are ready for review.", "warning");
       return;
     }
+    if (await maybeHandleDeltaInbox(store, deltas, ctx)) return;
     let delta = deltas[0]!;
     if (!explicitDeltaId || deltas.length > 1) {
       const choice = await askReviewChoice(ctx, "Choose an expectation delta", deltas.map((item, index) => ({ value: item.id, label: deltaChoiceLabel(item, index) })));
@@ -848,7 +906,7 @@ async function handleFlightDeltaReview(argsText: string, ctx: PiCommandContext, 
       notify(ctx, dismissed ? `Dismissed expectation delta ${dismissed.id}; evidence provenance remains stored locally.` : `No expectation delta found for ${delta.id}.`, dismissed ? "success" : "error");
       return;
     }
-    const rationale = await askReviewEditor(ctx, "Routing rationale", route.value === "observe" ? "Observe/no artifact: keep evidence and watch recurrence before creating an artifact." : `Route to ${artifactRouteLabel(route.value)} because ...`);
+    const rationale = await askReviewEditor(ctx, "Why this follow-up?", followupReasonPrefill(route.value));
     if (rationale.kind === "cancelled") {
       notify(ctx, fallbackMessage(rationale.reason, `/flight-learn deltas route --delta ${delta.id} --type ${route.value} --rationale "..."`), rationale.reason === "no-ui" ? "warning" : "info");
       return;
@@ -867,7 +925,7 @@ function formatArtifactCandidateDetail(candidate: ArtifactCandidate | null, recu
     `Outcome: ${candidate.outcome}${candidate.outcomeSummary ? ` — ${candidate.outcomeSummary}` : ""}`,
     `Applied artifact: ${candidate.appliedArtifactRef ?? "none"}; applied at: ${candidate.appliedAt ?? "not recorded"}`,
     `Linked recurrences: ${recurrenceCount}`,
-    `Rationale: ${candidate.rationale}`,
+    `Why this follow-up: ${candidate.rationale}`,
     `Next step: ${candidate.nextStep ?? "unknown"}`,
     "Draft:",
     candidate.proposedDraft ?? "No draft stored.",

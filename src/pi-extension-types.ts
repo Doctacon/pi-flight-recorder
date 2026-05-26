@@ -1,3 +1,4 @@
+import type { FlightLearnCustomComponent } from "./flight-learn-inbox.js";
 import type { LiveMode, LiveSuggestionEngine } from "./live-suggestions.js";
 import type { SessionWatchService } from "./watch-service.js";
 
@@ -9,6 +10,15 @@ export interface PiLike {
   on?: (eventName: string, handler: (event: unknown, ctx: PiCommandContext) => Promise<unknown> | unknown) => void;
 }
 
+export interface PiCustomTui {
+  requestRender?: () => void;
+}
+
+export interface PiCustomTheme {
+  fg?: (color: string, value: string) => string;
+  bold?: (value: string) => string;
+}
+
 export interface PiCommandContext {
   cwd?: string;
   ui?: {
@@ -17,6 +27,7 @@ export interface PiCommandContext {
     select?: (message: string, choices: string[]) => Promise<string | undefined> | string | undefined;
     editor?: (message: string, prefilled?: string) => Promise<string | undefined> | string | undefined;
     confirm?: (title: string, message: string) => Promise<boolean> | boolean;
+    custom?: <T>(factory: (tui: PiCustomTui, theme: PiCustomTheme, keybindings: unknown, done: (result: T) => void) => FlightLearnCustomComponent, options?: unknown) => Promise<T | undefined> | T | undefined;
   };
   sessionManager?: {
     getCwd?: () => string;

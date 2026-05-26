@@ -231,3 +231,4 @@ Non-examples:
 - `spec:seamless-failure-memory-ux` - reflection proposals and feedback actions this spec generalizes.
 - `plan:20260523-reflection-rule-promotion-ux` - existing Flight Rule artifact path this spec should not replace.
 - `spec:visible-command-surface` - owns which Pi slash commands should be visible by default while this spec owns the learning-loop behavior behind them.
+- `spec:flight-learn-inbox-ux` - owns the richer interactive TUI quality bar for reviewing and routing deltas through `/flight-learn`.
