@@ -28,10 +28,13 @@ The Pi extension defaults to `suggest-on-failure` with conservative gates. Most 
 
 ```text
 /flight-status
+/flight-learn
 /flight-mode status|pause|resume|disable|off|index-only|suggest-on-failure
 /flight-feedback --action snooze --occurrence occ_...
 /flight-reflect [--min-count N] [--limit N] [--model] [--interactive]
 /flight-review
+/flight-delta-review
+/flight-deltas list|show|summary|route|apply|outcome|recur|reject|dismiss
 /flight-rules status|pending|show|approve|reject|disable|export
 /flight-watch status
 /flight-watch stop
@@ -90,6 +93,14 @@ This ledger is the reflection buffer. Low-confidence/no-match failures are inten
 ```
 
 Reflection mines local occurrence clusters and emits pattern-level proposals with evidence, likely durable fix or next investigation step, confidence, limits, and actions.
+
+For the newer expectation-delta learning loop, prefer:
+
+```text
+/flight-learn
+```
+
+`/flight-learn` is the one-command learning inbox: it prepares local candidates from existing signals, routes one pending delta through human review, or records one artifact candidate follow-up/outcome without requiring candidate IDs. Advanced `/flight-delta-review` and `/flight-deltas ...` commands remain available when the guided UI is unavailable.
 
 `/flight-reflect --model` is explicit. It uses bounded redacted snippets only when Pi exposes a model provider; otherwise deterministic local reflection is used and labeled.
 

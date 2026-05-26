@@ -19,7 +19,7 @@ Implemented:
 - high-confidence live suggestion gates with prior-resolution requirement, specificity gate, cooldown, and silence/snooze feedback;
 - local repeated-failure clustering and `/flight-reflect` pattern proposals;
 - optional model-assisted reflection only when explicitly requested and a provider is available;
-- Pi commands: `/flight-status`, `/flight-mode`, `/flight-feedback`, `/flight-reflect`, `/flight-review`, `/flight-rules`, `/flight-sync`, `/seen-this-before`, `/flight-watch`;
+- Pi commands: `/flight-status`, `/flight-learn`, `/flight-mode`, `/flight-feedback`, `/flight-reflect`, `/flight-review`, `/flight-delta-review`, `/flight-deltas`, `/flight-rules`, `/flight-sync`, `/seen-this-before`, `/flight-watch`;
 - debug CLI commands: `status`, `sync`, `query`, `seen-this-before`, `watch`, `reflect`, `feedback`.
 
 ## Requirements
@@ -53,16 +53,26 @@ Useful Pi commands:
 
 ```text
 /flight-status
+/flight-learn
+/seen-this-before --cwd current Cannot find module src/config/app.ts
+/flight-reflect
+/flight-review
+/flight-rules status
 /flight-mode status
 /flight-mode pause
 /flight-mode resume
 /flight-mode disable
-/flight-reflect
-/flight-review
-/flight-rules status
 /flight-feedback --action snooze --occurrence occ_...
-/seen-this-before --cwd current Cannot find module src/config/app.ts
 ```
+
+For the delta/artifact learning loop, the normal commands to remember are just:
+
+```text
+/flight-status   # check whether capture is alive and how many items exist
+/flight-learn    # review the next delta or artifact outcome item
+```
+
+Advanced `/flight-delta-review` and `/flight-deltas ...` commands remain available for debugging/recovery, but they are not the normal path.
 
 Default behavior:
 
@@ -105,7 +115,9 @@ Reflection proposals include:
 - confidence and limits;
 - actions: `useful`, `wrong-match`, `snooze`, `silence-pattern`, `promote-later`, `make-rule`.
 
-Use `/flight-review` or `/flight-reflect --interactive` for a guided Pi-native review flow. `make-rule` drafts a Flight Rule candidate, lets you edit/approve scope, and only approved rules are injected into future turns. `/flight-rules status|pending|show|disable|export` keeps rules inspectable and reversible.
+Use `/flight-review` or `/flight-reflect --interactive` for the older guided reflection/Flight Rule proposal flow. `make-rule` drafts a Flight Rule candidate, lets you edit/approve scope, and only approved rules are injected into future turns. `/flight-rules status|pending|show|disable|export` keeps rules inspectable and reversible.
+
+Use `/flight-learn` for the newer expectation-delta learning inbox. It prepares local delta candidates from existing signals, routes one pending delta through human review, or follows up on one artifact candidate outcome without requiring you to remember candidate IDs. It never applies source/docs/Loom/rules/skills/prompts by itself.
 
 ## Debug CLI usage
 

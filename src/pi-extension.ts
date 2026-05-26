@@ -385,6 +385,7 @@ async function handleFlightStatus(argsText: string, ctx: PiCommandContext, state
       `Flight Rules: active=${activeRuleCount}, pending=${pendingRuleCount}, last injected=${state.lastInjectedRuleIds.join(", ") || "none"}`,
       `Deltas: pending=${pendingDeltaCount}, artifact candidates=${store.count("artifact_candidates")}`,
       `Delta outcomes: unresolved=${deltaOutcomes.counts.unresolved}, insufficient evidence=${deltaOutcomes.counts["insufficient-evidence"]}, no recurrence observed=${deltaOutcomes.counts["no-recurrence-observed"]}, recurring after applied=${deltaOutcomes.counts["recurring-after-applied"]}`,
+      `Learning loop: run /flight-learn to review the next delta or outcome item.`,
       `User-bash capture: disabled (Pi user_bash is pre-execution; command semantics are not wrapped).`,
       `Errors: ${state.lastBootstrapError ?? (watchStatus?.state === "watched-by-another-process" ? null : watchStatus?.lastError) ?? "none"}`,
       `Recent feedback: ${recentFeedback.map((item) => `${item.action}:${item.targetType}/${item.targetId}`).join(", ") || "none"}`,
@@ -724,6 +725,16 @@ function storeDeltaRoute(store: FlightRecorderStore, delta: ExpectationDelta, ar
   return store.acceptArtifactCandidate(candidate.id) ?? candidate;
 }
 
+async function prepareLearningDeltaCandidates(args: string[], state: LiveExtensionState): Promise<{ created: number; total: number }> {
+  const minCount = parseLimit(readOption(args, "--min-count"));
+  const limit = parseLimit(readOption(args, "--limit"));
+  const { runReflection } = await import("./reflection.js");
+  await runReflection({ dataDir: stateDataDir(state), trigger: "manual", ...(minCount !== undefined ? { minCount } : {}), ...(limit !== undefined ? { limit } : {}) });
+  const { suggestDeltasFromExistingSignals } = await import("./delta-capture.js");
+  const results = suggestDeltasFromExistingSignals({ dataDir: stateDataDir(state), ...(minCount !== undefined ? { minCount } : {}), ...(limit !== undefined ? { limit } : {}) });
+  return { created: results.filter((result) => result.created).length, total: results.length };
+}
+
 async function handleFlightDeltaReview(argsText: string, ctx: PiCommandContext, state: LiveExtensionState): Promise<void> {
   const args = splitArgs(argsText);
   const dataDir = readOption(args, "--data-dir");
@@ -796,6 +807,110 @@ function formatArtifactCandidateWithRecurrence(store: FlightRecorderStore, candi
   return formatArtifactCandidateDetail(candidate, recurrenceCount);
 }
 
+function listLearningFollowupCandidates(store: FlightRecorderStore, limit = 10): ArtifactCandidate[] {
+  const candidates = [...store.listArtifactCandidates({ status: "accepted", limit: 1_000 }), ...store.listArtifactCandidates({ status: "applied", limit: 1_000 })];
+  const seen = new Set<string>();
+  return candidates
+    .filter((candidate) => {
+      if (seen.has(candidate.id)) return false;
+      seen.add(candidate.id);
+      return candidate.outcome === "unknown" || candidate.outcome === "pending";
+    })
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+    .slice(0, limit);
+}
+
+function learningFollowupChoiceLabel(store: FlightRecorderStore, candidate: ArtifactCandidate, index: number): string {
+  const delta = store.getExpectationDelta(candidate.deltaId);
+  const summary = compactSnippet((delta?.summary ?? candidate.title).replace(/\s+/g, " "), 80);
+  return `${index + 1}. ${artifactRouteLabel(candidate.artifactType)} — ${summary} [${candidate.id}; ${candidate.status}; outcome=${candidate.outcome}]`;
+}
+
+type LearningFollowupChoice = "mark-applied" | "helped" | "needs-reroute" | "no-change" | "reject" | "skip";
+
+const LEARNING_FOLLOWUP_CHOICES: Array<ReviewChoice<LearningFollowupChoice>> = [
+  { value: "mark-applied", label: "Marked applied", description: "I applied or used this candidate elsewhere; ask later whether it helped" },
+  { value: "helped", label: "Helped", description: "Record that this human-applied route helped; if needed, mark it applied in the ledger only" },
+  { value: "needs-reroute", label: "Needs reroute", description: "A similar delta recurred or the route is the wrong intervention" },
+  { value: "no-change", label: "No change", description: "Tried it, but there was no observed improvement" },
+  { value: "reject", label: "Reject", description: "Reject this candidate but keep its evidence/rationale history" },
+  { value: "skip", label: "Skip", description: "Leave this candidate unchanged for later" },
+];
+
+function learningOutcomePrefill(choice: Exclude<LearningFollowupChoice, "mark-applied" | "reject" | "skip">): string {
+  if (choice === "helped") return "What evidence suggests this helped? Keep this cautious, e.g. 'no recurrence observed in later similar work'.";
+  if (choice === "needs-reroute") return "What recurred or why does this need a different route?";
+  return "What was tried, and what did not change?";
+}
+
+function learningNoItemsMessage(store: FlightRecorderStore, prepared: { created: number; total: number }): string {
+  const summary = formatDeltaOutcomeSummary(summarizeDeltaOutcomes(store, { limit: 5 }));
+  return [
+    "Flight Learn: nothing needs review right now.",
+    prepared.total > 0 ? `Prepared ${prepared.total} local delta candidate(s), but none are pending review.` : "No repeated local pattern has enough evidence for a delta candidate yet.",
+    "Keep working normally; Flight Recorder will capture failures and repeated friction locally.",
+    "Normal commands to remember: /flight-learn to review the next item, /flight-status to check state.",
+    "",
+    summary,
+  ].join("\n");
+}
+
+async function handleLearningFollowup(store: FlightRecorderStore, candidates: ArtifactCandidate[], ctx: PiCommandContext): Promise<void> {
+  const choice = await askReviewChoice(ctx, "Choose an artifact candidate to follow up", candidates.map((candidate, index) => ({
+    value: candidate.id,
+    label: learningFollowupChoiceLabel(store, candidate, index),
+  })));
+  if (choice.kind === "cancelled") {
+    notify(ctx, fallbackMessage(choice.reason, "Run /flight-learn in interactive Pi, or use advanced /flight-deltas apply|outcome|reject fallback commands."), choice.reason === "no-ui" ? "warning" : "info");
+    return;
+  }
+  const candidate = candidates.find((item) => item.id === choice.value);
+  if (!candidate) {
+    notify(ctx, `Artifact candidate not found: ${choice.value}`, "error");
+    return;
+  }
+  const action = await askReviewChoice(ctx, [
+    "Follow up artifact candidate",
+    ...formatArtifactCandidateWithRecurrence(store, candidate),
+  ].join("\n"), LEARNING_FOLLOWUP_CHOICES);
+  if (action.kind === "cancelled" || action.value === "skip") {
+    notify(ctx, action.kind === "cancelled" ? fallbackMessage(action.reason, "Run /flight-learn later to continue.") : `Skipped ${candidate.id}; no changes recorded.`, action.kind === "cancelled" && action.reason === "no-ui" ? "warning" : "info");
+    return;
+  }
+  if (action.value === "mark-applied") {
+    const appliedRef = await askReviewEditor(ctx, "Applied artifact reference", candidate.appliedArtifactRef ?? "");
+    if (appliedRef.kind === "cancelled") {
+      notify(ctx, fallbackMessage(appliedRef.reason, `/flight-deltas apply --candidate ${candidate.id}`), appliedRef.reason === "no-ui" ? "warning" : "info");
+      return;
+    }
+    const updated = store.markArtifactCandidateApplied(candidate.id, { appliedArtifactRef: appliedRef.text.trim() || null });
+    notify(ctx, updated ? `Marked ${candidate.id} applied in the local ledger. Run /flight-learn later to record whether it helped.` : `No artifact candidate found for ${candidate.id}.`, updated ? "success" : "error");
+    return;
+  }
+  if (action.value === "reject") {
+    const reason = await askReviewEditor(ctx, "Reject reason", "Why is this not the right artifact route?");
+    if (reason.kind === "cancelled") {
+      notify(ctx, fallbackMessage(reason.reason, `/flight-deltas reject --candidate ${candidate.id} --reason "..."`), reason.reason === "no-ui" ? "warning" : "info");
+      return;
+    }
+    const rejected = store.rejectArtifactCandidate(candidate.id, reason.text.trim() || "Rejected through /flight-learn");
+    notify(ctx, rejected ? `Rejected ${candidate.id}; evidence and rationale remain stored locally.` : `No artifact candidate found for ${candidate.id}.`, rejected ? "success" : "error");
+    return;
+  }
+  const note = await askReviewEditor(ctx, "Outcome note", learningOutcomePrefill(action.value));
+  if (note.kind === "cancelled") {
+    notify(ctx, fallbackMessage(note.reason, `/flight-deltas outcome --candidate ${candidate.id} --outcome ${action.value}`), note.reason === "no-ui" ? "warning" : "info");
+    return;
+  }
+  const result = recordArtifactCandidateOutcomeWithStore(store, {
+    candidateId: candidate.id,
+    outcome: action.value,
+    outcomeSummary: note.text.trim() || null,
+    ...(!candidate.applied ? { appliedArtifactRef: candidate.appliedArtifactRef } : {}),
+  });
+  notify(ctx, result ? `Recorded outcome for ${result.candidate.id}: ${result.candidate.outcome} [${result.candidate.status}].` : `No artifact candidate found for ${candidate.id}.`, result ? "success" : "error");
+}
+
 function formatDeltaDetail(store: FlightRecorderStore, delta: ExpectationDelta): string {
   const signals = store.listDeltaDetectorSignals(delta.id, 5);
   const activeCandidate = delta.activeArtifactCandidateId ? store.getArtifactCandidate(delta.activeArtifactCandidateId) : null;
@@ -812,6 +927,33 @@ function formatDeltaDetail(store: FlightRecorderStore, delta: ExpectationDelta):
     "Evidence:",
     ...formatDeltaEvidence(delta),
   ].join("\n");
+}
+
+async function handleFlightLearn(argsText: string, ctx: PiCommandContext, state: LiveExtensionState): Promise<void> {
+  const args = splitArgs(argsText);
+  const dataDir = readOption(args, "--data-dir");
+  await switchDataDir(state, dataDir);
+  await ensureBootstrapped(ctx, state, "command", false);
+  const prepared = await prepareLearningDeltaCandidates(args, state);
+  let reviewDelta = false;
+  const store = new FlightRecorderStore(defaultDatabasePath(stateDataDir(state)));
+  try {
+    const pendingDeltas = store.listExpectationDeltas({ status: "candidate", limit: 1 });
+    if (pendingDeltas.length > 0) {
+      notify(ctx, prepared.created > 0 ? `Flight Learn prepared ${prepared.created} new local delta candidate(s). Reviewing the next delta now.` : "Flight Learn: reviewing the next pending delta.", "info");
+      reviewDelta = true;
+    } else {
+      const followups = listLearningFollowupCandidates(store, parseLimit(readOption(args, "--limit")) ?? 8);
+      if (followups.length > 0) {
+        await handleLearningFollowup(store, followups, ctx);
+        return;
+      }
+      notify(ctx, learningNoItemsMessage(store, prepared), "info");
+    }
+  } finally {
+    store.close();
+  }
+  if (reviewDelta) await handleFlightDeltaReview(argsText, ctx, state);
 }
 
 async function handleFlightDeltas(argsText: string, ctx: PiCommandContext, state: LiveExtensionState): Promise<void> {
@@ -1286,6 +1428,11 @@ export default function piFlightRecorderExtension(pi: PiLike): void {
   pi.registerCommand?.("flight-review", {
     description: "Interactively review Flight Recorder reflection proposals and choose actions",
     handler: (args, ctx) => handleFlightReview(args, ctx, state),
+  });
+
+  pi.registerCommand?.("flight-learn", {
+    description: "One-command learning inbox: prepare local delta candidates, review routes, and record artifact outcomes",
+    handler: (args, ctx) => handleFlightLearn(args, ctx, state),
   });
 
   pi.registerCommand?.("flight-delta-review", {

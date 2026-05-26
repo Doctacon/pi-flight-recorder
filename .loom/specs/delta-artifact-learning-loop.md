@@ -4,7 +4,7 @@ ID: spec:delta-artifact-learning-loop
 Type: Spec
 Status: active
 Created: 2026-05-23
-Updated: 2026-05-23
+Updated: 2026-05-25
 
 ## Summary
 
@@ -74,6 +74,7 @@ A “problem” is an expectation delta: the difference between what the user wa
 - REQ-009: The system MUST track whether a chosen artifact was accepted/applied and whether similar deltas recur afterward, so the user can distinguish solved old categories from emerging frontier categories.
 - REQ-010: Automated artifact classification MUST NOT become the default until enough manually routed deltas with outcomes exist to evaluate it. A model may assist drafting or suggest a route only with bounded/redacted local evidence and explicit disclosure.
 - REQ-011: All delta, routing, artifact-candidate, and outcome state MUST stay local by default and respect existing redaction/privacy constraints.
+- REQ-012: The normal corpus-building UX MUST fit under a small command model. A user should be able to repeatedly run one primary learning command to prepare local candidates, review/route the next pending delta, and record artifact follow-up/outcome decisions without memorizing artifact candidate IDs or the advanced fallback command set.
 
 ## Scenarios
 
@@ -124,6 +125,16 @@ WHEN a user asks the system to auto-route new deltas
 THEN the system refuses or labels the route as experimental/advisory
 AND explains that classifier trust requires a labeled outcome corpus.
 
+### SCN-006: One-command learning inbox
+
+Exercises: REQ-005, REQ-007, REQ-009, REQ-012
+
+GIVEN local failure/reflection signals, pending delta candidates, or artifact candidates needing outcome follow-up
+WHEN the user runs the primary learning command
+THEN the system moves the next human-reviewed item forward
+AND the user can route a delta or record applied/outcome/reject/skip feedback without typing candidate IDs
+AND durable artifact creation, classifier labels, and recurrence/outcome claims remain human-gated.
+
 ## Evidence Plan
 
 - REQ-001 through REQ-002 / SCN-001: storage/type tests over fixture deltas assert expectation/reality/evidence/provenance/redaction fields.
@@ -132,6 +143,7 @@ AND explains that classifier trust requires a labeled outcome corpus.
 - REQ-009 / SCN-004: recurrence/outcome tests assert post-application similar deltas are linked back to prior artifact candidates and visible as recurring.
 - REQ-010 / SCN-005: classifier-readiness tests or research evidence assert auto-routing remains disabled/advisory below the corpus threshold.
 - REQ-011: privacy tests assert raw session text, secrets, full prompts, and unredacted paths are not persisted in derived delta/artifact records.
+- REQ-012 / SCN-006: Pi extension tests assert the primary learning command registers, delegates to guided delta routing, records artifact outcome follow-up without candidate IDs, and gives a concise no-items message.
 
 ## Open Questions
 
@@ -169,10 +181,12 @@ Expected local data surfaces:
 
 Expected Pi/user surfaces:
 
+- primary learning-loop command (`/flight-learn`) that can be repeated to prepare local candidates, review/route the next delta, or record artifact follow-up/outcome feedback;
 - command or guided UI for reviewing delta candidates;
 - manual capture command/action for “record this as a delta”;
 - routing choices that can store candidates without applying them;
-- status/export surfaces that show unresolved, recurring, and solved categories.
+- status/export surfaces that show unresolved, recurring, and solved categories;
+- advanced fallback commands for listing/showing/routing/applying/outcome/rejecting records when UI review is unavailable.
 
 Side effects:
 

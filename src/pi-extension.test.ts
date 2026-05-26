@@ -46,6 +46,7 @@ describe("Pi extension wrapper", () => {
     expect(commands.has("flight-feedback")).toBe(true);
     expect(commands.has("flight-reflect")).toBe(true);
     expect(commands.has("flight-review")).toBe(true);
+    expect(commands.has("flight-learn")).toBe(true);
     expect(commands.has("flight-rules")).toBe(true);
     expect(commands.has("flight-delta-review")).toBe(true);
     expect(commands.has("flight-deltas")).toBe(true);
@@ -483,6 +484,134 @@ describe("Pi extension wrapper", () => {
     }
     expect(notifications.join("\n")).toContain("Draft/handoff text was stored locally");
     expect(notifications.join("\n")).toContain("No artifact was created or applied");
+  });
+
+  it("routes a pending expectation delta through one-command flight-learn", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-learn-delta-data-"));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    let deltaId = "";
+    try {
+      deltaId = store.createExpectationDelta({
+        source: "manual",
+        summary: "Assistant keeps missing the validation seam",
+        expectation: "Validation ownership should be obvious before edits.",
+        reality: "The assistant chose the wrong seam twice.",
+        impact: "Review churn before any useful fix.",
+        severity: "medium",
+        cwd: "/repo",
+        evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/repo", entryId: null, timestamp: null, snippet: "wrong seam twice", note: "manual" }],
+      }).id;
+    } finally {
+      store.close();
+    }
+
+    const notifications: string[] = [];
+    const ctx = {
+      cwd: "/repo",
+      ui: {
+        notify: (message: string) => notifications.push(message),
+        select: (message: string, choices: string[]) => {
+          if (message.includes("Choose an expectation delta")) return choices[0];
+          if (message.includes("Route expectation delta")) return choices.find((choice) => choice.startsWith("Test/check"));
+          return undefined;
+        },
+        editor: (message: string, prefilled: string) => {
+          if (message.includes("Review expectation delta")) return prefilled;
+          if (message.includes("Routing rationale")) return "A missing validation check let the seam confusion recur.";
+          return undefined;
+        },
+      },
+      sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
+    };
+
+    await commands.get("flight-learn")?.handler(`--data-dir ${dataDir}`, ctx);
+
+    const check = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    try {
+      const candidate = check.listArtifactCandidates({ deltaId })[0];
+      expect(candidate?.artifactType).toBe("test-check");
+      expect(candidate?.status).toBe("accepted");
+      expect(candidate?.applied).toBe(false);
+      expect(check.getExpectationDelta(deltaId)?.status).toBe("routed");
+    } finally {
+      check.close();
+    }
+    expect(notifications.join("\n")).toContain("Flight Learn: reviewing the next pending delta");
+    expect(notifications.join("\n")).toContain("No artifact was created or applied");
+  });
+
+  it("records artifact outcome follow-up through one-command flight-learn", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-learn-outcome-data-"));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    let candidateId = "";
+    try {
+      const delta = store.createExpectationDelta({ source: "manual", summary: "Repeated stale route choice", evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/repo", entryId: null, timestamp: null, snippet: "stale route", note: "manual" }] });
+      const candidate = store.createArtifactCandidate({
+        deltaId: delta.id,
+        artifactType: "code-legibility",
+        title: "Code legibility: repeated stale route choice",
+        rationale: "The code shape is causing repeated route mistakes.",
+        proposedDraft: "Draft a small refactor ticket.",
+        nextStep: "Create Loom ticket if accepted.",
+        evidenceRefs: delta.evidenceRefs,
+      });
+      candidateId = store.acceptArtifactCandidate(candidate.id)!.id;
+    } finally {
+      store.close();
+    }
+
+    const notifications: string[] = [];
+    const selectPrompts: string[] = [];
+    const ctx = {
+      cwd: "/repo",
+      ui: {
+        notify: (message: string) => notifications.push(message),
+        select: (message: string, choices: string[]) => {
+          selectPrompts.push(message);
+          if (message.includes("Choose an artifact candidate")) return choices[0];
+          if (message.includes("Follow up artifact candidate")) return choices.find((choice) => choice.startsWith("Helped"));
+          return undefined;
+        },
+        editor: (message: string) => {
+          if (message.includes("Outcome note")) return "No recurrence observed in later similar work yet.";
+          return undefined;
+        },
+      },
+      sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
+    };
+
+    await commands.get("flight-learn")?.handler(`--data-dir ${dataDir}`, ctx);
+
+    const check = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    try {
+      const candidate = check.getArtifactCandidate(candidateId);
+      expect(candidate?.outcome).toBe("helped");
+      expect(candidate?.status).toBe("resolved");
+      expect(candidate?.applied).toBe(true);
+      expect(candidate?.outcomeSummary).toContain("No recurrence observed");
+    } finally {
+      check.close();
+    }
+    expect(selectPrompts.find((prompt) => prompt.includes("Follow up artifact candidate"))).toContain("Draft:");
+    expect(notifications.join("\n")).toContain(`Recorded outcome for ${candidateId}: helped`);
+  });
+
+  it("keeps flight-learn concise when no learning items are ready", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-learn-empty-data-"));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    const notifications: string[] = [];
+    const ctx = { cwd: "/repo", ui: { notify: (message: string) => notifications.push(message) }, sessionManager: { getCwd: () => "/repo", getSessionFile: () => null } };
+
+    await commands.get("flight-learn")?.handler(`--data-dir ${dataDir}`, ctx);
+
+    const output = notifications.join("\n");
+    expect(output).toContain("Flight Learn: nothing needs review right now");
+    expect(output).toContain("/flight-learn to review the next item, /flight-status to check state");
   });
 
   it("supports explicit fallback delta routing, observe, no-ui guidance, and dismiss", async () => {

@@ -59,7 +59,31 @@ On failed Pi `tool_result` events:
 
 The extension does not wrap or mutate tool results.
 
-## 4. Ask directly when needed
+## 4. Use the learning inbox
+
+For the expectation-delta / artifact-routing corpus, remember one command:
+
+```text
+/flight-learn
+```
+
+Run it whenever you want to move the next learning item forward. It will:
+
+- prepare safe local delta candidates from existing repeated-failure signals;
+- review and route one pending delta when one exists;
+- otherwise ask about one artifact candidate that needs applied/outcome feedback;
+- otherwise tell you there is nothing ready yet.
+
+The normal pair to remember is:
+
+```text
+/flight-status
+/flight-learn
+```
+
+Advanced fallback commands such as `/flight-delta-review` and `/flight-deltas outcome ...` still exist for debugging/recovery, but they are not the normal workflow.
+
+## 5. Ask directly when needed
 
 ```text
 /seen-this-before --cwd current npm test Cannot find module src/config/app.ts
@@ -76,7 +100,7 @@ A good match separates:
 
 If no passing validation was detected after a failure, the episode is shown as unresolved instead of inventing a fix.
 
-## 5. Reflect on repeated failures
+## 6. Reflect on repeated failures
 
 Manual reflection:
 
@@ -87,6 +111,8 @@ Manual reflection:
 /flight-reflect --interactive
 ```
 
+For corpus-building, prefer `/flight-learn`; it wraps the review/outcome path so you do not need to remember the lower-level delta commands.
+
 Optional model-assisted reflection, only when requested and Pi exposes a model completion surface:
 
 ```text
@@ -95,7 +121,7 @@ Optional model-assisted reflection, only when requested and Pi exposes a model c
 
 Reflection groups repeated local failures and proposes one pattern-level next step with evidence, confidence, limits, and actions. Use `/flight-review` for a guided keyboard-driven review: pick a proposal, pick an action, and optionally draft/edit/approve a scoped Flight Rule.
 
-## 6. Give feedback
+## 7. Give feedback
 
 Examples:
 
@@ -111,7 +137,7 @@ Examples:
 
 Feedback is local SQLite state. `promote-later` records user intent. `make-rule` creates a draft candidate; a Flight Rule affects future turns only after explicit approval, and `/flight-rules disable` turns it off.
 
-## 7. Control mode
+## 8. Control mode
 
 ```text
 /flight-mode status
