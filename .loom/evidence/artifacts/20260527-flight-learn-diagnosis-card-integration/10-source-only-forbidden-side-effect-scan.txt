@@ -1,0 +1,1 @@
+$ rg "registerCommand|fetch\(|complete\(|modelProvider|http|https|createExpectationDelta|recordDelta|createArtifactCandidate|acceptArtifactCandidate|rerouteExpectationDelta|markExpectationDelta" src/flight-learn-inbox.ts src/flight-learn-diagnosis.ts

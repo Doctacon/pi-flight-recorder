@@ -6,6 +6,13 @@ function stripAnsi(value: string): string {
   return value.replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "");
 }
 
+function sectionBetween(lines: string[], start: string, end: string): string[] {
+  const startIndex = lines.indexOf(start);
+  const endIndex = lines.indexOf(end);
+  if (startIndex === -1) return [];
+  return lines.slice(startIndex, endIndex === -1 ? undefined : endIndex);
+}
+
 function kittyKey(codepoint: number, modifier = 1): string {
   return `\u001b[${codepoint};${modifier}u`;
 }
@@ -58,6 +65,23 @@ function fixtureSignal(deltaId: string): DeltaDetectorSignal {
   };
 }
 
+function routeChoices(): FlightLearnDeltaInboxInput["routeChoices"] {
+  return [
+    { value: "code-legibility", label: "Code legibility", description: "Create a refactor/readability route when code shape causes repeated confusion" },
+    { value: "test-check", label: "Test/check", description: "Route to a missing or weak validation check" },
+    { value: "loom-ticket", label: "Loom ticket", description: "Route to bounded implementation or cleanup work" },
+    { value: "flight-rule", label: "Flight Rule", description: "Route to reusable assistant guidance, still requiring approval later" },
+    { value: "loom-spec", label: "Loom spec", description: "Route to intended-behavior clarification" },
+    { value: "loom-research", label: "Loom research", description: "Route to investigation before implementation" },
+    { value: "loom-knowledge", label: "Loom knowledge", description: "Route to reusable project understanding" },
+    { value: "prompt-context", label: "Prompt/context", description: "Route to project prompt or context documentation" },
+    { value: "skill-or-template", label: "Skill/template", description: "Route to a reusable workflow or prompt template" },
+    { value: "observe", label: "Observe/no artifact", description: "Keep evidence and watch recurrence without creating an artifact" },
+    { value: "dismiss", label: "Dismiss", description: "Close this delta without routing" },
+    { value: "cancel", label: "Cancel", description: "Leave unchanged" },
+  ];
+}
+
 function fixtureInput(): FlightLearnDeltaInboxInput {
   const first = fixtureDelta("delta-one", "Repeated failure pattern: exact-text edit mismatches with a very long summary that must be clipped safely");
   const second = fixtureDelta("delta-two", "Validation seam missed after edits");
@@ -66,20 +90,34 @@ function fixtureInput(): FlightLearnDeltaInboxInput {
       { delta: first, signals: [fixtureSignal(first.id)] },
       { delta: second, signals: [fixtureSignal(second.id)] },
     ],
-    routeChoices: [
-      { value: "code-legibility", label: "Code legibility", description: "Create a refactor/readability route when code shape causes repeated confusion" },
-      { value: "test-check", label: "Test/check", description: "Route to a missing or weak validation check" },
-      { value: "loom-ticket", label: "Loom ticket", description: "Route to bounded implementation or cleanup work" },
-      { value: "flight-rule", label: "Flight Rule", description: "Route to reusable assistant guidance, still requiring approval later" },
-      { value: "loom-spec", label: "Loom spec", description: "Route to intended-behavior clarification" },
-      { value: "loom-research", label: "Loom research", description: "Route to investigation before implementation" },
-      { value: "loom-knowledge", label: "Loom knowledge", description: "Route to reusable project understanding" },
-      { value: "prompt-context", label: "Prompt/context", description: "Route to project prompt or context documentation" },
-      { value: "skill-or-template", label: "Skill/template", description: "Route to a reusable workflow or prompt template" },
-      { value: "observe", label: "Observe/no artifact", description: "Keep evidence and watch recurrence without creating an artifact" },
-      { value: "dismiss", label: "Dismiss", description: "Close this delta without routing" },
-      { value: "cancel", label: "Cancel", description: "Leave unchanged" },
-    ],
+    routeChoices: routeChoices(),
+  };
+}
+
+function rawCommandInput(): FlightLearnDeltaInboxInput {
+  const raw = fixtureDelta("delta-raw", "Repeated failure pattern: bash cd /Users/alice/Code/personal/pi-flight-recorder && npm test > pi-flight-recorder.log");
+  raw.expectation = null;
+  raw.reality = "Observed 2 related failure occurrences in reflection cluster cluster_73111b7e16551a58.";
+  raw.impact = "Repeated local friction across tools/cwds: bash.";
+  raw.evidenceRefs = [
+    { sourceType: "occurrence", sourceId: "occ-1", sourceFile: null, sessionFile: "session.jsonl", cwd: "/Users/alice/Code/personal/pi-flight-recorder", entryId: "entry-1", timestamp: "2026-05-27T01:00:00.000Z", snippet: "bash cd /Users/alice/Code/personal/pi-flight-recorder && npm test > pi-flight-recorder.log failed from a stale pane", note: "Reflection cluster cluster_73111b7e16551a58" },
+  ];
+  raw.metadata = { count: 2, clusterId: "cluster_73111b7e16551a58" };
+  return {
+    items: [{
+      delta: raw,
+      signals: [{
+        id: "sig-delta-raw",
+        deltaId: raw.id,
+        type: "reflection-cluster",
+        explanation: "Reflection cluster cluster_73111b7e16551a58 has 2 related occurrence(s), meeting the conservative threshold 2.",
+        confidence: 0.55,
+        evidenceRefs: raw.evidenceRefs,
+        metadata: {},
+        createdAt: "2026-05-27T01:00:00.000Z",
+      }],
+    }],
+    routeChoices: routeChoices(),
   };
 }
 
@@ -133,11 +171,15 @@ describe("Flight Learn custom inbox component", () => {
 
     expect(output).toContain("Flight Learn — Issue 1 of 2");
     expect(output).toContain("2 pending · 3 evidence refs");
-    expect(output).toContain("Issue");
-    expect(output).toContain("exact-text edit mismatches");
+    expect(output).toContain("Problem");
+    expect(output).toContain("The user had to correct an assistant assumption.");
     expect(output).toContain("What happened?");
+    expect(output).toContain("The assistant edited repository storage and missed mapper sanitization twice.");
     expect(output).toContain("Why it matters");
     expect(output).toContain("Expected");
+    expect(output).toContain("The assistant should identify the storage/mapper seam before editing.");
+    expect(output).toContain("Raw clue");
+    expect(output).toContain("exact-text edit mismatches");
     expect(output).toContain("Why suggested");
     expect(output).toContain("Evidence");
     expect(output).toContain("3 refs hidden by default — press v to view concise refs.");
@@ -154,6 +196,39 @@ describe("Flight Learn custom inbox component", () => {
     const expanded = component.render(88).map(stripAnsi).join("\n");
     expect(expanded).toContain("session-entry/entry-1");
     expect(expanded).toContain("No, actually the mapper owns this behavior");
+  });
+
+  it("renders raw detector text as a plain-English focused-card diagnosis with secondary raw clue", () => {
+    const results: FlightLearnDeltaInboxResult[] = [];
+    const component = createFlightLearnDeltaInboxComponent({
+      input: rawCommandInput(),
+      done: (result) => results.push(result),
+      layout: "focused-card",
+    });
+
+    const lines = component.render(132).map(stripAnsi);
+    const output = lines.join("\n");
+    const primaryBlock = sectionBetween(lines, "Problem", "Raw clue").join("\n");
+    const primaryContent = primaryBlock
+      .split("\n")
+      .filter((line) => line.trim() && !["Problem", "What happened?", "Why it matters", "Expected"].includes(line));
+
+    expect(output).toContain("Problem");
+    expect(output).toContain("A validation command failed repeatedly in this project.");
+    expect(output).toContain("Pi saw the same validation-failure pattern twice in recent sessions.");
+    expect(output).toContain("Repeated validation friction makes it harder to trust whether the latest code");
+    expect(output).toContain("actually passed.");
+    expect(output).toContain("Raw clue");
+    expect(output).toContain("npm test");
+    expect(output).toContain("Why suggested");
+    expect(output).toContain("Reflection cluster cluster_73111b7e16551a58");
+    expect(output).not.toContain("Issue\nbash cd");
+    expect(primaryBlock).not.toContain("bash cd");
+    expect(primaryBlock).not.toContain("cluster_73111b7e16551a58");
+    expect(primaryBlock).not.toContain("/Users/alice");
+    for (const line of primaryContent) expect(line.length).toBeLessThanOrEqual(86);
+    for (const line of lines) expect(line.length).toBeLessThanOrEqual(132);
+    expect(results).toEqual([]);
   });
 
   it("keeps rendered visible lines within narrow and wide terminal widths", () => {

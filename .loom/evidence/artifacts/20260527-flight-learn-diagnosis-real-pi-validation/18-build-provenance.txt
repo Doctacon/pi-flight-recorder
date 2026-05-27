@@ -1,0 +1,70 @@
+# Build provenance gathered after real Pi run
+observed_at=2026-05-27T04:32:50Z
+repo=/Users/crlough/Code/personal/pi-flight-recorder
+
+## git
+bce5e9da4979e60bcb94bc4b7785991c33fbf5f5
+
+ M .loom/plans/20260527-flight-learn-plain-english-diagnosis-cards.md
+ M .loom/tickets/20260527-flight-learn-diagnosis-card-integration.md
+ M .loom/tickets/20260527-flight-learn-diagnosis-real-pi-validation.md
+ M .loom/tickets/20260527-flight-learn-diagnosis-view-model.md
+ M src/flight-learn-inbox.test.ts
+ M src/flight-learn-inbox.ts
+ M src/pi-extension.test.ts
+?? .loom/audit/20260527-flight-learn-diagnosis-card-integration-review.md
+?? .loom/audit/20260527-flight-learn-diagnosis-view-model-followup-review.md
+?? .loom/audit/20260527-flight-learn-diagnosis-view-model-review.md
+?? .loom/evidence/20260527-flight-learn-diagnosis-card-integration-validation.md
+?? .loom/evidence/20260527-flight-learn-diagnosis-view-model-validation.md
+?? .loom/evidence/artifacts/20260527-flight-learn-diagnosis-card-integration/
+?? .loom/evidence/artifacts/20260527-flight-learn-diagnosis-real-pi-validation/
+?? .loom/evidence/artifacts/20260527-flight-learn-diagnosis-view-model/
+?? src/flight-learn-diagnosis.test.ts
+?? src/flight-learn-diagnosis.ts
+
+## package extension declaration
+{
+  "name": "pi-flight-recorder",
+  "version": "0.1.0",
+  "pi": {
+    "extensions": [
+      "./dist/pi-extension.js"
+    ]
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./pi-extension": "./dist/pi-extension.js"
+  }
+}
+
+## dist/pi-extension.js stat
+path=dist/pi-extension.js size=83654 mtime=2026-05-26T21:30:49-0700
+
+## dist/pi-extension.js sha256
+6bc3f10e7a7580e808f5018d96ee827e78448cbf5502b0a1e113711c8cb3bfc9  dist/pi-extension.js
+
+## dist focused diagnosis fingerprint
+dist/flight-learn-inbox.js:1:import { buildFlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
+dist/flight-learn-inbox.js:5:const FOCUSED_PRIMARY_PROSE_WIDTH = 84;
+dist/flight-learn-inbox.js:58:    const readableWidth = Math.min(width, FOCUSED_PRIMARY_PROSE_WIDTH + indent.length);
+dist/flight-learn-inbox.js:399:        const diagnosis = buildFlightLearnDiagnosisView({ delta: displayDelta, signals: item.signals });
+dist/flight-learn-inbox.js:401:        const rawClueLines = diagnosis.rawClue ? ["", "Raw clue", ...wrapFocusedProse(diagnosis.rawClue, width)] : [];
+dist/flight-learn-inbox.js:406:            "Problem",
+dist/flight-learn-inbox.js:691:        return ["Problem", "What happened?", "Why it matters", "Expected", "Raw clue", "Why suggested", "Evidence", "Choose a follow-up"].includes(line);
+dist/flight-learn-inbox.js:713:        const result = await ctx.ui.custom((tui, theme, _keybindings, done) => createFlightLearnDeltaInboxComponent({ input, done, tui, theme, layout: "focused-card" }));
+
+## project local package setting
+{
+  "packages": [
+    "../../../../../Users/crlough/Code/personal/pi-flight-recorder"
+  ]
+}
+## resolved installed package path
+/Users/crlough/Code/personal/pi-flight-recorder
+
+## dist/flight-learn-inbox.js stat
+path=dist/flight-learn-inbox.js size=30252 mtime=2026-05-26T21:30:49-0700
+
+## dist/flight-learn-inbox.js sha256
+1bf9601d4e8dba75b246c6e5f8a8a2b6edcf2716488aec56c2048dbadd34f5e2  dist/flight-learn-inbox.js

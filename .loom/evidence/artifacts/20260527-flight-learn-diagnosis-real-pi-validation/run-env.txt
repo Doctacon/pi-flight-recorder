@@ -1,0 +1,14 @@
+run_root=/tmp/pfr-diagnosis-realpi-QQFY1b
+home=/tmp/pfr-diagnosis-realpi-QQFY1b/home
+workspace=/tmp/pfr-diagnosis-realpi-QQFY1b/workspace
+agent_dir=/tmp/pfr-diagnosis-realpi-QQFY1b/home/.pi/agent
+session_dir=/tmp/pfr-diagnosis-realpi-QQFY1b/home/.pi/agent/sessions
+data_dir=/tmp/pfr-diagnosis-realpi-QQFY1b/home/.pi/flight-recorder
+tui_log_dir=/tmp/pfr-diagnosis-realpi-QQFY1b/tui-logs
+repo=/Users/crlough/Code/personal/pi-flight-recorder
+pi_version=0.75.5
+tmux_version=tmux 3.5a
+node_version=v24.6.0
+tmux_session=pfr_diag_realpi_1779856303_37756
+command=env -i HOME=<temp-home> PATH=<redacted-path> TERM=xterm-256color SHELL=/bin/bash PI_OFFLINE=1 PI_CODING_AGENT_DIR=<temp-agent-dir> PI_CODING_AGENT_SESSION_DIR=<temp-session-dir> PI_TUI_WRITE_LOG=<temp-tui-log-dir> pi --offline --no-skills --no-prompt-templates --no-context-files --no-session --no-tools
+forced_kill=false

@@ -28,7 +28,7 @@ Out of scope:
 
 - changing the two-command visible surface owned by `spec:visible-command-surface`;
 - changing delta/artifact/outcome storage semantics owned by `spec:delta-artifact-learning-loop`;
-- adding classifier automation or model/provider calls;
+- adding classifier automation, hosted model/provider calls, or default model-dependent behavior;
 - automatically applying artifacts, rules, source edits, docs, Loom records, skills, or prompts;
 - building a separate dashboard, web UI, or non-Pi frontend.
 
@@ -75,7 +75,8 @@ The UI should preserve all existing safety boundaries: candidate generation can 
 - Do not hide evidence provenance completely; summarize first, but keep inspectable evidence available.
 - Do not require users to edit YAML/Markdown-like blobs for ordinary delta review.
 - Do not remove CLI/subcommand fallback paths for non-interactive or broken-UI recovery.
-- Do not use hosted services, model calls, or classifier labels as part of the default UI improvement.
+- Do not use hosted services, hosted model calls, or classifier labels as part of the default UI improvement.
+- Do not require a model for `/flight-learn`; optional local model polish must fail closed to deterministic text.
 
 ## Requirements
 
@@ -102,6 +103,12 @@ The UI should preserve all existing safety boundaries: candidate generation can 
 - REQ-021: The inbox MUST keep display diagnosis separate from stored delta truth. Derived plain-English text may improve the UI, but it must not silently rewrite `ExpectationDelta.summary`, `expectation`, `reality`, `impact`, evidence refs, artifact drafts, source files, Loom records, rules, skills, or prompts unless the operator explicitly edits or approves a separate mutation workflow.
 - REQ-022: Raw commands, paths, detector labels, cluster IDs, and evidence provenance MUST be visually secondary to the primary diagnosis. They may appear as `Raw clue`, `Why suggested`, or expanded evidence, but they must not be the first thing the operator has to decode.
 - REQ-023: Primary diagnosis prose SHOULD wrap to a human reading measure even on wide terminals. Rendered lines still MUST obey Pi TUI width limits, but primary explanatory text should avoid full-width single-line stretching/truncation when a narrower prose column would be easier to scan.
+- REQ-024: The inbox MAY offer optional local-model diagnosis polish after the deterministic diagnosis view exists. This polish MUST be opt-in through explicit local configuration or a recoverable `/flight-learn` flag/subcommand path, and the deterministic diagnosis MUST remain the default/fallback when the model is disabled, unavailable, slow, or invalid.
+- REQ-025: Optional diagnosis polish MUST use only local/open-source model execution. It MUST NOT call hosted providers, non-loopback network endpoints, telemetry services, or automatically download model weights without explicit operator action.
+- REQ-026: Optional local-model input MUST be a bounded redacted fact packet derived from already stored local delta fields, detector signals, deterministic diagnosis text, and concise evidence summaries. It MUST NOT send raw session files, full prompts, unredacted paths, secrets, or unconstrained transcript text to the model process.
+- REQ-027: Optional local-model output MUST be structured, validated, length-bounded, and treated as display-only phrasing. Invalid, hallucinated, over-specific, secret-looking, or schema-invalid output MUST be rejected in favor of deterministic text.
+- REQ-028: Optional local-model polish MUST NOT affect artifact routing, route ranking, classifier behavior, delta status, stored `ExpectationDelta` fields, artifact candidates, source files, Loom records, rules, skills, or prompts. It may only change the displayed diagnosis wording for the current review screen.
+- REQ-029: When local-model polish is used, the UI SHOULD disclose it unobtrusively, for example with a small secondary line such as `Local model phrasing; deterministic fallback available`, without making the wording look authoritative.
 
 ## Scenarios
 
@@ -173,6 +180,29 @@ AND raw command/path/cluster details are secondary or hidden behind evidence/pro
 AND the explanatory prose wraps to a readable measure within the component width
 AND no stored delta fields are changed merely because the UI derived friendlier text.
 
+### SCN-008: Optional local model polishes diagnosis text
+
+Exercises: REQ-024, REQ-025, REQ-026, REQ-027, REQ-028, REQ-029
+
+GIVEN the operator has explicitly configured an approved local model runtime and model
+AND a pending delta has a deterministic diagnosis plus bounded redacted facts
+WHEN the operator opens `/flight-learn` with local-model polish enabled
+THEN the system may ask the local model for structured diagnosis wording
+AND the prompt/input contains only bounded redacted facts, not raw session transcripts
+AND valid output replaces only the display wording for the current card
+AND invalid, slow, unavailable, or unsafe output falls back to deterministic wording
+AND routing, storage, artifact candidates, rules, source files, Loom records, and prompts remain unchanged.
+
+### SCN-009: Local model is unavailable or unsafe
+
+Exercises: REQ-024, REQ-025, REQ-027, REQ-028
+
+GIVEN local-model polish is enabled but the local runtime is unavailable, times out, returns malformed JSON, mentions a non-evidence fact, includes a secret-looking value, or produces overlong text
+WHEN `/flight-learn` renders the diagnosis card
+THEN the card uses deterministic diagnosis text
+AND the UI or debug output records an honest local-model fallback reason without interrupting review
+AND no route/storage/artifact side effects occur.
+
 ## Evidence Plan
 
 - REQ-001 through REQ-007 / SCN-001 through SCN-003: fake-Pi command/component tests prove `/flight-learn` opens the custom inbox for pending deltas, selection/edit/route/dismiss/skip flows store the same safe records as the old flow, and no durable artifact mutation occurs.
@@ -182,6 +212,7 @@ AND no stored delta fields are changed merely because the UI derived friendlier 
 - REQ-013: regression tests and source review prove no default model/provider/classifier or auto-apply path was introduced.
 - REQ-015 through REQ-018 / SCN-006: render artifacts and tests should compare the focused-card layout against a representative multi-delta fixture and show that pending queue, primary diagnosis, secondary evidence/signals, and active route selection have separate visual hierarchy.
 - REQ-019 through REQ-023 / SCN-007: deterministic view-model tests should cover detector-created deltas with raw commands, cluster IDs, user corrections, stale edit attempts, missing evidence, and human-authored fields. Render artifacts should show that primary diagnosis text is plain-English, raw details are secondary, and prose wraps at a readable measure while staying width-safe.
+- REQ-024 through REQ-029 / SCN-008 and SCN-009: tests should use fake local-model providers/runtimes to prove bounded redacted prompt construction, JSON schema validation, timeout/error fallback, unsafe-output rejection, display-only integration, and no storage/routing side effects. Before release claims about real local-model behavior, capture a disposable real local runtime smoke with an explicitly installed/authorized local model or record the validation as blocked.
 - Visual UX claim: before strong release claims, capture at least one real interactive Pi TUI screenshot or ANSI log showing the custom inbox with representative data.
 
 ## Open Questions
@@ -190,6 +221,7 @@ AND no stored delta fields are changed merely because the UI derived friendlier 
 - Should the component be an overlay or replace the editor area? Recommendation: replace the editor area for the first slice, because the current review flow is modal and focused; overlays can be added later if the inbox needs to coexist with chat context.
 - Should route recommendations be ranked? Recommendation: route cards can group likely/default-safe choices, but avoid classifier-like ranking language until routed/outcome corpus exists.
 - Should the split-pane layout be polished further or replaced? Recommendation: replace it for the primary review path. The current screenshots show that the split-pane shape itself creates the cognitive-load problem; further border/copy tweaks are likely incremental.
+- Which local model runtime should optional diagnosis polish use? Recommendation: research local/open-source options first and choose a small explicit runtime adapter with deterministic fallback, no automatic model downloads, and no hosted/network dependency.
 
 ## Quality Bar
 
@@ -294,6 +326,7 @@ Examples:
 - Evidence drawer: show concise refs only when requested by `v`, expand to fuller redacted snippets without changing route selection.
 - Route cards: `Test/check — missing or weak validation`, `Loom spec — intended behavior ambiguity`, `Observe — keep evidence only`.
 - Plain-English diagnosis: `A validation command failed repeatedly in this project.` as the primary headline, with `Raw clue: npm test > pi-flight…` under evidence/provenance rather than under the headline.
+- Optional local-model polish: `A stale terminal may have rerun validation against the wrong project state.` may replace deterministic wording only after a local configured model returns valid bounded JSON, with deterministic fallback still available.
 
 Non-examples:
 
@@ -304,6 +337,9 @@ Non-examples:
 - A third top-level command such as `/flight-inbox`.
 - A primary headline that is only a command, path, cluster ID, detector type, or redacted source filename.
 - Silently rewriting stored delta fields because the UI found a friendlier phrase.
+- Calling a hosted model or non-loopback endpoint for diagnosis polish.
+- Treating local-model phrasing as a route recommendation, classifier label, artifact creation instruction, or durable source of truth.
+- Downloading model weights automatically during `/flight-learn`.
 
 ## Constraints
 
@@ -311,6 +347,7 @@ Non-examples:
 - For primary prose, prefer a readable measure over using the whole terminal width. Use Pi TUI wrapping utilities or an equivalent width-safe local wrapper so plain-English paragraphs do not become one-line/truncated command walls.
 - Prefer built-in Pi TUI components such as `SelectList`, `Markdown`, `Container`, `Text`, and `DynamicBorder` before building custom primitives from scratch.
 - Preserve local-first privacy, redaction, and human gates from `spec:delta-artifact-learning-loop`.
+- Optional model polish must be local/open-source, explicit, bounded, timeout-protected, and safe to disable without changing normal `/flight-learn` behavior.
 - Preserve the two-command visible surface from `spec:visible-command-surface`.
 - Do not make visual quality claims without visual evidence.
 

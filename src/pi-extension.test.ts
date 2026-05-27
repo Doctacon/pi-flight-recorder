@@ -592,6 +592,9 @@ describe("Pi extension wrapper", () => {
     }
     expect(customCalls).toBe(1);
     expect(rendered[0]?.join("\n")).toContain("Flight Learn — Issue 1 of 1");
+    expect(rendered[0]?.join("\n")).toContain("Problem");
+    expect(rendered[0]?.join("\n")).toContain("Assistant keeps missing the validation seam");
+    expect(rendered[0]?.join("\n")).toContain("What happened?");
     expect(rendered[0]?.join("\n")).toContain("Choose a follow-up");
     expect(rendered[0]?.join("\n")).toContain("▶ [1] Code legibility");
     expect(rendered[0]?.join("\n")).not.toContain("Pending deltas");

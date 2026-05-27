@@ -1,0 +1,87 @@
+$ node .loom/evidence/artifacts/20260527-flight-learn-diagnosis-card-integration/render-focused-diagnosis-card.mjs
+Flight Learn — Issue 1 of 1
+1 pending · 1 evidence ref · ↑/↓ changes issue
+
+Problem
+ A validation command failed repeatedly in this project.
+
+What happened?
+ Pi saw the same validation-failure pattern twice in recent sessions.
+
+Why it matters
+ Repeated validation friction makes it harder to trust whether the latest code
+ actually passed.
+
+Expected
+ unknown — press e to add what should have happened
+
+Raw clue
+ Repeated failure pattern: bash cd /Users/<user>/Code/personal/pi-flight-recorder &&
+ npm test > pi-flight-recorder.log
+
+Why suggested
+ reflection-cluster (0.55): Reflection cluster cluster_73111b7e16551a58 has 2 related occurrence(s), meeting the conservative
+ threshold 2.
+
+Evidence
+ 1 ref hidden by default — press v to view concise refs.
+
+Choose a follow-up
+▶ [1] Code legibility
+ Create a refactor/readability route when code shape causes repeated confusion
+ [2] Test/check
+ Route to a missing or weak validation check
+ [3] Loom ticket
+ Route to bounded implementation or cleanup work
+ [4] Flight Rule
+ Route to reusable assistant guidance, still requiring approval later
+ [5] Loom spec
+ Route to intended-behavior clarification
+ ↓ 1 more follow-up
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose · e edit · v evidence · d dismiss · s skip · q quit
+
+--- expanded evidence ---
+
+Flight Learn — Issue 1 of 1
+1 pending · 1 evidence ref · ↑/↓ changes issue
+
+Problem
+ A validation command failed repeatedly in this project.
+
+What happened?
+ Pi saw the same validation-failure pattern twice in recent sessions.
+
+Why it matters
+ Repeated validation friction makes it harder to trust whether the latest code
+ actually passed.
+
+Expected
+ unknown — press e to add what should have happened
+
+Raw clue
+ Repeated failure pattern: bash cd /Users/<user>/Code/personal/pi-flight-recorder &&
+ npm test > pi-flight-recorder.log
+
+Why suggested
+ reflection-cluster (0.55): Reflection cluster cluster_73111b7e16551a58 has 2 related occurrence(s), meeting the conservative
+ threshold 2.
+
+Evidence
+ - occurrence/occ-1: bash cd /Users/alice/Code/personal/pi-flight-recorder && npm test > pi-flight-recorder.log failed from a stale
+ pane
+
+Choose a follow-up
+▶ [1] Code legibility
+ Create a refactor/readability route when code shape causes repeated confusion
+ [2] Test/check
+ Route to a missing or weak validation check
+ [3] Loom ticket
+ Route to bounded implementation or cleanup work
+ [4] Flight Rule
+ Route to reusable assistant guidance, still requiring approval later
+ [5] Loom spec
+ Route to intended-behavior clarification
+ ↓ 1 more follow-up
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose · e edit · v evidence · d dismiss · s skip · q quit

@@ -2,7 +2,7 @@
 
 ID: plan:20260527-flight-learn-plain-english-diagnosis-cards
 Type: Plan
-Status: open
+Status: completed
 Created: 2026-05-27
 Updated: 2026-05-27
 Risk: medium - the plan changes the primary operator-facing interpretation of failure-memory records while preserving storage, privacy, and candidate-only safety boundaries.
@@ -99,8 +99,30 @@ Real installed Pi evidence shows the improved card with representative data, whi
 
 ## Current State
 
-Open. The operator feedback has been preserved as evidence, `spec:flight-learn-inbox-ux` has been amended with plain-English diagnosis requirements, and three child tickets are ready for execution. The next move is to execute `ticket:20260527-flight-learn-diagnosis-view-model` with a bounded implementation agent, not to implement from this shaping session.
+Completed. All child tickets are closed with evidence and audit:
+
+- `ticket:20260527-flight-learn-diagnosis-view-model` closed with helper tests, validation evidence, first audit finding, follow-up fix, and clear follow-up audit.
+- `ticket:20260527-flight-learn-diagnosis-card-integration` closed with focused-card integration, render/test/build/full-test evidence, and clear audit.
+- `ticket:20260527-flight-learn-diagnosis-real-pi-validation` closed with disposable project-local installed-package real Pi evidence and clear audit.
+
+Final plan-level outcome: `/flight-learn` focused-card pending-delta review now shows a display-only deterministic local plain-English `Problem` / `What happened?` / wrapped `Why it matters` diagnosis for raw detector deltas, demotes raw command/provenance details to secondary sections, preserves route/editor/candidate-only storage safety, and has real Pi pane/TUI evidence for the improved diagnosis card.
+
+Residual risks/follow-ups:
+
+- global/user-scope install remains unproven;
+- hosted/real model-provider behavior remains unproven and intentionally unused by default;
+- artifact outcome follow-up custom UI remains future work;
+- all terminal/theme/key-protocol variants remain unproven;
+- operator preference after continued hands-on use remains to be learned;
+- direct Pi TUI component imports were not added because dependency/package changes were outside the integration ticket scope.
 
 ## Journal
 
 - 2026-05-27: Created plan after operator feedback that focused-card layout improved but primary `Issue` / `What happened?` content remained code-heavy, internal, and one-line/truncated. Chose deterministic display-time diagnosis generation as the default route and created three child tickets.
+- 2026-05-27: Set plan status to `active` and started `ticket:20260527-flight-learn-diagnosis-view-model`.
+- 2026-05-27: Closed `ticket:20260527-flight-learn-diagnosis-view-model` after helper implementation, validation evidence, first audit finding, follow-up fix, and clear follow-up audit.
+- 2026-05-27: Started `ticket:20260527-flight-learn-diagnosis-card-integration`.
+- 2026-05-27: Closed `ticket:20260527-flight-learn-diagnosis-card-integration` after focused-card integration, validation evidence, and clear audit.
+- 2026-05-27: Started `ticket:20260527-flight-learn-diagnosis-real-pi-validation`.
+- 2026-05-27: Closed `ticket:20260527-flight-learn-diagnosis-real-pi-validation` after disposable installed-package real Pi validation and clear audit.
+- 2026-05-27: Marked plan `completed`; all child tickets are closed and residual risks are named.

@@ -2,7 +2,7 @@
 
 ID: ticket:20260527-flight-learn-diagnosis-real-pi-validation
 Type: Ticket
-Status: open
+Status: closed
 Created: 2026-05-27
 Updated: 2026-05-27
 Risk: medium - this validates user-facing Pi TUI behavior and must avoid overclaiming beyond the observed terminal/install route.
@@ -87,8 +87,44 @@ First likely Ralph run:
 
 ## Current State
 
-Open. Do not start until `ticket:20260527-flight-learn-diagnosis-card-integration` is closed with evidence. The validation should reuse the disposable real Pi guardrails from prior real TUI evidence.
+Closed. The real-Pi validation closure claim is satisfied for the observed disposable project-local tmux/offline route.
+
+What was observed:
+
+- `npm run build` passed.
+- Disposable project-local `pi install /Users/crlough/Code/personal/pi-flight-recorder -l` succeeded.
+- Real Pi TUI launched in tmux with disposable `HOME`, agent/session/data dirs, offline/no-provider mode, no skills/templates/context/session/tools, and `PI_TUI_WRITE_LOG`.
+- Startup pane showed `[Extensions] pi-extension.js`.
+- `/flight` palette showed only `flight-status` and `flight-learn`.
+- `/flight-learn --data-dir <temp-data-dir>` showed `Problem` / `A validation command failed repeatedly in this project.` and `What happened?` / `Pi saw the same validation-failure pattern twice in recent sessions.` for the raw-command fixture.
+- `Why it matters` wrapped across readable lines instead of appearing as one long/truncated line.
+- Raw command/provenance appeared under `Raw clue`, `Why suggested`, and expanded `Evidence`, not as the primary headline.
+- Route selection opened `Why this follow-up?` and submitting stored an accepted `test-check` artifact candidate with `applied=false`, `ruleCandidates=0`, and `flightRules=0`.
+
+Evidence:
+
+- `evidence:20260527-flight-learn-diagnosis-real-pi-validation`
+  - build/install/startup/provenance artifacts;
+  - command palette capture;
+  - focused-card default/expanded/route/editor/submission/status captures;
+  - local DB inspection;
+  - raw TUI write log.
+
+Audit:
+
+- `audit:20260527-flight-learn-diagnosis-real-pi-validation-review` returned `clear` with no findings.
+
+Residual limits:
+
+- project-local install only, not global/user-scope install;
+- offline/no-provider slash-command validation only, not hosted/model-provider behavior;
+- one tmux/xterm-256color terminal route, not all terminal/theme/key-protocol variants;
+- artifact outcome follow-up custom UI remains out of scope;
+- operator preference after continued hands-on use remains to be learned.
 
 ## Journal
 
 - 2026-05-27: Created ticket as the third child of `plan:20260527-flight-learn-plain-english-diagnosis-cards`. It intentionally separates real Pi proof from render/test integration so UX claims stay honest.
+- 2026-05-27: Set status to `active`; started disposable installed-package real Pi validation.
+- 2026-05-27: Completed disposable project-local real Pi validation, captured panes/TUI log/DB/provenance artifacts, recorded `evidence:20260527-flight-learn-diagnosis-real-pi-validation`, and moved to `review` for audit.
+- 2026-05-27: Audit `audit:20260527-flight-learn-diagnosis-real-pi-validation-review` returned `clear` with no findings. Closed ticket with real-Pi scope limits preserved.

@@ -1,0 +1,1 @@
+$ rg "fetch\(|complete\(|modelProvider|http|https|createExpectationDelta|recordDelta|registerCommand|writeFile|appendFile" src/flight-learn-diagnosis.ts src/flight-learn-diagnosis.test.ts

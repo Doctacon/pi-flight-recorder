@@ -1,0 +1,10 @@
+$ npx vitest run src/flight-learn-diagnosis.test.ts
+
+ RUN  v4.1.7 /Users/crlough/Code/personal/pi-flight-recorder
+
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  21:02:10
+   Duration  110ms (transform 24ms, setup 0ms, import 31ms, tests 5ms, environment 0ms)
+

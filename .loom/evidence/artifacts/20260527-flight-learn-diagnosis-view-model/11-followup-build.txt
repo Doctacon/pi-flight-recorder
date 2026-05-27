@@ -1,0 +1,9 @@
+$ npm run build
+
+> pi-flight-recorder@0.1.0 build
+> npm run clean && tsc -p tsconfig.build.json
+
+
+> pi-flight-recorder@0.1.0 clean
+> rm -rf dist
+

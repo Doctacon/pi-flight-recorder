@@ -1,0 +1,7 @@
+$ git status --short src/flight-learn-diagnosis.ts src/flight-learn-diagnosis.test.ts
+?? src/flight-learn-diagnosis.test.ts
+?? src/flight-learn-diagnosis.ts
+
+$ shasum -a 256 src/flight-learn-diagnosis.ts src/flight-learn-diagnosis.test.ts
+1b0d7882bfd25a5309d74d7bd489a0cad2b306bfb8ea4484d70926a321b01a32  src/flight-learn-diagnosis.ts
+da3319f5db7a06c7f49028c78e69a1db6747f4893eb34dd653b83db44b13e947  src/flight-learn-diagnosis.test.ts

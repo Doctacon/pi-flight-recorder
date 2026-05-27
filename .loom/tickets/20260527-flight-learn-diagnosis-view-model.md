@@ -2,7 +2,7 @@
 
 ID: ticket:20260527-flight-learn-diagnosis-view-model
 Type: Ticket
-Status: open
+Status: closed
 Created: 2026-05-27
 Updated: 2026-05-27
 Risk: medium - this creates the semantic layer that decides what the operator sees as the plain-English diagnosis, but it should be pure/local and easy to test.
@@ -92,8 +92,43 @@ First likely Ralph run:
 
 ## Current State
 
-Open and ready to start. This ticket is the first child of `plan:20260527-flight-learn-plain-english-diagnosis-cards`. No implementation has begun under this ticket.
+Closed. The helper-only closure claim is satisfied: `src/flight-learn-diagnosis.ts` now exports a pure deterministic local display helper that turns `ExpectationDelta` + signals into plain-English diagnosis fields, and `src/flight-learn-diagnosis.test.ts` covers representative raw detector, validation/build, stale-edit, user-correction, useful human-authored field, and low-confidence fallback cases.
+
+Final implementation shape:
+
+- `buildFlightLearnDiagnosisView(...)` returns display-only `headline`, `whatHappened`, `whyItMatters`, `expectedBehavior`, `rawClue`, `confidence`, and `limits`.
+- Useful human-authored summary/reality/impact/expectation fields are respected independently when they are plain English.
+- Raw commands, local paths, cluster IDs, and detector details are excluded from primary fields when a deterministic phrase can be derived and retained as `rawClue` when useful.
+- No storage schema, command registration, package dependency, model/provider, network, or UI integration changes were made in this ticket.
+
+Evidence:
+
+- `evidence:20260527-flight-learn-diagnosis-view-model-validation`
+  - focused tests passed: 1 file / 5 tests;
+  - typecheck passed;
+  - build passed;
+  - full tests passed: 19 files / 96 tests;
+  - targeted diff check passed;
+  - targeted side-effect scan found no forbidden hooks.
+
+Audit:
+
+- `audit:20260527-flight-learn-diagnosis-view-model-review` first returned `changes-needed` with `FIND-001` against ACC-004.
+- Follow-up implementation resolved `FIND-001`.
+- `audit:20260527-flight-learn-diagnosis-view-model-followup-review` returned `clear` / ready-to-close for this helper-only scope.
+
+Residual risk:
+
+- The helper is not yet integrated into `/flight-learn`; that is owned by `ticket:20260527-flight-learn-diagnosis-card-integration`.
+- Real Pi TUI behavior is not proven here; that is owned by `ticket:20260527-flight-learn-diagnosis-real-pi-validation`.
+- Some auxiliary domains are source-covered but not individually tested; the follow-up audit did not consider this blocking for current acceptance.
 
 ## Journal
 
 - 2026-05-27: Created ticket from Loom Weaver shaping after operator asked how plain-English headlines should be generated. The chosen route is deterministic display-time generation, not stored-data mutation or model-assisted phrasing.
+- 2026-05-27: Set status to `active`; launching bounded Ralph implementation run for helper + tests only.
+- 2026-05-27: Ralph implementation returned with helper/test files changed. Coordinator reran focused tests, typecheck, build, full tests, diff check, and targeted side-effect scan; recorded `evidence:20260527-flight-learn-diagnosis-view-model-validation`.
+- 2026-05-27: Set status to `review`; launching bounded Ralph audit before closure.
+- 2026-05-27: Audit `audit:20260527-flight-learn-diagnosis-view-model-review` returned `changes-needed` with `FIND-001` against ACC-004. Set status back to `active` for a bounded fix run.
+- 2026-05-27: Follow-up implementation run resolved the summary-gated human-field behavior, added `expectedBehavior`, added a raw-summary/useful-fields test, and reran focused tests/typecheck/build/full tests/diff check/side-effect scan. Updated evidence dossier and set status back to `review` for follow-up audit.
+- 2026-05-27: Follow-up audit `audit:20260527-flight-learn-diagnosis-view-model-followup-review` returned `clear` / ready-to-close. Closed ticket with UI integration and real Pi validation explicitly deferred to dependent tickets.

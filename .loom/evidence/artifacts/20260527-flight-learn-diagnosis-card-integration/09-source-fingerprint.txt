@@ -1,0 +1,23 @@
+$ rg "layout: \"focused-card\"|Flight Learn — Issue|Problem|buildFlightLearnDiagnosisView" src/flight-learn-inbox.ts src/pi-extension.ts src/pi-extension.test.ts src/flight-learn-inbox.test.ts
+src/flight-learn-inbox.test.ts:      layout: "focused-card",
+src/flight-learn-inbox.test.ts:    expect(output).toContain("Flight Learn — Issue 1 of 2");
+src/flight-learn-inbox.test.ts:    expect(output).toContain("Problem");
+src/flight-learn-inbox.test.ts:      layout: "focused-card",
+src/flight-learn-inbox.test.ts:    const primaryBlock = sectionBetween(lines, "Problem", "Raw clue").join("\n");
+src/flight-learn-inbox.test.ts:      .filter((line) => line.trim() && !["Problem", "What happened?", "Why it matters", "Expected"].includes(line));
+src/flight-learn-inbox.test.ts:    expect(output).toContain("Problem");
+src/flight-learn-inbox.test.ts:      createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: () => undefined, layout: "focused-card" }),
+src/flight-learn-inbox.test.ts:    const component = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => results.push(result), layout: "focused-card" });
+src/flight-learn-inbox.test.ts:    const component = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => results.push(result), layout: "focused-card" });
+src/flight-learn-inbox.test.ts:    const component = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => results.push(result), layout: "focused-card" });
+src/flight-learn-inbox.test.ts:    const dismissComponent = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => dismissed.push(result), layout: "focused-card" });
+src/flight-learn-inbox.test.ts:    const skipComponent = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => skipped.push(result), layout: "focused-card" });
+src/flight-learn-inbox.test.ts:    const cancelComponent = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => cancelled.push(result), layout: "focused-card" });
+src/pi-extension.test.ts:    expect(rendered[0]?.join("\n")).toContain("Flight Learn — Issue 1 of 1");
+src/pi-extension.test.ts:    expect(rendered[0]?.join("\n")).toContain("Problem");
+src/flight-learn-inbox.ts:import { buildFlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
+src/flight-learn-inbox.ts:    const diagnosis = buildFlightLearnDiagnosisView({ delta: displayDelta, signals: item.signals });
+src/flight-learn-inbox.ts:      clip(`Flight Learn — Issue ${this.selectedItemIndex + 1} of ${this.items.length}`, width),
+src/flight-learn-inbox.ts:      "Problem",
+src/flight-learn-inbox.ts:    return ["Problem", "What happened?", "Why it matters", "Expected", "Raw clue", "Why suggested", "Evidence", "Choose a follow-up"].includes(line);
+src/flight-learn-inbox.ts:    const result = await ctx.ui.custom<Exclude<FlightLearnDeltaInboxResult, { kind: "unavailable" }>>((tui, theme, _keybindings, done) => createFlightLearnDeltaInboxComponent({ input, done, tui, theme, layout: "focused-card" }));

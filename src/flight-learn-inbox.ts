@@ -1,3 +1,4 @@
+import { buildFlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
 import { compactSnippet } from "./redact.js";
 import type { ArtifactCandidateType, DeltaDetectorSignal, DeltaEvidenceRef, ExpectationDelta } from "./types.js";
 
@@ -54,6 +55,7 @@ type FlightLearnInboxLayout = "split-pane" | "focused-card";
 
 const EDITABLE_FIELDS: EditableField[] = ["expectation", "reality", "impact"];
 const DEFAULT_DISMISS_REASON = "Dismissed through Flight Learn inbox";
+const FOCUSED_PRIMARY_PROSE_WIDTH = 84;
 
 function isArtifactRoute(value: ArtifactCandidateType | "dismiss" | "cancel"): value is ArtifactCandidateType {
   return value !== "dismiss" && value !== "cancel";
@@ -104,6 +106,11 @@ function wrapText(value: string, width: number): string[] {
 function wrapIndented(value: string, width: number, indent = "  "): string[] {
   const contentWidth = Math.max(1, width - indent.length);
   return wrapText(value, contentWidth).map((line) => clip(`${indent}${line}`, width));
+}
+
+function wrapFocusedProse(value: string, width: number, indent = "  "): string[] {
+  const readableWidth = Math.min(width, FOCUSED_PRIMARY_PROSE_WIDTH + indent.length);
+  return wrapIndented(value, readableWidth, indent).map((line) => clip(line, width));
 }
 
 function keyForRouteIndex(index: number): string {
@@ -416,21 +423,31 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
     const item = this.currentItem();
     const delta = item.delta;
     const fields = this.fieldsFor(delta.id);
+    const displayDelta: ExpectationDelta = {
+      ...delta,
+      expectation: fields.expectation.trim() || null,
+      reality: fields.reality.trim() || null,
+      impact: fields.impact.trim() || null,
+    };
+    const diagnosis = buildFlightLearnDiagnosisView({ delta: displayDelta, signals: item.signals });
+    const expectedText = diagnosis.expectedBehavior ?? "unknown — press e to add what should have happened";
+    const rawClueLines = diagnosis.rawClue ? ["", "Raw clue", ...wrapFocusedProse(diagnosis.rawClue, width)] : [];
     const lines: string[] = [
       clip(`Flight Learn — Issue ${this.selectedItemIndex + 1} of ${this.items.length}`, width),
       clip(`${this.items.length} pending · ${delta.evidenceRefs.length} evidence ref${delta.evidenceRefs.length === 1 ? "" : "s"} · ↑/↓ changes issue`, width),
       "",
-      "Issue",
-      ...wrapIndented(issueTitle(delta), width),
+      "Problem",
+      ...wrapFocusedProse(diagnosis.headline, width),
       "",
       "What happened?",
-      ...wrapIndented(normalizeText(fields.reality), width),
+      ...wrapFocusedProse(diagnosis.whatHappened, width),
       "",
       "Why it matters",
-      ...wrapIndented(normalizeText(fields.impact), width),
+      ...wrapFocusedProse(diagnosis.whyItMatters, width),
       "",
       "Expected",
-      ...wrapIndented(unknownExpectation(normalizeText(fields.expectation)) ? "unknown — press e to add what should have happened" : normalizeText(fields.expectation), width),
+      ...wrapFocusedProse(expectedText, width),
+      ...rawClueLines,
       "",
       "Why suggested",
       ...this.focusedSignalLines(item, width),
@@ -688,7 +705,7 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
   }
 
   private focusedSectionHeading(line: string): boolean {
-    return ["Issue", "What happened?", "Why it matters", "Expected", "Why suggested", "Evidence", "Choose a follow-up"].includes(line);
+    return ["Problem", "What happened?", "Why it matters", "Expected", "Raw clue", "Why suggested", "Evidence", "Choose a follow-up"].includes(line);
   }
 
   private accent(value: string): string {

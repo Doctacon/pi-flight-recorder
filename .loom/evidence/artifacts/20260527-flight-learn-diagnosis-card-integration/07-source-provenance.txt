@@ -1,0 +1,13 @@
+$ git status --short src/flight-learn-inbox.ts src/flight-learn-inbox.test.ts src/pi-extension.test.ts src/flight-learn-diagnosis.ts src/flight-learn-diagnosis.test.ts
+ M src/flight-learn-inbox.test.ts
+ M src/flight-learn-inbox.ts
+ M src/pi-extension.test.ts
+?? src/flight-learn-diagnosis.test.ts
+?? src/flight-learn-diagnosis.ts
+
+$ shasum -a 256 src/flight-learn-inbox.ts src/flight-learn-inbox.test.ts src/pi-extension.test.ts src/flight-learn-diagnosis.ts src/flight-learn-diagnosis.test.ts
+3b7c0e5347671d341f1fd22ba0463d5ad64bce2ef097a7bd3d58e3cb47128164  src/flight-learn-inbox.ts
+a54bbb06b74d1b15f22b0ad6baa6e53e73458d2ec8ea3d00a73be9ab2c91d79e  src/flight-learn-inbox.test.ts
+30caff62038ac85b693f2fb045bfa15f2adb8ac5ab4c51f548e214bab851852c  src/pi-extension.test.ts
+1b0d7882bfd25a5309d74d7bd489a0cad2b306bfb8ea4484d70926a321b01a32  src/flight-learn-diagnosis.ts
+da3319f5db7a06c7f49028c78e69a1db6747f4893eb34dd653b83db44b13e947  src/flight-learn-diagnosis.test.ts

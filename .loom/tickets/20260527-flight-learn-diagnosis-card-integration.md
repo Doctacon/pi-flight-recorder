@@ -2,7 +2,7 @@
 
 ID: ticket:20260527-flight-learn-diagnosis-card-integration
 Type: Ticket
-Status: open
+Status: closed
 Created: 2026-05-27
 Updated: 2026-05-27
 Risk: medium - this changes the primary `/flight-learn` UI while preserving route/editor/storage safety and command-surface constraints.
@@ -85,8 +85,41 @@ First likely Ralph run:
 
 ## Current State
 
-Open, blocked only by its hard dependency on `ticket:20260527-flight-learn-diagnosis-view-model`. Start this ticket after the diagnosis helper has tests/evidence.
+Closed. The focused-card integration closure claim is satisfied: production focused-card rendering now uses `buildFlightLearnDiagnosisView(...)` for the primary selected-delta diagnosis and preserves existing route/editor/storage safety.
+
+Final implementation shape:
+
+- `src/flight-learn-inbox.ts` imports and calls `buildFlightLearnDiagnosisView(...)` for focused-card display.
+- The primary focused-card section is now `Problem`, followed by diagnosis-based `What happened?`, `Why it matters`, and `Expected` text.
+- Raw command/provenance details are secondary under `Raw clue`, `Why suggested`, and expanded evidence.
+- Primary prose is wrapped through `wrapFocusedProse(...)` with a readable max measure while retaining Pi TUI width safety.
+- `src/pi-extension.ts` remains the production wrapper and still passes `layout: "focused-card"`; command registration and storage semantics were not changed.
+
+Evidence:
+
+- `evidence:20260527-flight-learn-diagnosis-card-integration-validation`
+  - focused tests passed: 2 files / 34 tests;
+  - typecheck passed;
+  - build passed;
+  - render artifact shows plain-English primary diagnosis and secondary raw clue;
+  - full tests passed: 19 files / 97 tests;
+  - diff check passed;
+  - source-only side-effect scan found no forbidden hooks.
+
+Audit:
+
+- `audit:20260527-flight-learn-diagnosis-card-integration-review` returned `clear` with no findings.
+
+Residual risk:
+
+- Real installed Pi TUI behavior is not proven by this ticket; it is owned by `ticket:20260527-flight-learn-diagnosis-real-pi-validation`.
+- Operator preference after hands-on use remains to be learned.
+- Width tests are representative, not exhaustive across all terminal/theme/unicode variants.
+- The implementation kept the existing custom renderer rather than adding direct Pi TUI component imports because package/dependency changes were outside ticket scope.
 
 ## Journal
 
 - 2026-05-27: Created ticket as the second child of `plan:20260527-flight-learn-plain-english-diagnosis-cards`. It is intentionally separated from the helper so display semantics and TUI integration can be reviewed independently.
+- 2026-05-27: Set status to `active` after dependency closure; launching bounded Ralph implementation run for focused-card integration.
+- 2026-05-27: Ralph implementation integrated the diagnosis helper into focused-card rendering, added/updated tests, generated render artifact output, and ran focused tests/typecheck/build/full tests/diff check. Recorded `evidence:20260527-flight-learn-diagnosis-card-integration-validation` and moved to `review` for audit.
+- 2026-05-27: Audit `audit:20260527-flight-learn-diagnosis-card-integration-review` returned `clear` with no findings. Closed ticket with real Pi validation explicitly deferred to the dependent validation ticket.

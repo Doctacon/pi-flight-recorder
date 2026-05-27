@@ -1,0 +1,1 @@
+$ git diff --check -- src/flight-learn-diagnosis.ts src/flight-learn-diagnosis.test.ts

@@ -1,0 +1,42 @@
+$ rg "registerCommand|PI_FLIGHT_RECORDER_LEGACY_COMMANDS|fetch\(|complete\(|modelProvider|http|https|createExpectationDelta|recordDelta|createArtifactCandidate|acceptArtifactCandidate|rerouteExpectationDelta|markExpectationDelta" src/flight-learn-inbox.ts src/flight-learn-inbox.test.ts src/pi-extension.test.ts src/flight-learn-diagnosis.ts
+src/pi-extension.test.ts:      registerCommand: (name, command) => commands.set(name, command),
+src/pi-extension.test.ts:      registerCommand: (name, command) => commands.set(name, command),
+src/pi-extension.test.ts:        registerCommand: (name, command) => commands.set(name, command),
+src/pi-extension.test.ts:        registerCommand: (name, command) => commands.set(name, command),
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:      registerCommand: (name, command) => commands.set(name, command),
+src/pi-extension.test.ts:      registerCommand: (name, command) => commands.set(name, command),
+src/pi-extension.test.ts:      registerCommand: (name, command) => commands.set(name, command),
+src/pi-extension.test.ts:      registerCommand: (name, command) => commands.set(name, command),
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:      const delta = store.createExpectationDelta({
+src/pi-extension.test.ts:      store.recordDeltaDetectorSignal({ deltaId, type: "user-correction", explanation: "User correction language matched a conservative phrase.", confidence: 0.68, evidenceRefs: delta.evidenceRefs });
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:      const delta = store.createExpectationDelta({
+src/pi-extension.test.ts:      store.recordDeltaDetectorSignal({ deltaId, type: "failed-validation", explanation: "Validation failed again after assistant edits.", confidence: 0.72, evidenceRefs: delta.evidenceRefs });
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:      deltaId = store.createExpectationDelta({ source: "manual", summary: "One delta route then cancel rationale", evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/repo", entryId: null, timestamp: null, snippet: "preserve after cancel", note: "manual" }] }).id;
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:      deltaId = store.createExpectationDelta({ source: "manual", summary: "One delta to dismiss", evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/repo", entryId: null, timestamp: null, snippet: "dismiss but preserve", note: "manual" }] }).id;
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:      deltaId = store.createExpectationDelta({
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:      const delta = store.createExpectationDelta({ source: "manual", summary: "Repeated stale route choice", evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/repo", entryId: null, timestamp: null, snippet: "stale route", note: "manual" }] });
+src/pi-extension.test.ts:      const candidate = store.createArtifactCandidate({
+src/pi-extension.test.ts:      candidateId = store.acceptArtifactCandidate(candidate.id)!.id;
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:      observeDeltaId = store.createExpectationDelta({ source: "manual", summary: "One route to observe", evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/repo", entryId: null, timestamp: null, snippet: "keep this evidence", note: "manual" }] }).id;
+src/pi-extension.test.ts:      dismissDeltaId = store.createExpectationDelta({ source: "manual", summary: "One route to dismiss", evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/repo", entryId: null, timestamp: null, snippet: "dismiss evidence", note: "manual" }] }).id;
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:      const delta = store.createExpectationDelta({ source: "manual", summary: "Assistant misses the validation check" });
+src/pi-extension.test.ts:      const candidate = store.acceptArtifactCandidate(store.createArtifactCandidate({
+src/pi-extension.test.ts:      laterDeltaId = laterStore.createExpectationDelta({ source: "manual", summary: "Assistant misses the validation check again" }).id;
+src/pi-extension.test.ts:      registerCommand: (name, command) => commands.set(name, command),
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });
+src/pi-extension.test.ts:    extension({ registerCommand: (name, command) => commands.set(name, command) });

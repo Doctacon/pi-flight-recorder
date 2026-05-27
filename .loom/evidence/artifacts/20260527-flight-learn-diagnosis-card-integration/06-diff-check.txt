@@ -1,0 +1,1 @@
+$ git diff --check -- src/flight-learn-inbox.ts src/flight-learn-inbox.test.ts src/pi-extension.test.ts .loom/evidence/artifacts/20260527-flight-learn-diagnosis-card-integration/render-focused-diagnosis-card.mjs

@@ -1,0 +1,1 @@
+/tmp/pfr-diagnosis-realpi-QQFY1b/workspace/.pi/settings.json
