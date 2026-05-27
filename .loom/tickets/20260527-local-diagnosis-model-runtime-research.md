@@ -19,6 +19,7 @@ Single closure claim: the project has a citable research record that compares vi
 - `plan:20260527-flight-learn-local-model-diagnosis-polish` - parent plan.
 - `constitution:main` - local-first/open-source principle.
 - `spec:flight-learn-inbox-ux` - REQ-024 through REQ-029 and SCN-008/SCN-009.
+- `research:20260527-local-diagnosis-model-runtime` - active research record seeded with preliminary Bonsai findings; this ticket owns completing it.
 - `src/reflection.ts` - existing bounded model-assisted reflection precedent, not necessarily the target runtime.
 - `package.json` - dependency/package footprint constraints.
 
@@ -65,9 +66,10 @@ Stop conditions:
 
 ## Current State
 
-Open and ready to start. This is the first child of `plan:20260527-flight-learn-local-model-diagnosis-polish`.
+Open and ready to start. This is the first child of `plan:20260527-flight-learn-local-model-diagnosis-polish`. `research:20260527-local-diagnosis-model-runtime` exists in active state with preliminary Bonsai findings, but the ticket is not complete until that research is completed with a concrete adapter recommendation or an explicit blocker.
 
 ## Journal
 
 - 2026-05-27: Created ticket from the local-model diagnosis polish plan. The first move is research, not implementation.
 - 2026-05-27: Operator expressed interest in PrismML Bonsai 1-bit because of its low memory usage. Research should evaluate Bonsai first rather than treating it as a generic local-model option.
+- 2026-05-27: Seeded `research:20260527-local-diagnosis-model-runtime` with preliminary source findings: Bonsai GGUF/`llama.cpp` looks like the best first candidate, Bonsai 1.7B should be tried first for memory, and 4B/8B remain quality fallbacks pending real JSON/prompt validation.
