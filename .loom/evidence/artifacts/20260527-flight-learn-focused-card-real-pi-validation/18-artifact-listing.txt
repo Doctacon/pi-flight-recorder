@@ -1,0 +1,27 @@
+total 344
+-rw-r--r--@ 1 crlough  staff    130 May 26 20:12 01-build.txt
+-rw-r--r--@ 1 crlough  staff    120 May 26 20:12 02-pi-install-output.txt
+-rw-r--r--@ 1 crlough  staff    484 May 26 20:12 03-seed-output.json
+-rw-r--r--@ 1 crlough  staff     91 May 26 20:12 04-project-settings.json
+-rw-r--r--@ 1 crlough  staff     80 May 26 20:12 04-temp-home-files.txt
+-rw-r--r--@ 1 crlough  staff     64 May 26 20:12 04-workspace-files.txt
+-rw-r--r--@ 1 crlough  staff   2277 May 26 20:12 05-startup-pane.txt
+-rw-r--r--@ 1 crlough  staff   2505 May 26 20:12 06-command-palette-flight-pane.txt
+-rw-r--r--@ 1 crlough  staff   2277 May 26 20:12 07-after-clear-pane.txt
+-rw-r--r--@ 1 crlough  staff   2165 May 26 20:13 08-flight-learn-focused-card-default-pane.txt
+-rw-r--r--@ 1 crlough  staff   2165 May 26 20:13 09-route-testcheck-selected-pane.txt
+-rw-r--r--@ 1 crlough  staff   2422 May 26 20:13 10-expanded-evidence-pane.txt
+-rw-r--r--@ 1 crlough  staff   3805 May 26 20:13 11-why-followup-editor-pane.txt
+-rw-r--r--@ 1 crlough  staff   3852 May 26 20:13 12-why-followup-editor-edited-pane.txt
+-rw-r--r--@ 1 crlough  staff   2630 May 26 20:13 13-after-route-submit-pane.txt
+-rw-r--r--@ 1 crlough  staff   3169 May 26 20:13 14-status-after-route-pane.txt
+-rw-r--r--@ 1 crlough  staff     79 May 26 20:14 16-tui-log-dir-listing.txt
+-rw-r--r--@ 1 crlough  staff   1594 May 26 20:14 17-db-after-route.json
+-rw-r--r--@ 1 crlough  wheel   1896 May 26 20:14 18-artifact-listing.txt
+-rw-r--r--@ 1 crlough  staff   2966 May 26 20:22 19-build-provenance.txt
+-rw-r--r--@ 1 crlough  staff   1218 May 26 20:14 inspect-db-after-route.mjs
+-rw-r--r--@ 1 crlough  staff    933 May 26 20:15 run-env.txt
+-rw-r--r--@ 1 crlough  staff    411 May 26 20:12 run-vars.env
+-rw-r--r--@ 1 crlough  staff   3715 May 26 20:12 seed-focused-card-fixture.mjs
+-rw-r--r--@ 1 crlough  staff     34 May 26 20:12 tmux-session.txt
+-rw-r--r--@ 1 crlough  staff  73308 May 26 20:14 tui-2026-05-26_20-12-47-33034.log

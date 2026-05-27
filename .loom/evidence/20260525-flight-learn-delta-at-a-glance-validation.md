@@ -31,10 +31,10 @@ This dossier records validation for `ticket:20260525-flight-learn-delta-at-a-gla
 
 - Observation: render artifact shows the improved at-a-glance layout.
   - Procedure/source: `.loom/evidence/artifacts/20260525-flight-learn-delta-at-a-glance/render-at-a-glance.mjs` imported built `dist/flight-learn-inbox.js` and rendered a fixture similar to the operator screenshot at width 104.
-  - Actual result: `.loom/evidence/artifacts/20260525-flight-learn-delta-at-a-glance/render-output.txt` shows stripped item labels, issue/what happened/why it matters/expected lines, selected follow-up explanation, and compact route guide.
+  - Actual result: `.loom/evidence/artifacts/20260525-flight-learn-delta-at-a-glance/render-output.txt` shows stripped item labels, renamed `Pending deltas` / `Selected delta` panes, separated `At a glance`, `Why suggested`, and `Evidence preview` sections, a prominent active follow-up line, and compact route guide.
 
 - Observation: targeted diff whitespace check produced no findings.
-  - Procedure/source: `git diff --check -- src/flight-learn-inbox.ts src/flight-learn-inbox.test.ts .loom/specs/flight-learn-inbox-ux.md .loom/tickets/20260525-flight-learn-delta-at-a-glance.md`.
+  - Procedure/source: `git diff --check -- src/flight-learn-inbox.ts src/flight-learn-inbox.test.ts src/pi-extension.test.ts .loom/specs/flight-learn-inbox-ux.md .loom/tickets/20260525-flight-learn-delta-at-a-glance.md .loom/evidence/20260525-flight-learn-delta-at-a-glance-validation.md`.
   - Actual result: command exited successfully with empty output. Output file `.loom/evidence/artifacts/20260525-flight-learn-delta-at-a-glance/diff-check.txt` is empty.
 
 ## Artifacts
@@ -50,24 +50,28 @@ This dossier records validation for `ticket:20260525-flight-learn-delta-at-a-gla
 Key render excerpt:
 
 ```text
-Flight Learn - 3 pending deltas - Review 3/3
-+ Items -------------------------+ + Delta ------------------------------------------------------------+
-| stale edit block · 2 refs ... | | Issue: exact-text edit mismatches |
-| validation retry loop · 2 ... | | What happened: Observed 2 related failure occurrences in refle... |
-| > exact-text edit mismatche... | | Why it matters: Repeated local friction across tools/cwds: edit. |
-+--------------------------------+ | Expected: unknown — press e to add what should have happened |
- | Signal: reflection-cluster 0.55; evidence refs: 2 |
+Flight Learn - 3 pending deltas - selected 3/3
++ Pending deltas ----------------+ + Selected delta ---------------------------------------------------+
+| 1/3 stale edit block · 2 refs | | Showing item 3 of 3 |
+| 2/3 validation retry loop ... | | At a glance |
+| > 3/3 exact-text edit misma... | | - Issue: exact-text edit mismatches |
++--------------------------------+ | - What happened: Observed 2 related failure occurrences in ref... |
+ | - Why it matters: Repeated local friction across tools/cwds: e... |
+ | - Expected: unknown — press e to add what should have happened |
+ | - Signal: reflection-cluster 0.55; evidence refs: 2 |
+ | |
+ | Why suggested |
 ...
-Route cards: 1 Code legibility 2 Test/check [3 Loom ticket] 4 Flight Rule 5 Observe
-Selected follow-up: Loom ticket — Route to bounded implementation or cleanup work
-Guide: Rule=behavior reminder | Code=confusing source | Test=missing check | Ticket=larger follow-up ...
+Active follow-up: [3] Loom ticket — Route to bounded implementation or cleanup work
+Follow-up choices: 1 Code legibility 2 Test/check ▶ 3 Loom ticket ◀ 4 Flight Rule 5 Observe
+How to choose: Rule=behavior reminder | Code=confusing source | Test=missing check | Ticket=larger wo...
 ```
 
 ## What This Shows
 
 - `ticket:20260525-flight-learn-delta-at-a-glance#ACC-001` - supports - render tests/artifact show issue, what happened, why it matters, expected behavior, signal, and evidence count.
 - `ticket:20260525-flight-learn-delta-at-a-glance#ACC-002` - supports - render tests/artifact show generic `Repeated failure pattern:` prefixes stripped from list/detail labels.
-- `ticket:20260525-flight-learn-delta-at-a-glance#ACC-003` - supports - render tests/artifact show selected follow-up explanation and route guide.
+- `ticket:20260525-flight-learn-delta-at-a-glance#ACC-003` - supports - render tests/artifact show a prominent active follow-up line, visibly marked selected route card, and route guide.
 - `ticket:20260525-flight-learn-delta-at-a-glance#ACC-004` - supports - focused tests, full tests, typecheck, build, and diff check passed; changes are presentation-only.
 
 ## What This Does Not Show

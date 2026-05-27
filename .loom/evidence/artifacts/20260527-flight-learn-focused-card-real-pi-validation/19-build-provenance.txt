@@ -1,0 +1,67 @@
+# Build provenance gathered after real Pi run
+observed_at=2026-05-27T03:22:20Z
+repo=/Users/crlough/Code/personal/pi-flight-recorder
+
+## git
+1fb7624b5b0273b2ff0c9f7ad8cb23bdcbd7c342
+
+ M .loom/evidence/20260525-flight-learn-delta-at-a-glance-validation.md
+ M .loom/evidence/artifacts/20260525-flight-learn-delta-at-a-glance/focused-tests.txt
+ M .loom/evidence/artifacts/20260525-flight-learn-delta-at-a-glance/full-tests.txt
+ M .loom/evidence/artifacts/20260525-flight-learn-delta-at-a-glance/render-output.txt
+ M .loom/specs/flight-learn-inbox-ux.md
+ M .loom/tickets/20260525-flight-learn-delta-at-a-glance.md
+ M src/flight-learn-inbox.test.ts
+ M src/flight-learn-inbox.ts
+ M src/pi-extension.test.ts
+?? .loom/audit/20260527-flight-learn-focused-card-integration-review.md
+?? .loom/audit/20260527-flight-learn-focused-card-render-harness-review.md
+?? .loom/evidence/20260527-flight-learn-focused-card-integration-validation.md
+?? .loom/evidence/20260527-flight-learn-focused-card-real-pi-validation.md
+?? .loom/evidence/20260527-flight-learn-focused-card-render-harness-validation.md
+?? .loom/evidence/20260527-flight-learn-split-pane-ux-feedback.md
+?? .loom/evidence/artifacts/20260527-flight-learn-focused-card-integration/
+?? .loom/evidence/artifacts/20260527-flight-learn-focused-card-real-pi-validation/
+?? .loom/evidence/artifacts/20260527-flight-learn-focused-card-render-harness/
+?? .loom/evidence/artifacts/20260527-flight-learn-split-pane-ux-feedback/
+?? .loom/plans/20260527-flight-learn-focused-card-redesign.md
+?? .loom/tickets/20260527-flight-learn-focused-card-integration.md
+?? .loom/tickets/20260527-flight-learn-focused-card-real-pi-validation.md
+?? .loom/tickets/20260527-flight-learn-focused-card-render-harness.md
+
+## package extension declaration
+{
+  "name": "pi-flight-recorder",
+  "version": "0.1.0",
+  "pi": {
+    "extensions": [
+      "./dist/pi-extension.js"
+    ]
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./pi-extension": "./dist/pi-extension.js"
+  }
+}
+
+## dist/pi-extension.js stat
+path=dist/pi-extension.js size=83654 mtime=2026-05-26T20:12:08-0700
+
+## dist/pi-extension.js sha256
+6bc3f10e7a7580e808f5018d96ee827e78448cbf5502b0a1e113711c8cb3bfc9  dist/pi-extension.js
+
+## dist focused-card fingerprint
+352:        if (this.layout === "focused-card")
+388:            clip(`Flight Learn — Issue ${this.selectedItemIndex + 1} of ${this.items.length}`, width),
+409:            "Choose a follow-up",
+675:        return ["Issue", "What happened?", "Why it matters", "Expected", "Why suggested", "Evidence", "Choose a follow-up"].includes(line);
+697:        const result = await ctx.ui.custom((tui, theme, _keybindings, done) => createFlightLearnDeltaInboxComponent({ input, done, tui, theme, layout: "focused-card" }));
+
+## project local package setting
+{
+  "packages": [
+    "../../../../../Users/crlough/Code/personal/pi-flight-recorder"
+  ]
+}
+## resolved installed package path
+/Users/crlough/Code/personal/pi-flight-recorder

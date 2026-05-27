@@ -94,43 +94,86 @@ describe("Flight Learn custom inbox component", () => {
 
     const output = component.render(104).map(stripAnsi).join("\n");
 
-    expect(output).toContain("Flight Learn - 2 pending deltas - Review 1/2");
-    expect(output).toContain("Items");
-    expect(output).toContain("Delta");
+    expect(output).toContain("Flight Learn - 2 pending deltas - selected 1/2");
+    expect(output).toContain("Pending deltas");
+    expect(output).toContain("Selected delta");
     expect(output).toContain("Issue:");
     expect(output).toContain("exact-text edit mismatches");
     expect(output).not.toContain("> Repeated failure pattern:");
     expect(output).toContain("What happened:");
     expect(output).toContain("Why it matters:");
     expect(output).toContain("Expected:");
-    expect(output).toContain("Signals:");
-    expect(output).toContain("Evidence:");
-    expect(output).toContain("Route cards:");
+    expect(output).toContain("Signal:");
+    expect(output).toContain("Evidence preview");
+    expect(output).toContain("Why suggested");
+    expect(output).toContain("Follow-up choices:");
     expect(output).toContain("Code legibility");
     expect(output).toContain("Test/check");
     expect(output).toContain("Flight Rule");
     expect(output).toContain("Prompt/context");
     expect(output).toContain("Skill/template");
     expect(output).toContain("Observe");
-    expect(output).toContain("Selected follow-up:");
-    expect(output).toContain("Guide: Rule=behavior reminder");
+    expect(output).toContain("Active follow-up:");
+    expect(output).toContain("How to choose: Rule=behavior reminder");
     expect(output).toContain("Keys: up/down item");
     expect(results).toEqual([]);
   });
 
-  it("keeps rendered visible lines within narrow and wide terminal widths", () => {
-    const component = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: () => undefined });
+  it("renders a focused-card preview layout without the split-pane table", () => {
+    const results: FlightLearnDeltaInboxResult[] = [];
+    const component = createFlightLearnDeltaInboxComponent({
+      input: fixtureInput(),
+      done: (result) => results.push(result),
+      layout: "focused-card",
+      theme: { fg: (_color, value) => `\u001b[36m${value}\u001b[0m`, bold: (value) => `\u001b[1m${value}\u001b[22m` },
+    });
 
-    for (const width of [48, 72, 104]) {
-      const lines = component.render(width);
-      expect(lines.length).toBeGreaterThan(0);
-      for (const line of lines) expect(stripAnsi(line).length).toBeLessThanOrEqual(width);
+    component.handleInput?.("2");
+    const output = component.render(88).map(stripAnsi).join("\n");
+
+    expect(output).toContain("Flight Learn — Issue 1 of 2");
+    expect(output).toContain("2 pending · 3 evidence refs");
+    expect(output).toContain("Issue");
+    expect(output).toContain("exact-text edit mismatches");
+    expect(output).toContain("What happened?");
+    expect(output).toContain("Why it matters");
+    expect(output).toContain("Expected");
+    expect(output).toContain("Why suggested");
+    expect(output).toContain("Evidence");
+    expect(output).toContain("3 refs hidden by default — press v to view concise refs.");
+    expect(output).toContain("Choose a follow-up");
+    expect(output).toContain("▶ [2] Test/check");
+    expect(output).toContain("Route to a missing or weak validation check");
+    expect(output).not.toContain("Pending deltas");
+    expect(output).not.toContain("Selected delta");
+    expect(output).not.toContain("Follow-up choices:");
+    expect(output).not.toContain("session.jsonl");
+    expect(results).toEqual([]);
+
+    component.handleInput?.("v");
+    const expanded = component.render(88).map(stripAnsi).join("\n");
+    expect(expanded).toContain("session-entry/entry-1");
+    expect(expanded).toContain("No, actually the mapper owns this behavior");
+  });
+
+  it("keeps rendered visible lines within narrow and wide terminal widths", () => {
+    const components = [
+      createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: () => undefined }),
+      createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: () => undefined, layout: "focused-card" }),
+    ];
+
+    for (const component of components) {
+      for (const width of [48, 72, 104]) {
+        const lines = component.render(width);
+        expect(lines.length).toBeGreaterThan(0);
+        for (const line of lines) expect(stripAnsi(line).length).toBeLessThanOrEqual(width);
+      }
     }
   });
 
   it("returns edited-field and route decisions without mutating evidence text", () => {
     const results: FlightLearnDeltaInboxResult[] = [];
-    const component = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => results.push(result) });
+    const component = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => results.push(result), layout: "focused-card" });
 
     component.handleInput?.("e");
     component.handleInput?.("\u0015");
@@ -154,7 +197,7 @@ describe("Flight Learn custom inbox component", () => {
 
   it("discards edited fields when escape cancels the edit screen", () => {
     const results: FlightLearnDeltaInboxResult[] = [];
-    const component = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => results.push(result) });
+    const component = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => results.push(result), layout: "focused-card" });
 
     component.handleInput?.("e");
     component.handleInput?.("\u0015");
@@ -175,7 +218,7 @@ describe("Flight Learn custom inbox component", () => {
 
   it("accepts Kitty CSI-u shortcut and printable input before route selection", () => {
     const results: FlightLearnDeltaInboxResult[] = [];
-    const component = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => results.push(result) });
+    const component = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => results.push(result), layout: "focused-card" });
 
     component.handleInput?.(kittyKey("e".codePointAt(0)!));
     component.handleInput?.(kittyKey("u".codePointAt(0)!, 5));
@@ -196,13 +239,18 @@ describe("Flight Learn custom inbox component", () => {
 
   it("supports dismiss and skip results as safe no-apply actions", () => {
     const dismissed: FlightLearnDeltaInboxResult[] = [];
-    const dismissComponent = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => dismissed.push(result) });
+    const dismissComponent = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => dismissed.push(result), layout: "focused-card" });
     dismissComponent.handleInput?.("d");
     expect(dismissed).toEqual([{ kind: "dismissed", deltaId: "delta-one", reason: "Dismissed through Flight Learn inbox" }]);
 
     const skipped: FlightLearnDeltaInboxResult[] = [];
-    const skipComponent = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => skipped.push(result) });
+    const skipComponent = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => skipped.push(result), layout: "focused-card" });
     skipComponent.handleInput?.("s");
     expect(skipped).toEqual([{ kind: "skipped", deltaId: "delta-one" }]);
+
+    const cancelled: FlightLearnDeltaInboxResult[] = [];
+    const cancelComponent = createFlightLearnDeltaInboxComponent({ input: fixtureInput(), done: (result) => cancelled.push(result), layout: "focused-card" });
+    cancelComponent.handleInput?.("q");
+    expect(cancelled).toEqual([{ kind: "cancelled" }]);
   });
 });

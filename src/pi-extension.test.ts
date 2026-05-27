@@ -591,8 +591,10 @@ describe("Pi extension wrapper", () => {
       check.close();
     }
     expect(customCalls).toBe(1);
-    expect(rendered[0]?.join("\n")).toContain("Flight Learn - 1 pending delta - Review 1/1");
-    expect(rendered[0]?.join("\n")).toContain("Route cards:");
+    expect(rendered[0]?.join("\n")).toContain("Flight Learn — Issue 1 of 1");
+    expect(rendered[0]?.join("\n")).toContain("Choose a follow-up");
+    expect(rendered[0]?.join("\n")).toContain("▶ [1] Code legibility");
+    expect(rendered[0]?.join("\n")).not.toContain("Pending deltas");
     expect(notifications.join("\n")).toContain("Flight Learn: reviewing the next pending delta");
     expect(notifications.join("\n")).toContain("No artifact was created or applied");
   });

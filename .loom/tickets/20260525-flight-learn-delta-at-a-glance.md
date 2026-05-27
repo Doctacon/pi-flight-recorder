@@ -18,7 +18,7 @@ In scope:
 
 - Make item-list labels distinguishable by stripping generic prefixes like `Repeated failure pattern:` and showing concise evidence count/status.
 - Add at-a-glance detail lines for selected delta: issue, what happened, why it matters, and expected behavior/unknown expectation.
-- Add selected follow-up explanation and a compact route guide so route cards are easier to choose.
+- Add selected follow-up explanation, a more visible active route marker, and a compact route guide so route cards are easier to choose.
 - Keep existing route selection, editor handoff, storage semantics, and command surface unchanged.
 - Add/update focused render tests.
 
@@ -33,7 +33,7 @@ Out of scope:
 
 - ACC-001: The selected delta detail pane includes plain-language at-a-glance fields for issue, what happened, why it matters, and expected behavior.
 - ACC-002: The pending item list is distinguishable when multiple deltas share a generic `Repeated failure pattern:` prefix.
-- ACC-003: The route area explains the selected follow-up and provides compact guidance for common route decisions.
+- ACC-003: The route area clearly marks the active follow-up, explains it, and provides compact guidance for common route decisions.
 - ACC-004: Focused tests and typecheck pass; storage semantics are unchanged.
 
 ## Current State
@@ -43,9 +43,11 @@ Closed. The custom `/flight-learn` inbox now renders selected deltas with an at-
 Implemented behavior:
 
 - item labels strip generic prefixes like `Repeated failure pattern:` and include evidence count/status;
+- selected delta detail is separated into `At a glance`, `Why suggested`, and `Evidence preview` sections;
 - selected delta detail starts with plain-language `Issue`, `What happened`, `Why it matters`, `Expected`, and signal/evidence count lines;
-- route area includes `Selected follow-up: <label> — <description>`;
-- route area includes a compact guide: `Rule=behavior reminder | Code=confusing source | Test=missing check | Ticket=larger follow-up | Observe=unsure`;
+- route area includes a prominent `Active follow-up: [key] <label> — <description>` line;
+- selected route card is marked with `▶ ... ◀`;
+- route area includes a compact guide: `Rule=behavior reminder | Code=confusing source | Test=missing check | Ticket=larger work | Observe=not sure`;
 - route selection, editor handoff, storage, command surface, and no-auto-apply behavior are unchanged.
 
 Evidence:
@@ -65,4 +67,5 @@ Audit:
 
 - 2026-05-25: Created after operator screenshot showed the inbox was technically functional but hard to understand or route because the delta summary/evidence were too generic and clipped.
 - 2026-05-25: Implemented item-label cleanup, at-a-glance selected delta fields, selected follow-up explanation, and compact route guide.
+- 2026-05-25: After another operator screenshot showed the pane still felt like one large block and the active route was hard to see, revised the layout to rename panes to `Pending deltas` / `Selected delta`, add `At a glance` / `Why suggested` / `Evidence preview` section breaks, shorten evidence preview paths, and mark the active route with both a prominent active line and `▶ ... ◀` card markers.
 - 2026-05-25: Validation passed and evidence recorded in `evidence:20260525-flight-learn-delta-at-a-glance-validation`; closed as presentation-only with no live-Pi screenshot limitation preserved.

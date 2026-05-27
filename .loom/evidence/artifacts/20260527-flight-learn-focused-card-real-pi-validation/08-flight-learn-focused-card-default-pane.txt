@@ -1,0 +1,62 @@
+
+ pi v0.75.5
+ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+[Extensions]
+  pi-extension.js
+
+
+ Warning: No models available. Use /login to log into a provider via OAuth or API key. See:
+   /Users/crlough/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/docs/providers.md
+   /Users/crlough/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/docs/models.md
+
+ Flight Learn: reviewing the next pending delta.
+
+Flight Learn — Issue 1 of 2
+2 pending · 3 evidence refs · ↑/↓ changes issue
+
+Issue
+ bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm run build from stale panes
+
+What happened?
+ Observed 2 related failure occurrences where validation commands ran from a stale shell context after package reinstall.
+
+Why it matters
+ Repeated local friction across tools and cwd setup makes release validation slower and harder to trust.
+
+Expected
+ unknown — press e to add what should have happened
+
+Why suggested
+ reflection-cluster (0.55): Reflection cluster grouped cwd/setup validation failures from multiple sessions.
+
+Evidence
+ 3 refs hidden by default — press v to view concise refs.
+
+Choose a follow-up
+▶ [1] Code legibility
+ Create a refactor/readability route when code shape causes repeated confusion
+ [2] Test/check
+ Route to a missing or weak validation check
+ [3] Loom ticket
+ Route to bounded implementation or cleanup work
+ [4] Flight Rule
+ Route to reusable assistant guidance, still requiring rule approval later
+ [5] Loom spec
+ Route to intended-behavior clarification
+ ↓ 5 more follow-ups
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose · e edit · v evidence · d dismiss · s skip · q quit
+/private/tmp/pfr-focused-card-realpi-tbtn7L/workspace
+0.0%/0 (auto)                                                                                                                                                                                                                 unknown
+
+
+
+
+
+
+
+

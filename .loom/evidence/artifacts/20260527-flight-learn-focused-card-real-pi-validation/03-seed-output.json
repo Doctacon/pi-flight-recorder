@@ -1,0 +1,14 @@
+{
+  "dataDir": "/tmp/pfr-focused-card-realpi-tbtn7L/home/.pi/flight-recorder",
+  "databasePath": "/tmp/pfr-focused-card-realpi-tbtn7L/home/.pi/flight-recorder/flight-recorder.db",
+  "deltaIds": [
+    "delta_realpi_focus_card",
+    "delta_realpi_secondary"
+  ],
+  "counts": {
+    "deltas": 2,
+    "signals": 2
+  }
+}
+(node:29762) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)

@@ -4,7 +4,7 @@ ID: spec:flight-learn-inbox-ux
 Type: Spec
 Status: active
 Created: 2026-05-25
-Updated: 2026-05-25
+Updated: 2026-05-27
 
 ## Summary
 
@@ -47,7 +47,9 @@ The current `/flight-learn` flow is functionally correct but visually poor:
 - the operator must mentally connect separate screens into one workflow;
 - the UI does not communicate progress, priority, recommendations, or safe actions clearly.
 
-Pi supports richer extension UI primitives: `ctx.ui.custom()`, custom components, overlays, `SelectList`, `SettingsList`, `Markdown`, theme-aware styling, widgets, status indicators, keybindings, autocomplete providers, and custom message/tool renderers. The Flight Learn workflow should use those capabilities for the review path rather than relying on primitive dialogs for the primary experience.
+Later operator screenshots showed that a hand-rolled split-pane ASCII layout is still the wrong shape even after at-a-glance copy improvements: the visual seam between item list and selected-detail sections is confusing, signals/evidence blend into the primary diagnosis, and horizontal route cards make the active follow-up hard to find.
+
+Pi supports richer extension UI primitives: `ctx.ui.custom()`, custom components, overlays, `SelectList`, `SettingsList`, `Markdown`, theme-aware styling, widgets, status indicators, keybindings, autocomplete providers, and custom message/tool renderers. The Flight Learn workflow should use those capabilities for the review path rather than relying on primitive dialogs or hand-rolled ASCII table layouts for the primary experience.
 
 ## Desired Behavior
 
@@ -91,6 +93,15 @@ The UI should preserve all existing safety boundaries: candidate generation can 
 - REQ-012: Artifact candidate follow-up SHOULD use the same inbox design language as delta review, even if implemented in a later slice.
 - REQ-013: The inbox MUST not introduce default model/provider calls, hosted services, classifier automation, or automatic source/docs/Loom/rule/skill/prompt mutation.
 - REQ-014: The selected delta view SHOULD include a plain-language at-a-glance summary of the issue, what happened, why it matters, expected behavior if known, and the currently selected follow-up route guidance so the operator can route without decoding internal record fields.
+- REQ-015: The primary delta-review screen SHOULD use a focused selected-item card or step flow rather than a side-by-side split-pane table by default. The pending list may be condensed into progress, a short queue preview, or a secondary drawer, but the selected delta must read as the main object on screen.
+- REQ-016: Follow-up route selection MUST use prominent selectable rows/cards with a strong active state and per-option purpose text. The active follow-up must not rely only on subtle brackets, horizontal chip order, or a repeated summary line.
+- REQ-017: Detector signals, evidence refs, record IDs, and provenance details MUST be visually secondary to the at-a-glance diagnosis and follow-up choice. They should appear behind progressive disclosure or under clearly separated sections, not as peers in one continuous text block.
+- REQ-018: Implementations SHOULD prefer Pi TUI building blocks such as `Container`, `Text`, `SelectList`, `Box`, `DynamicBorder`, and overlay/dialog patterns before adding more custom ASCII layout primitives. If custom rendering remains necessary, the ticket should explain why Pi primitives were insufficient.
+- REQ-019: The primary selected-delta headline MUST be a plain-English diagnosis generated from local stored delta fields, detector signals, and evidence snippets; it MUST NOT use a raw shell command, file path, cluster ID, detector ID, or unprocessed storage summary as the primary headline when a clearer deterministic phrase can be derived.
+- REQ-020: Plain-English diagnosis generation MUST be local and deterministic by default. It MUST NOT introduce hosted model/provider calls, classifier automation, or network access. Optional model-assisted phrasing may only be introduced behind an explicit future opt-in path and must not be required for the default inbox.
+- REQ-021: The inbox MUST keep display diagnosis separate from stored delta truth. Derived plain-English text may improve the UI, but it must not silently rewrite `ExpectationDelta.summary`, `expectation`, `reality`, `impact`, evidence refs, artifact drafts, source files, Loom records, rules, skills, or prompts unless the operator explicitly edits or approves a separate mutation workflow.
+- REQ-022: Raw commands, paths, detector labels, cluster IDs, and evidence provenance MUST be visually secondary to the primary diagnosis. They may appear as `Raw clue`, `Why suggested`, or expanded evidence, but they must not be the first thing the operator has to decode.
+- REQ-023: Primary diagnosis prose SHOULD wrap to a human reading measure even on wide terminals. Rendered lines still MUST obey Pi TUI width limits, but primary explanatory text should avoid full-width single-line stretching/truncation when a narrower prose column would be easier to scan.
 
 ## Scenarios
 
@@ -139,6 +150,29 @@ GIVEN a deterministic fixture with multiple deltas and long evidence snippets
 WHEN the inbox component renders at representative terminal widths
 THEN the output remains width-safe, visually scannable, theme-aware, and includes key hints.
 
+### SCN-006: Focused card review avoids split-pane confusion
+
+Exercises: REQ-014, REQ-015, REQ-016, REQ-017, REQ-018
+
+GIVEN several pending deltas exist and one delta is selected
+WHEN the operator opens `/flight-learn`
+THEN the selected delta reads as one focused review card or step
+AND the pending queue is visibly secondary to that selected item
+AND signals/evidence/provenance are separated from the primary diagnosis
+AND the active follow-up route is obvious without scanning a horizontal sentence.
+
+### SCN-007: Raw detector text becomes a plain-English diagnosis
+
+Exercises: REQ-019, REQ-020, REQ-021, REQ-022, REQ-023
+
+GIVEN a pending detector-created delta whose stored summary is a raw command such as `bash cd ... && npm test` and whose reality names an internal reflection cluster ID
+WHEN the operator opens `/flight-learn`
+THEN the primary headline describes the problem in plain English, such as `A validation command failed repeatedly in this project`
+AND `What happened?` explains the observed recurrence without requiring the operator to decode a cluster ID
+AND raw command/path/cluster details are secondary or hidden behind evidence/provenance affordances
+AND the explanatory prose wraps to a readable measure within the component width
+AND no stored delta fields are changed merely because the UI derived friendlier text.
+
 ## Evidence Plan
 
 - REQ-001 through REQ-007 / SCN-001 through SCN-003: fake-Pi command/component tests prove `/flight-learn` opens the custom inbox for pending deltas, selection/edit/route/dismiss/skip flows store the same safe records as the old flow, and no durable artifact mutation occurs.
@@ -146,6 +180,8 @@ THEN the output remains width-safe, visually scannable, theme-aware, and include
 - REQ-011 / SCN-004: fake no-UI tests prove fallback behavior still works and names default-available commands.
 - REQ-012: either include artifact follow-up in the same ticket evidence or record a follow-up ticket; do not claim it complete if only delta routing was implemented.
 - REQ-013: regression tests and source review prove no default model/provider/classifier or auto-apply path was introduced.
+- REQ-015 through REQ-018 / SCN-006: render artifacts and tests should compare the focused-card layout against a representative multi-delta fixture and show that pending queue, primary diagnosis, secondary evidence/signals, and active route selection have separate visual hierarchy.
+- REQ-019 through REQ-023 / SCN-007: deterministic view-model tests should cover detector-created deltas with raw commands, cluster IDs, user corrections, stale edit attempts, missing evidence, and human-authored fields. Render artifacts should show that primary diagnosis text is plain-English, raw details are secondary, and prose wraps at a readable measure while staying width-safe.
 - Visual UX claim: before strong release claims, capture at least one real interactive Pi TUI screenshot or ANSI log showing the custom inbox with representative data.
 
 ## Open Questions
@@ -153,22 +189,38 @@ THEN the output remains width-safe, visually scannable, theme-aware, and include
 - Should the first implementation slice cover only pending delta review/routing, or also artifact outcome follow-up? Recommendation: implement pending delta review/routing first, then reuse the component shell for outcome follow-up in a later ticket if the slice grows.
 - Should the component be an overlay or replace the editor area? Recommendation: replace the editor area for the first slice, because the current review flow is modal and focused; overlays can be added later if the inbox needs to coexist with chat context.
 - Should route recommendations be ranked? Recommendation: route cards can group likely/default-safe choices, but avoid classifier-like ranking language until routed/outcome corpus exists.
+- Should the split-pane layout be polished further or replaced? Recommendation: replace it for the primary review path. The current screenshots show that the split-pane shape itself creates the cognitive-load problem; further border/copy tweaks are likely incremental.
 
 ## Quality Bar
 
 Good inbox behavior:
 
 ```text
-Flight Learn  •  7 pending deltas  •  Review 1/7
+Flight Learn  •  Issue 5 of 6
 
-┌ Items ─────────────────────┐ ┌ Delta ───────────────────────────────┐
-│ > Exact-text edit mismatch │ │ Summary: repeated edit oldText miss  │
-│   Typecheck retry loop     │ │ Reality: 4 related failures          │
-│   Bash smoke failure       │ │ Signals: reflection cluster 0.55     │
-└────────────────────────────┘ │ Evidence: 2 refs shown, 3 hidden      │
-                               └───────────────────────────────────────┘
-Routes:  [Code legibility] [Test/check] [Flight Rule] [Observe] [Dismiss]
-Keys: ↑↓ item • r route • e edit fields • v evidence • s skip • q quit
+Problem
+  A validation command failed repeatedly from the wrong project or shell context.
+
+What happened?
+  Pi saw the same validation-failure pattern twice in recent sessions.
+
+Why it matters
+  Repeated setup/cwd friction makes it harder to trust whether the latest code actually passed.
+
+Expected
+  unknown — press e to add what should have happened
+
+Choose a follow-up
+> Code legibility
+  Use when confusing source/project shape caused repeated mistakes.
+
+  Test/check
+  Use when a missing validation check would have caught this.
+
+  Flight Rule
+  Use when Pi needs a reusable behavior reminder.
+
+v evidence  •  e edit expected  •  enter choose  •  ↑↓ move  •  q quit
 ```
 
 Bad inbox behavior:
@@ -179,6 +231,17 @@ Choose an expectation delta
 2. Repeated failure pattern: bash cd /Users/<user>/Code/... && npm ...
 ...
 ```
+
+Also bad:
+
+```text
++ Pending deltas -----------+ + Selected delta -----------------------+
+| > 5/6 bash cd /Users/... | | At a glance | Why suggested | Evidence |
++--------------------------+ +----------------------------------------+
+Follow-up choices: 1 Code legibility 2 Test/check [3 Flight Rule] 4 Observe
+```
+
+This is still too much of a table. It makes the selected item, explanation, evidence, and route choice compete for attention.
 
 A reviewer should be able to tell whether the UI reduces cognitive load: fewer giant text blobs, less path noise, visible current step, visible safe actions, and no need to infer workflow state across separate dialogs.
 
@@ -225,10 +288,12 @@ Compatibility:
 
 Examples:
 
-- Split pane: item list on the left, selected delta details on the right, route/action row at the bottom.
+- Focused card: one selected delta fills the primary screen, with item count/progress instead of a dominant side-by-side queue.
+- Vertical route selector: `Code legibility`, `Test/check`, `Flight Rule`, and `Observe` appear as rows/cards with the active row visibly highlighted and described.
 - Field edit modal: edit only expectation/reality/impact, not detector signals or evidence refs.
-- Evidence drawer: show two concise refs by default, expand to redacted snippets on `v`.
+- Evidence drawer: show concise refs only when requested by `v`, expand to fuller redacted snippets without changing route selection.
 - Route cards: `Test/check — missing or weak validation`, `Loom spec — intended behavior ambiguity`, `Observe — keep evidence only`.
+- Plain-English diagnosis: `A validation command failed repeatedly in this project.` as the primary headline, with `Raw clue: npm test > pi-flight…` under evidence/provenance rather than under the headline.
 
 Non-examples:
 
@@ -237,10 +302,13 @@ Non-examples:
 - A model-generated route recommendation presented as fact.
 - A UI that creates Loom tickets or active rules directly from a route selection.
 - A third top-level command such as `/flight-inbox`.
+- A primary headline that is only a command, path, cluster ID, detector type, or redacted source filename.
+- Silently rewriting stored delta fields because the UI found a friendlier phrase.
 
 ## Constraints
 
 - Must follow Pi TUI rules: component `render(width)` lines must not exceed width, state changes call render invalidation, and theme colors come from the callback theme.
+- For primary prose, prefer a readable measure over using the whole terminal width. Use Pi TUI wrapping utilities or an equivalent width-safe local wrapper so plain-English paragraphs do not become one-line/truncated command walls.
 - Prefer built-in Pi TUI components such as `SelectList`, `Markdown`, `Container`, `Text`, and `DynamicBorder` before building custom primitives from scratch.
 - Preserve local-first privacy, redaction, and human gates from `spec:delta-artifact-learning-loop`.
 - Preserve the two-command visible surface from `spec:visible-command-surface`.
@@ -252,5 +320,6 @@ Non-examples:
 - `spec:delta-artifact-learning-loop` - owns delta/artifact/outcome semantics that this inbox must preserve.
 - `ticket:20260525-streamlined-learning-inbox-command` - created the current functional but primitive one-command flow.
 - `ticket:20260525-collapse-visible-command-surface` - collapsed visible commands; this UX work builds on that surface.
+- `evidence:20260527-flight-learn-plain-english-feedback` - operator screenshot/feedback showing that focused-card layout improved but primary diagnosis text remains too code-heavy and one-line/truncated.
 - `/Users/crlough/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/docs/tui.md` - Pi TUI capabilities and component constraints.
 - `/Users/crlough/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/docs/extensions.md` - extension UI APIs, command handlers, and custom UI integration.

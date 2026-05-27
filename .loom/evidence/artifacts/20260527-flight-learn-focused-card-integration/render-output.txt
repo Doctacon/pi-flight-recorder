@@ -1,0 +1,83 @@
+# Production askFlightLearnDeltaInbox collapsed render
+Flight Learn — Issue 2 of 2
+2 pending · 3 evidence refs · ↑/↓ changes issue
+
+Issue
+ bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm run build from stale panes
+
+What happened?
+ Observed 2 related failure occurrences where validation commands ran from a stale shell context
+ after package reinstall.
+
+Why it matters
+ Repeated local friction across tools and cwd setup makes release validation slower and harder to
+ trust.
+
+Expected
+ unknown — press e to add what should have happened
+
+Why suggested
+ reflection-cluster (0.55): Reflection cluster grouped cwd/setup validation failures from multiple
+ sessions.
+
+Evidence
+ 3 refs hidden by default — press v to view concise refs.
+
+Choose a follow-up
+▶ [1] Code legibility
+ Use when confusing source or project shape causes repeated mistakes.
+ [2] Test/check
+ Use when a missing or weak validation check would have caught this.
+ [3] Loom ticket
+ Use when this needs bounded implementation or cleanup work.
+ [4] Flight Rule
+ Use when Pi needs a reusable behavior reminder, still requiring approval later.
+ [5] Observe
+ Keep evidence and watch recurrence without creating an artifact.
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose · e edit · v evidence · d dismiss · s...
+
+# Production askFlightLearnDeltaInbox expanded render
+Flight Learn — Issue 2 of 2
+2 pending · 3 evidence refs · ↑/↓ changes issue
+
+Issue
+ bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm run build from stale panes
+
+What happened?
+ Observed 2 related failure occurrences where validation commands ran from a stale shell context
+ after package reinstall.
+
+Why it matters
+ Repeated local friction across tools and cwd setup makes release validation slower and harder to
+ trust.
+
+Expected
+ unknown — press e to add what should have happened
+
+Why suggested
+ reflection-cluster (0.55): Reflection cluster grouped cwd/setup validation failures from multiple
+ sessions.
+
+Evidence
+ - occurrence/occ_prod_focus_1: bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm run
+ build failed from a stale pane
+ - occurrence/occ_prod_focus_2: local evidence ref (pi-flight-recorder)
+ - occurrence/occ_prod_focus_3: local evidence ref (pi-flight-recorder)
+
+Choose a follow-up
+▶ [1] Code legibility
+ Use when confusing source or project shape causes repeated mistakes.
+ [2] Test/check
+ Use when a missing or weak validation check would have caught this.
+ [3] Loom ticket
+ Use when this needs bounded implementation or cleanup work.
+ [4] Flight Rule
+ Use when Pi needs a reusable behavior reminder, still requiring approval later.
+ [5] Observe
+ Keep evidence and watch recurrence without creating an artifact.
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose · e edit · v evidence · d dismiss · s...
+
+# Result
+{"kind":"cancelled"}

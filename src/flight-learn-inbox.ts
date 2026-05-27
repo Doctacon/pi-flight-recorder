@@ -39,6 +39,7 @@ interface FlightLearnInboxComponentOptions {
   done: (result: Exclude<FlightLearnDeltaInboxResult, { kind: "unavailable" }>) => void;
   tui?: FlightLearnInboxTui;
   theme?: FlightLearnInboxTheme;
+  layout?: FlightLearnInboxLayout;
 }
 
 export interface FlightLearnCustomComponent {
@@ -49,6 +50,7 @@ export interface FlightLearnCustomComponent {
 
 type InboxMode = "review" | "edit" | "rationale";
 type EditableField = "expectation" | "reality" | "impact";
+type FlightLearnInboxLayout = "split-pane" | "focused-card";
 
 const EDITABLE_FIELDS: EditableField[] = ["expectation", "reality", "impact"];
 const DEFAULT_DISMISS_REASON = "Dismissed through Flight Learn inbox";
@@ -73,6 +75,35 @@ function clip(value: string, width: number): string {
 function pad(value: string, width: number): string {
   const clipped = clip(value, width);
   return clipped + " ".repeat(Math.max(0, width - clipped.length));
+}
+
+function wrapText(value: string, width: number): string[] {
+  if (width <= 0) return [""];
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (!normalized) return [""];
+  const words = normalized.split(" ");
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    if (!current) {
+      current = word;
+      continue;
+    }
+    const candidate = `${current} ${word}`;
+    if (candidate.length <= width) {
+      current = candidate;
+      continue;
+    }
+    lines.push(clip(current, width));
+    current = word;
+  }
+  if (current) lines.push(clip(current, width));
+  return lines.length > 0 ? lines : [""];
+}
+
+function wrapIndented(value: string, width: number, indent = "  "): string[] {
+  const contentWidth = Math.max(1, width - indent.length);
+  return wrapText(value, contentWidth).map((line) => clip(`${indent}${line}`, width));
 }
 
 function keyForRouteIndex(index: number): string {
@@ -112,7 +143,7 @@ function atAGlanceLines(delta: ExpectationDelta, fields: Record<EditableField, s
 }
 
 function routeGuideLine(): string {
-  return "Guide: Rule=behavior reminder | Code=confusing source | Test=missing check | Ticket=larger follow-up | Observe=unsure";
+  return "How to choose: Rule=behavior reminder | Code=confusing source | Test=missing check | Ticket=larger work | Observe=not sure";
 }
 
 function signalLine(signal: DeltaDetectorSignal): string {
@@ -125,6 +156,13 @@ function evidenceLine(ref: DeltaEvidenceRef): string {
   const where = [ref.cwd, ref.sessionFile].filter(Boolean).join("; ") || "local source unknown";
   const snippet = ref.snippet ? ` :: ${compactSnippet(ref.snippet.replace(/\s+/g, " "), 95)}` : "";
   return `${source} (${where})${snippet}`;
+}
+
+function evidencePreviewLine(ref: DeltaEvidenceRef): string {
+  const source = [ref.sourceType, ref.sourceId ?? ref.entryId].filter(Boolean).join("/") || ref.sourceType;
+  const snippet = ref.snippet ? compactSnippet(ref.snippet.replace(/\s+/g, " "), 115) : null;
+  const where = ref.cwd?.split(/[\\/]/).filter(Boolean).at(-1);
+  return snippet ? `${source}: ${snippet}` : `${source}: local evidence ref${where ? ` (${compactSnippet(where, 48)})` : ""}`;
 }
 
 function border(title: string, width: number): string {
@@ -283,6 +321,7 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
   private readonly done: (result: Exclude<FlightLearnDeltaInboxResult, { kind: "unavailable" }>) => void;
   private readonly tui: FlightLearnInboxTui | undefined;
   private readonly theme: FlightLearnInboxTheme | undefined;
+  private readonly layout: FlightLearnInboxLayout;
   private selectedItemIndex = 0;
   private selectedRouteIndex = 0;
   private evidenceExpanded = false;
@@ -301,6 +340,7 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
     this.done = options.done;
     this.tui = options.tui;
     this.theme = options.theme;
+    this.layout = options.layout ?? "split-pane";
     for (const item of this.items) {
       this.fieldsByDelta.set(item.delta.id, {
         expectation: item.delta.expectation ?? "",
@@ -316,7 +356,9 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
     const plain = this.renderPlain(safeWidth);
     const styled = plain.map((line, index) => {
       if (index === 0) return this.accent(this.bold(line));
-      if (line.startsWith("Keys:")) return this.dim(line);
+      if (line.startsWith("Active follow-up:") || line.startsWith("▶")) return this.accent(this.bold(line));
+      if (this.focusedSectionHeading(line)) return this.bold(line);
+      if (line.startsWith("Keys:") || line.includes("hidden by default") || line.includes("more follow-up")) return this.dim(line);
       if (this.statusMessage && line.includes(this.statusMessage)) return this.warning(line);
       return line;
     });
@@ -343,23 +385,24 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
 
   private renderPlain(width: number): string[] {
     if (this.items.length === 0) return [clip("Flight Learn - no pending deltas", width), clip("Keys: q quit", width)];
+    if (this.layout === "focused-card") return this.renderFocusedCardPlain(width);
     const item = this.currentItem();
     const delta = item.delta;
-    const lines = [clip(`Flight Learn - ${this.items.length} pending delta${this.items.length === 1 ? "" : "s"} - Review ${this.selectedItemIndex + 1}/${this.items.length}`, width)];
+    const lines = [clip(`Flight Learn - ${this.items.length} pending delta${this.items.length === 1 ? "" : "s"} - selected ${this.selectedItemIndex + 1}/${this.items.length}`, width)];
     const listLines = this.itemListLines();
     const detailLines = this.deltaDetailLines(item);
     if (width >= 80) {
       const leftWidth = Math.max(24, Math.min(34, Math.floor(width * 0.34)));
       const rightWidth = Math.max(1, width - leftWidth - 1);
-      const left = box("Items", listLines, leftWidth, 12);
-      const right = box("Delta", detailLines, rightWidth, 14);
+      const left = box("Pending deltas", listLines, leftWidth, 12);
+      const right = box("Selected delta", detailLines, rightWidth, 16);
       const rowCount = Math.max(left.length, right.length);
       for (let index = 0; index < rowCount; index += 1) {
         lines.push(clip(`${pad(left[index] ?? "", leftWidth)} ${right[index] ?? ""}`, width));
       }
     } else {
-      lines.push(...box("Items", listLines, width, 6));
-      lines.push(...box("Delta", detailLines, width, 10));
+      lines.push(...box("Pending deltas", listLines, width, 6));
+      lines.push(...box("Selected delta", detailLines, width, 13));
     }
     lines.push(...this.routeLines(width));
     lines.push(clip("Keys: up/down item | left/right route | 1-9/0 route | enter/r route | e edit | v evidence | d dismiss | s skip | q quit", width));
@@ -369,10 +412,87 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
     return lines.map((line) => clip(line, width));
   }
 
+  private renderFocusedCardPlain(width: number): string[] {
+    const item = this.currentItem();
+    const delta = item.delta;
+    const fields = this.fieldsFor(delta.id);
+    const lines: string[] = [
+      clip(`Flight Learn — Issue ${this.selectedItemIndex + 1} of ${this.items.length}`, width),
+      clip(`${this.items.length} pending · ${delta.evidenceRefs.length} evidence ref${delta.evidenceRefs.length === 1 ? "" : "s"} · ↑/↓ changes issue`, width),
+      "",
+      "Issue",
+      ...wrapIndented(issueTitle(delta), width),
+      "",
+      "What happened?",
+      ...wrapIndented(normalizeText(fields.reality), width),
+      "",
+      "Why it matters",
+      ...wrapIndented(normalizeText(fields.impact), width),
+      "",
+      "Expected",
+      ...wrapIndented(unknownExpectation(normalizeText(fields.expectation)) ? "unknown — press e to add what should have happened" : normalizeText(fields.expectation), width),
+      "",
+      "Why suggested",
+      ...this.focusedSignalLines(item, width),
+      "",
+      "Evidence",
+      ...this.focusedEvidenceLines(delta, width),
+      "",
+      "Choose a follow-up",
+      ...this.focusedRouteLines(width),
+      "",
+      clip("Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose · e edit · v evidence · d dismiss · s skip · q quit", width),
+    ];
+    if (this.statusMessage) lines.push(clip(`Status: ${this.statusMessage}`, width));
+    if (this.mode === "edit") lines.push(...this.editLines(width, delta.id));
+    if (this.mode === "rationale") lines.push(...this.rationaleLines(width));
+    return lines.map((line) => clip(line, width));
+  }
+
+  private focusedSignalLines(item: FlightLearnDeltaInboxItem, width: number): string[] {
+    const primarySignal = item.signals[0];
+    if (!primarySignal) return wrapIndented("No detector signal recorded. Route only if the issue is still clear from the summary and evidence.", width);
+    return wrapIndented(signalLine(primarySignal), width);
+  }
+
+  private focusedEvidenceLines(delta: ExpectationDelta, width: number): string[] {
+    if (!this.evidenceExpanded) {
+      return wrapIndented(`${delta.evidenceRefs.length} ref${delta.evidenceRefs.length === 1 ? "" : "s"} hidden by default — press v to view concise refs.`, width);
+    }
+    const refs = delta.evidenceRefs.slice(0, 5);
+    const hiddenEvidence = Math.max(0, delta.evidenceRefs.length - refs.length);
+    return [
+      ...(refs.length > 0 ? refs.flatMap((ref) => wrapIndented(`- ${evidencePreviewLine(ref)}`, width)) : wrapIndented("No evidence refs recorded.", width)),
+      ...(hiddenEvidence > 0 ? wrapIndented(`- ${hiddenEvidence} more evidence ref${hiddenEvidence === 1 ? "" : "s"}; full refs stay in local storage.`, width) : []),
+    ];
+  }
+
+  private focusedRouteLines(width: number): string[] {
+    if (this.routeChoices.length === 0) return wrapIndented("No follow-up choices are available.", width);
+    const visibleCount = Math.min(5, this.routeChoices.length);
+    const maxStart = Math.max(0, this.routeChoices.length - visibleCount);
+    const start = Math.min(maxStart, Math.max(0, this.selectedRouteIndex - Math.floor(visibleCount / 2)));
+    const end = Math.min(this.routeChoices.length, start + visibleCount);
+    const lines: string[] = [];
+    if (start > 0) lines.push(clip(`  ↑ ${start} earlier follow-up${start === 1 ? "" : "s"}`, width));
+    for (let index = start; index < end; index += 1) {
+      const choice = this.routeChoices[index]!;
+      const selected = index === this.selectedRouteIndex;
+      const marker = selected ? "▶" : " ";
+      const key = keyForRouteIndex(index);
+      lines.push(clip(`${marker} [${key}] ${routeLabel(choice)}`, width));
+      const description = choice.description ?? "Human-reviewed follow-up choice.";
+      lines.push(...wrapIndented(description, width, selected ? "    " : "    "));
+    }
+    const remaining = this.routeChoices.length - end;
+    if (remaining > 0) lines.push(clip(`  ↓ ${remaining} more follow-up${remaining === 1 ? "" : "s"}`, width));
+    return lines;
+  }
+
   private itemListLines(): string[] {
     return this.items.map((item, index) => {
       const prefix = index === this.selectedItemIndex ? "> " : "  ";
-      return `${prefix}${issueTitle(item.delta)} · ${item.delta.evidenceRefs.length} ref${item.delta.evidenceRefs.length === 1 ? "" : "s"} · ${item.delta.status}`;
+      return `${prefix}${index + 1}/${this.items.length} ${issueTitle(item.delta)} · ${item.delta.evidenceRefs.length} ref${item.delta.evidenceRefs.length === 1 ? "" : "s"}`;
     });
   }
 
@@ -383,26 +503,32 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
     const hiddenEvidence = Math.max(0, delta.evidenceRefs.length - evidence.length);
     const signals = item.signals.slice(0, 3);
     return [
-      ...atAGlanceLines(delta, fields, item.signals),
-      `Record: ${delta.status}; id=${delta.id}`,
-      "Signals:",
+      `Showing item ${this.selectedItemIndex + 1} of ${this.items.length}`,
+      "At a glance",
+      ...atAGlanceLines(delta, fields, item.signals).map((line) => `- ${line}`),
+      "",
+      "Why suggested",
       ...(signals.length > 0 ? signals.map((signal) => `- ${signalLine(signal)}`) : ["- no detector signal recorded"]),
-      "Evidence:",
-      ...(evidence.length > 0 ? evidence.map((ref) => `- ${evidenceLine(ref)}`) : ["- no evidence refs recorded"]),
+      "",
+      this.evidenceExpanded ? "Evidence refs" : "Evidence preview",
+      ...(evidence.length > 0 ? evidence.map((ref) => `- ${this.evidenceExpanded ? evidenceLine(ref) : evidencePreviewLine(ref)}`) : ["- no evidence refs recorded"]),
       ...(hiddenEvidence > 0 ? [`- ${hiddenEvidence} more evidence ref${hiddenEvidence === 1 ? "" : "s"}; press v to expand`] : []),
+      ...(this.evidenceExpanded ? [`Record: ${delta.status}; id=${delta.id}`] : []),
     ];
   }
 
   private routeLines(width: number): string[] {
     if (this.routeChoices.length === 0) return [clip("Routes: none available", width)];
-    const prefix = "Route cards: ";
+    const prefix = "Follow-up choices: ";
     const indent = " ".repeat(prefix.length);
     const cards = this.routeChoices.map((choice, index) => {
       const key = keyForRouteIndex(index);
       const label = `${key ? `${key} ` : ""}${routeLabel(choice)}`;
-      return index === this.selectedRouteIndex ? `[${label}]` : label;
+      return index === this.selectedRouteIndex ? `▶ ${label} ◀` : label;
     });
-    const lines: string[] = [];
+    const selected = this.currentRouteChoice();
+    const selectedKey = keyForRouteIndex(this.selectedRouteIndex);
+    const lines: string[] = [clip(`Active follow-up: [${selectedKey}] ${routeLabel(selected)} — ${selected.description ?? "human-reviewed follow-up choice"}`, width)];
     let current = prefix;
     for (const card of cards) {
       const safeCard = clip(card, Math.max(1, width - indent.length));
@@ -416,8 +542,6 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
       current = `${indent}${safeCard}`;
     }
     if (current.trim().length > 0) lines.push(clip(current, width));
-    const selected = this.currentRouteChoice();
-    lines.push(clip(`Selected follow-up: ${routeLabel(selected)} — ${selected.description ?? "human-reviewed follow-up choice"}`, width));
     lines.push(clip(routeGuideLine(), width));
     return lines.length > 0 ? lines : [clip("Route cards: none visible", width)];
   }
@@ -563,6 +687,10 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
     this.tui?.requestRender?.();
   }
 
+  private focusedSectionHeading(line: string): boolean {
+    return ["Issue", "What happened?", "Why it matters", "Expected", "Why suggested", "Evidence", "Choose a follow-up"].includes(line);
+  }
+
   private accent(value: string): string {
     return this.theme?.fg?.("accent", value) ?? value;
   }
@@ -587,7 +715,7 @@ export function createFlightLearnDeltaInboxComponent(options: FlightLearnInboxCo
 export async function askFlightLearnDeltaInbox(ctx: { ui?: { custom?: <T>(factory: (tui: FlightLearnInboxTui, theme: FlightLearnInboxTheme, keybindings: unknown, done: (result: T) => void) => FlightLearnCustomComponent, options?: unknown) => Promise<T | undefined> | T | undefined } }, input: FlightLearnDeltaInboxInput): Promise<FlightLearnDeltaInboxResult> {
   if (!ctx.ui?.custom) return { kind: "unavailable" };
   try {
-    const result = await ctx.ui.custom<Exclude<FlightLearnDeltaInboxResult, { kind: "unavailable" }>>((tui, theme, _keybindings, done) => createFlightLearnDeltaInboxComponent({ input, done, tui, theme }));
+    const result = await ctx.ui.custom<Exclude<FlightLearnDeltaInboxResult, { kind: "unavailable" }>>((tui, theme, _keybindings, done) => createFlightLearnDeltaInboxComponent({ input, done, tui, theme, layout: "focused-card" }));
     return result ?? { kind: "cancelled" };
   } catch {
     return { kind: "unavailable" };

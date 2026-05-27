@@ -1,0 +1,42 @@
+{
+  "dataDir": "/tmp/pfr-focused-card-realpi-tbtn7L/home/.pi/flight-recorder",
+  "databasePath": "/tmp/pfr-focused-card-realpi-tbtn7L/home/.pi/flight-recorder/flight-recorder.db",
+  "counts": {
+    "deltas": 2,
+    "candidates": 1,
+    "ruleCandidates": 0,
+    "flightRules": 0
+  },
+  "deltas": [
+    {
+      "id": "delta_realpi_secondary",
+      "status": "candidate",
+      "summary": "Repeated failure pattern: exact-text edit mismatches",
+      "expectation": "Use current file contents before exact replacement.",
+      "activeArtifactCandidateId": null,
+      "evidenceRefCount": 1
+    },
+    {
+      "id": "delta_realpi_focus_card",
+      "status": "routed",
+      "summary": "Repeated failure pattern: bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm run build from stale panes",
+      "expectation": null,
+      "activeArtifactCandidateId": "artifact_cand_186d8a1a7d21cdd0",
+      "evidenceRefCount": 3
+    }
+  ],
+  "candidates": [
+    {
+      "id": "artifact_cand_186d8a1a7d21cdd0",
+      "deltaId": "delta_realpi_focus_card",
+      "artifactType": "test-check",
+      "status": "accepted",
+      "applied": false,
+      "rationale": "I chose Test/check because ... repeated validation gap needs a durable check.",
+      "evidenceRefCount": 3,
+      "nextStep": "Create the test/check in a separate implementation ticket; this candidate does not write tests or change validation behavior."
+    }
+  ]
+}
+(node:42067) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
