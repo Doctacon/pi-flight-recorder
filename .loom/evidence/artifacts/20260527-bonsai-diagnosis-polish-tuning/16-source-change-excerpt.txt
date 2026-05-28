@@ -1,0 +1,33 @@
+Source change summary for ticket:20260527-bonsai-diagnosis-polish-tuning
+
+Normal git diff for these files is not meaningful in this workspace because `src/flight-learn-local-diagnosis-model.ts` and its test are currently untracked from prior local-model work. This ticket changed the prompt text inside the untracked source file and added focused test assertions.
+
+Current prompt builder excerpt:
+
+```ts
+export function buildLocalDiagnosisPrompt(factPacket: LocalDiagnosisFactPacket): string {
+  const factPacketJson = JSON.stringify(factPacket);
+  return [
+    "You are an optional local-only phrasing helper for a Pi Flight Learn diagnosis card.",
+    "Use only the bounded redacted fact packet. Do not add facts, routes, actions, artifacts, file paths, secrets, stack traces, commands, or transcript text.",
+    "Return only a JSON object. Allowed keys: headline, whatHappened, whyItMatters, expectedBehavior. Omit any key you cannot improve. No other keys are allowed.",
+    "Do not include confidence, scores, metadata, notes, rationale, route, action, status, severity, or any other non-display field.",
+    "Do not echo or summarize the fact packet structure. Do not include nested objects, arrays, delta, signals, evidence, bounds, or analysis fields.",
+    `Length limits: headline <= ${RESPONSE_FIELD_LIMITS.headline} chars; whatHappened <= ${RESPONSE_FIELD_LIMITS.whatHappened}; whyItMatters <= ${RESPONSE_FIELD_LIMITS.whyItMatters}; expectedBehavior <= ${RESPONSE_FIELD_LIMITS.expectedBehavior}.`,
+    "The JSON is display-only wording for the current card and must not instruct routing, ranking, storage, artifact creation, source edits, Loom records, rules, skills, or prompt changes.",
+    "Fact packet JSON:",
+    factPacketJson,
+  ].join("\n");
+}
+```
+
+Current focused test assertion excerpt:
+
+```ts
+xpected fake provider request capture");
+    expect(capturedRequest.prompt).toContain("Return only a JSON object");
+    expect(capturedRequest.prompt).toContain("Do not include confidence");
+    expect(capturedRequest.prompt).toContain("Do not echo or summarize the fact packet structure");
+    expect(capturedRequest.prompt).not.toContain("/Users/<fixture>");
+    expect(capturedRequ
+```

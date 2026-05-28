@@ -1,0 +1,44 @@
+{
+  "dataDir": "/tmp/pfr-real-bonsai-pi-valid-LgalaK/home/.pi/flight-recorder",
+  "databasePath": "/tmp/pfr-real-bonsai-pi-valid-LgalaK/home/.pi/flight-recorder/flight-recorder.db",
+  "counts": {
+    "deltas": 2,
+    "candidates": 1,
+    "ruleCandidates": 0,
+    "flightRules": 0
+  },
+  "deltas": [
+    {
+      "id": "delta_real_bonsai_secondary",
+      "status": "candidate",
+      "summary": "Assistant repeatedly confused the storage mapper ownership boundary.",
+      "expectation": "Check the mapper before editing storage.",
+      "reality": "The assistant edited storage when mapper code owned the behavior.",
+      "impact": "Review churn increased before implementation could continue.",
+      "activeArtifactCandidateId": null,
+      "evidenceRefCount": 1
+    },
+    {
+      "id": "delta_real_bonsai_valid_model",
+      "status": "routed",
+      "summary": "Repeated failure pattern: bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm test",
+      "expectation": "Validation should run from a fresh project shell after changes.",
+      "reality": "Observed 2 related failure occurrences in reflection cluster cluster_real_bonsai_valid.",
+      "impact": "Repeated validation friction makes the result hard to trust.",
+      "activeArtifactCandidateId": "artifact_cand_5b106784f063c162",
+      "evidenceRefCount": 1
+    }
+  ],
+  "candidates": [
+    {
+      "id": "artifact_cand_5b106784f063c162",
+      "deltaId": "delta_real_bonsai_valid_model",
+      "artifactType": "test-check",
+      "status": "accepted",
+      "applied": false,
+      "rationale": "I chose Test/check because ... real Bonsai phrasing was display-only; route remains candidate-only.",
+      "evidenceRefCount": 1,
+      "nextStep": "Create the test/check in a separate implementation ticket; this candidate does not write tests or change validation behavior."
+    }
+  ]
+}

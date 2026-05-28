@@ -1,0 +1,20 @@
+date=2026-05-27T18:22:44Z
+which_llama_server=/opt/homebrew/bin/llama-server
+which_llama_cli=/opt/homebrew/bin/llama-cli
+llama_server_version=
+llama_cli_version=
+brew_info_after=
+==> llama.cpp: stable 9360 (bottled), HEAD
+LLM inference in C/C++
+https://github.com/ggml-org/llama.cpp
+Installed (on request)
+From: https://github.com/Homebrew/homebrew-core/blob/HEAD/Formula/l/llama.cpp.rb
+License: MIT
+==> Installed Kegs and Versions
+llama.cpp 9360 (71 files, 23MB) [Linked]
+==> Dependencies
+Required (2): ggml, openssl@3
+Recursive Runtime (4): all installed ✔
+==> Options
+--HEAD
+	Install HEAD version

@@ -1,0 +1,50 @@
+{
+  "dataDir": "/tmp/pfr-real-bonsai-pi-valid-LgalaK/home/.pi/flight-recorder",
+  "databasePath": "/tmp/pfr-real-bonsai-pi-valid-LgalaK/home/.pi/flight-recorder/flight-recorder.db",
+  "deltas": [
+    {
+      "id": "delta_real_bonsai_secondary",
+      "status": "candidate",
+      "summary": "Assistant repeatedly confused the storage mapper ownership boundary.",
+      "expectation": "Check the mapper before editing storage.",
+      "reality": "The assistant edited storage when mapper code owned the behavior.",
+      "impact": "Review churn increased before implementation could continue."
+    },
+    {
+      "id": "delta_real_bonsai_valid_model",
+      "status": "routed",
+      "summary": "Repeated failure pattern: bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm test",
+      "expectation": "Validation should run from a fresh project shell after changes.",
+      "reality": "Observed 2 related failure occurrences in reflection cluster cluster_real_bonsai_valid.",
+      "impact": "Repeated validation friction makes the result hard to trust."
+    }
+  ],
+  "candidates": [
+    {
+      "id": "artifact_cand_5b106784f063c162",
+      "deltaId": "delta_real_bonsai_valid_model",
+      "artifactType": "test-check",
+      "status": "accepted",
+      "applied": false,
+      "title": "Test/check: Repeated failure pattern: bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm test",
+      "rationale": "I chose Test/check because ... real Bonsai phrasing was display-only; route remains candidate-only.",
+      "proposedDraft": "# Test/check candidate (not written)\n\nBehavior or assumption to lock down:\nValidation should run from a fresh project shell after changes.\n\nObserved miss:\nObserved 2 related failure occurrences in reflection cluster cluster_real_bonsai_valid.\n\nSuggested check:\n- Add or update the smallest regression test, smoke check, fixture, or validation command that would have exposed this delta earlier.\n- Keep the check local/open-source and runnable without hosted services.\n\nWhy this follow-up:\nI chose Test/check because ... real Bonsai phrasing was display-only; route remains candidate-only.\n\nEvidence:\n- occurrence/occ_real_bonsai_1 (/Users/<user>/Code/personal/pi-flight-recorder; session.jsonl) :: bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm test failed twice from a stale shell",
+      "nextStep": "Create the test/check in a separate implementation ticket; this candidate does not write tests or change validation behavior.",
+      "limits": [
+        "Candidate draft only; no source, docs, Loom records, skills, prompt files, or active rules were changed.",
+        "Evidence snippets are local/redacted summaries; inspect the source refs before creating a durable artifact.",
+        "No test files or validation scripts were changed."
+      ],
+      "metadata": {},
+      "metadataJson": "{}",
+      "evidenceRefCount": 1,
+      "forbiddenModelTextMatches": []
+    }
+  ],
+  "counts": {
+    "deltas": 2,
+    "candidates": 1,
+    "ruleCandidates": 0,
+    "flightRules": 0
+  }
+}

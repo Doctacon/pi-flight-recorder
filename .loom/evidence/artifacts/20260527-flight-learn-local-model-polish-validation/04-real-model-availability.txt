@@ -1,0 +1,8 @@
+date=2026-05-27T17:44:32Z
+LLAMA_CPP_REAL_MODEL_BASE_URL=<unset>
+llama-server=
+llama-cli=
+llama.cpp=
+approved_model_env=<unset>
+real_model_status=blocked-no-explicit-approved-runtime-or-model-config
+note=no downloads, installs, hosted providers, or non-loopback probes were attempted

@@ -1,0 +1,40 @@
+# Third follow-up source inspection and diff check
+
+## Target status
+ M .loom/tickets/20260527-local-diagnosis-model-contract-harness.md
+?? .loom/evidence/20260527-local-diagnosis-model-contract-harness-validation.md
+?? .loom/evidence/artifacts/20260527-local-diagnosis-model-contract-harness-validation/
+?? src/flight-learn-local-diagnosis-model.test.ts
+?? src/flight-learn-local-diagnosis-model.ts
+
+## Focused source/test lines
+src/flight-learn-local-diagnosis-model.ts:173:  /\b(?:you\s+|we\s+|they\s+|the\s+assistant\s+|the\s+user\s+)?(?:can|could|should|might|may|would|must|need|needs|will)\s+(?:then\s+|also\s+|please\s+)*(?:add|edit|modify|change|delete|remove|fix|write|create|update|route|rank|store|save|persist|apply)\s+(?:this|it|them|a\s+|an\s+|the\s+)?(?:test|tests|file|files|code|source|module|dependency|prompt|rule|ticket|artifact|candidate|loom|skill|card|diagnosis|output|record)?\b/i,
+src/flight-learn-local-diagnosis-model.test.ts:322:      "You might update a file.",
+src/flight-learn-local-diagnosis-model.test.ts:341:    const inputWithSupportedActionTokens = {
+src/flight-learn-local-diagnosis-model.test.ts:352:      "You can add a test.",
+src/flight-learn-local-diagnosis-model.test.ts:353:      "We can add a test.",
+src/flight-learn-local-diagnosis-model.test.ts:354:      "The assistant can add a test.",
+src/flight-learn-local-diagnosis-model.test.ts:355:      "You can update a file.",
+src/flight-learn-local-diagnosis-model.test.ts:357:      const result = await polishWithResponse(JSON.stringify({ headline: modalAction }), inputWithSupportedActionTokens);
+
+## Target tracked diff note
+Note: source/test files are untracked in this worktree because this ticket's implementation is not committed; focused source/test lines above identify the third follow-up change.
+
+## Implementation imports
+1:import { buildFlightLearnDiagnosisView, type FlightLearnDiagnosisInput, type FlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
+2:import { sanitizeStoredText } from "./redact.js";
+3:import type { DeltaDetectorSignal, DeltaEvidenceRef, ExpectationDelta } from "./types.js";
+
+## Test imports
+1:import { describe, expect, it } from "vitest";
+2:import { buildFlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
+3:import {
+10:import type { DeltaDetectorSignal, DeltaDetectorSignalType, DeltaEvidenceRef, ExpectationDelta } from "./types.js";
+
+## Filesystem/process/network scan in implementation
+
+## Mutation API name scan in implementation
+
+## Target record diff summary
+ ...60527-local-diagnosis-model-contract-harness.md | 23 ++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)

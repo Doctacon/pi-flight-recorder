@@ -1,0 +1,2 @@
+stopped_at=2026-05-27T18:34:32Z
+server_stopped=true

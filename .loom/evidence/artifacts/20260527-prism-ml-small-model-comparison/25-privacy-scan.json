@@ -1,0 +1,61 @@
+{
+  "artifactDir": ".loom/evidence/artifacts/20260527-prism-ml-small-model-comparison",
+  "checkedFiles": [
+    "01-hf-bonsai-1.7b-metadata.raw.json",
+    "02-hf-bonsai-4b-metadata.raw.json",
+    "03-hf-model-metadata-summary.json",
+    "04-hf-file-heads.txt",
+    "05-download-authorization-and-target.txt",
+    "06-download-output.txt",
+    "07-model-4b-provenance.txt",
+    "08-runtime-provenance.txt",
+    "09-local-model-provenance.txt",
+    "20-typecheck.txt",
+    "21-focused-local-model-test.txt",
+    "22-diff-check.txt",
+    "23-model-comparison-summary.json",
+    "24-artifact-listing.txt",
+    "bonsai-1.7b-eval-output.txt",
+    "bonsai-1.7b-eval-results.json",
+    "bonsai-1.7b-eval-summary.json",
+    "bonsai-1.7b-llama-server.log",
+    "bonsai-1.7b-llama-server.pid",
+    "bonsai-1.7b-server-final-status.txt",
+    "bonsai-1.7b-server-health.err",
+    "bonsai-1.7b-server-health.json",
+    "bonsai-1.7b-server-log-summary.txt",
+    "bonsai-1.7b-server-start.txt",
+    "bonsai-1.7b-server-stop.txt",
+    "bonsai-4b-eval-output.txt",
+    "bonsai-4b-eval-results.json",
+    "bonsai-4b-eval-summary.json",
+    "bonsai-4b-llama-server.log",
+    "bonsai-4b-llama-server.pid",
+    "bonsai-4b-server-final-status.txt",
+    "bonsai-4b-server-health.err",
+    "bonsai-4b-server-health.json",
+    "bonsai-4b-server-log-summary.txt",
+    "bonsai-4b-server-start.txt",
+    "bonsai-4b-server-stop.txt",
+    "run-prism-ml-model-eval.mjs"
+  ],
+  "allowedPlaceholders": [
+    "/Users/<user>",
+    "/Users/<fixture>",
+    "<pi-session-file:redacted>",
+    "[REDACTED_CREDENTIAL]",
+    "[stack trace omitted]",
+    "[local path omitted]",
+    "<redacted-signed-download-url>"
+  ],
+  "redactionsApplied": [
+    "local /Users/<user> model path and project workspace path placeholders",
+    "Hugging Face signed redirect URLs redacted from HEAD artifact"
+  ],
+  "notes": [
+    "llama.cpp log vocabulary such as token: <number> is not treated as a credential token assignment.",
+    "Hugging Face API metadata is public repo metadata; signed redirect URLs are not persisted."
+  ],
+  "forbiddenPatternCount": 0,
+  "matches": []
+}

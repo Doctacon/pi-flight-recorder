@@ -1,0 +1,306 @@
+{
+  "ticket": "ticket:20260527-prism-ml-small-model-comparison",
+  "authorization": {
+    "sweep": "1.7B + 4B",
+    "downloads": "Prism-ML GGUF only",
+    "runtimeScope": "existing Homebrew llama.cpp; no Ternary/custom fork; no hosted inference"
+  },
+  "settings": {
+    "corpus": "local-diagnosis-model-eval-corpus-v1",
+    "cases": 12,
+    "timeoutMs": 5000,
+    "maxOutputTokens": 128,
+    "contextTokens": 2048,
+    "productDefaultTimeoutMs": 750
+  },
+  "models": {
+    "bonsai-1.7b": {
+      "model": "PrismML Bonsai 1.7B GGUF Q1_0",
+      "acceptedCount": 8,
+      "fallbackCount": 4,
+      "acceptedWithinDefaultTimeoutCount": 1,
+      "modelOutcomeCounts": {
+        "accepted-equivalent": 8,
+        "fallback-unexpected": 1,
+        "fallback-expected": 3
+      },
+      "fallbackReasonCounts": {
+        "null": 8,
+        "schema-invalid": 2,
+        "malformed-json": 2
+      },
+      "latencyAll": {
+        "count": 12,
+        "minMs": 674.32,
+        "medianMs": 880.682,
+        "p95Ms": 1283.614,
+        "maxMs": 1283.614,
+        "meanMs": 952.035
+      },
+      "latencyAccepted": {
+        "count": 8,
+        "minMs": 700.865,
+        "medianMs": 880.682,
+        "p95Ms": 1283.614,
+        "maxMs": 1283.614,
+        "meanMs": 937.217
+      },
+      "hardFailResultCount": 0,
+      "outputSafetyFailureCount": 0,
+      "promptSafetyFailureCount": 0,
+      "rssKiBFinal": 1190576,
+      "recommendation": {
+        "decision": "keep-opt-in-experimental-with-timeout-guidance",
+        "rationale": "Real Bonsai produced accepted display wording under the explicit 5000ms evaluation timeout, but only 1/8 accepted case(s) completed within the current 750ms default timeout posture."
+      }
+    },
+    "bonsai-4b": {
+      "model": "PrismML Bonsai 4B GGUF Q1_0",
+      "acceptedCount": 1,
+      "fallbackCount": 11,
+      "acceptedWithinDefaultTimeoutCount": 0,
+      "modelOutcomeCounts": {
+        "fallback-unexpected": 6,
+        "fallback-expected": 5,
+        "accepted-equivalent": 1
+      },
+      "fallbackReasonCounts": {
+        "unsupported-facts": 11,
+        "null": 1
+      },
+      "latencyAll": {
+        "count": 12,
+        "minMs": 1185.212,
+        "medianMs": 1574.961,
+        "p95Ms": 2306.825,
+        "maxMs": 2306.825,
+        "meanMs": 1675.834
+      },
+      "latencyAccepted": {
+        "count": 1,
+        "minMs": 2209.657,
+        "medianMs": 2209.657,
+        "p95Ms": 2209.657,
+        "maxMs": 2209.657,
+        "meanMs": 2209.657
+      },
+      "hardFailResultCount": 0,
+      "outputSafetyFailureCount": 0,
+      "promptSafetyFailureCount": 0,
+      "rssKiBFinal": 1704432,
+      "recommendation": {
+        "decision": "create-follow-up-tuning-ticket-before-release-claim",
+        "rationale": "Real Bonsai accepted 1/12 cases and had 6 unexpected fallback(s); quality/reliability is not strong enough for a release claim without prompt/schema/timeout tuning evidence."
+      }
+    }
+  },
+  "caseOutcomes": {
+    "bonsai-1.7b": [
+      {
+        "caseId": "LDM-EVAL-001",
+        "modelOutcome": "accepted-equivalent",
+        "usedLocalModel": true,
+        "fallbackReason": null,
+        "validationIssue": null,
+        "elapsedMs": 1283.614
+      },
+      {
+        "caseId": "LDM-EVAL-002",
+        "modelOutcome": "accepted-equivalent",
+        "usedLocalModel": true,
+        "fallbackReason": null,
+        "validationIssue": null,
+        "elapsedMs": 909.136
+      },
+      {
+        "caseId": "LDM-EVAL-003",
+        "modelOutcome": "fallback-unexpected",
+        "usedLocalModel": false,
+        "fallbackReason": "schema-invalid",
+        "validationIssue": "provider response included non-display fields",
+        "elapsedMs": 842.628
+      },
+      {
+        "caseId": "LDM-EVAL-004",
+        "modelOutcome": "accepted-equivalent",
+        "usedLocalModel": true,
+        "fallbackReason": null,
+        "validationIssue": null,
+        "elapsedMs": 847.39
+      },
+      {
+        "caseId": "LDM-EVAL-005",
+        "modelOutcome": "accepted-equivalent",
+        "usedLocalModel": true,
+        "fallbackReason": null,
+        "validationIssue": null,
+        "elapsedMs": 700.865
+      },
+      {
+        "caseId": "LDM-EVAL-006",
+        "modelOutcome": "fallback-expected",
+        "usedLocalModel": false,
+        "fallbackReason": "schema-invalid",
+        "validationIssue": "provider response included non-display fields",
+        "elapsedMs": 674.32
+      },
+      {
+        "caseId": "LDM-EVAL-007",
+        "modelOutcome": "fallback-expected",
+        "usedLocalModel": false,
+        "fallbackReason": "malformed-json",
+        "validationIssue": "provider response was not valid JSON",
+        "elapsedMs": 1168.416
+      },
+      {
+        "caseId": "LDM-EVAL-008",
+        "modelOutcome": "accepted-equivalent",
+        "usedLocalModel": true,
+        "fallbackReason": null,
+        "validationIssue": null,
+        "elapsedMs": 880.682
+      },
+      {
+        "caseId": "LDM-EVAL-009",
+        "modelOutcome": "fallback-expected",
+        "usedLocalModel": false,
+        "fallbackReason": "malformed-json",
+        "validationIssue": "provider response was not valid JSON",
+        "elapsedMs": 1241.32
+      },
+      {
+        "caseId": "LDM-EVAL-010",
+        "modelOutcome": "accepted-equivalent",
+        "usedLocalModel": true,
+        "fallbackReason": null,
+        "validationIssue": null,
+        "elapsedMs": 809.166
+      },
+      {
+        "caseId": "LDM-EVAL-011",
+        "modelOutcome": "accepted-equivalent",
+        "usedLocalModel": true,
+        "fallbackReason": null,
+        "validationIssue": null,
+        "elapsedMs": 1152.13
+      },
+      {
+        "caseId": "LDM-EVAL-012",
+        "modelOutcome": "accepted-equivalent",
+        "usedLocalModel": true,
+        "fallbackReason": null,
+        "validationIssue": null,
+        "elapsedMs": 914.754
+      }
+    ],
+    "bonsai-4b": [
+      {
+        "caseId": "LDM-EVAL-001",
+        "modelOutcome": "fallback-unexpected",
+        "usedLocalModel": false,
+        "fallbackReason": "unsupported-facts",
+        "validationIssue": "display field included unsupported facts",
+        "elapsedMs": 2306.825
+      },
+      {
+        "caseId": "LDM-EVAL-002",
+        "modelOutcome": "fallback-unexpected",
+        "usedLocalModel": false,
+        "fallbackReason": "unsupported-facts",
+        "validationIssue": "display field included unsupported facts",
+        "elapsedMs": 1541.109
+      },
+      {
+        "caseId": "LDM-EVAL-003",
+        "modelOutcome": "fallback-unexpected",
+        "usedLocalModel": false,
+        "fallbackReason": "unsupported-facts",
+        "validationIssue": "display field included unsupported facts",
+        "elapsedMs": 1472.364
+      },
+      {
+        "caseId": "LDM-EVAL-004",
+        "modelOutcome": "fallback-unexpected",
+        "usedLocalModel": false,
+        "fallbackReason": "unsupported-facts",
+        "validationIssue": "display field included unsupported facts",
+        "elapsedMs": 1574.961
+      },
+      {
+        "caseId": "LDM-EVAL-005",
+        "modelOutcome": "fallback-unexpected",
+        "usedLocalModel": false,
+        "fallbackReason": "unsupported-facts",
+        "validationIssue": "display field included unsupported facts",
+        "elapsedMs": 1487.145
+      },
+      {
+        "caseId": "LDM-EVAL-006",
+        "modelOutcome": "fallback-expected",
+        "usedLocalModel": false,
+        "fallbackReason": "unsupported-facts",
+        "validationIssue": "display field included unsupported facts",
+        "elapsedMs": 1185.212
+      },
+      {
+        "caseId": "LDM-EVAL-007",
+        "modelOutcome": "fallback-expected",
+        "usedLocalModel": false,
+        "fallbackReason": "unsupported-facts",
+        "validationIssue": "display field included unsupported facts",
+        "elapsedMs": 1242.095
+      },
+      {
+        "caseId": "LDM-EVAL-008",
+        "modelOutcome": "fallback-expected",
+        "usedLocalModel": false,
+        "fallbackReason": "unsupported-facts",
+        "validationIssue": "display field included unsupported facts",
+        "elapsedMs": 1759.15
+      },
+      {
+        "caseId": "LDM-EVAL-009",
+        "modelOutcome": "fallback-expected",
+        "usedLocalModel": false,
+        "fallbackReason": "unsupported-facts",
+        "validationIssue": "display field included unsupported facts",
+        "elapsedMs": 1910.338
+      },
+      {
+        "caseId": "LDM-EVAL-010",
+        "modelOutcome": "fallback-expected",
+        "usedLocalModel": false,
+        "fallbackReason": "unsupported-facts",
+        "validationIssue": "display field included unsupported facts",
+        "elapsedMs": 1617.243
+      },
+      {
+        "caseId": "LDM-EVAL-011",
+        "modelOutcome": "accepted-equivalent",
+        "usedLocalModel": true,
+        "fallbackReason": null,
+        "validationIssue": null,
+        "elapsedMs": 2209.657
+      },
+      {
+        "caseId": "LDM-EVAL-012",
+        "modelOutcome": "fallback-unexpected",
+        "usedLocalModel": false,
+        "fallbackReason": "unsupported-facts",
+        "validationIssue": "display field included unsupported facts",
+        "elapsedMs": 1803.912
+      }
+    ]
+  },
+  "recommendation": {
+    "decision": "prefer-1.7b-over-4b-for-current-validator-and-prompt",
+    "rationale": "Bonsai 4B Q1_0 was slower and accepted only 1/12 cases under the current strict support validator, while tuned 1.7B accepted 8/12 with zero safety failures. 4B produced richer paraphrases, but the validator rejected them as unsupported facts; do not recommend 4B for /flight-learn polish without a separate prompt/validator tuning ticket."
+  },
+  "limits": [
+    "single synthetic/redacted corpus",
+    "single run per model on one 16GB MacBook environment",
+    "automatic rubric marks accepted safe outputs equivalent pending manual review",
+    "unsupported-facts may reflect validator strictness rather than human copy quality",
+    "not release-readiness evidence"
+  ]
+}

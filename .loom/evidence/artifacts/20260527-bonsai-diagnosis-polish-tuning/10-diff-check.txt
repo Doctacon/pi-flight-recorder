@@ -1,0 +1,5 @@
+date=2026-05-27T22:55:54Z
+git_status_short_for_source=
+?? src/flight-learn-local-diagnosis-model.test.ts
+?? src/flight-learn-local-diagnosis-model.ts
+git_diff_check=

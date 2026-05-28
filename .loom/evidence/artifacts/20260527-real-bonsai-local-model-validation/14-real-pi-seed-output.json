@@ -1,0 +1,34 @@
+{
+  "dataDir": "/tmp/pfr-real-bonsai-pi-cIkbeK/home/.pi/flight-recorder",
+  "databasePath": "/tmp/pfr-real-bonsai-pi-cIkbeK/home/.pi/flight-recorder/flight-recorder.db",
+  "deltas": [
+    {
+      "id": "delta_realpi_plain_english_raw",
+      "status": "candidate",
+      "summary": "Repeated failure pattern: bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm test > pi-flight-recorder.log",
+      "evidenceRefs": 2,
+      "updatedAt": "2026-05-27T01:15:00.000Z"
+    },
+    {
+      "id": "delta_realpi_plain_english_secondary",
+      "status": "candidate",
+      "summary": "Assistant repeatedly confused the storage mapper ownership boundary.",
+      "evidenceRefs": 1,
+      "updatedAt": "2026-05-27T01:00:00.000Z"
+    }
+  ],
+  "signals": [
+    {
+      "id": "sig_realpi_plain_english_raw",
+      "deltaId": "delta_realpi_plain_english_raw",
+      "type": "reflection-cluster",
+      "confidence": 0.55
+    },
+    {
+      "id": "sig_realpi_plain_english_secondary",
+      "deltaId": "delta_realpi_plain_english_secondary",
+      "type": "manual-capture",
+      "confidence": null
+    }
+  ]
+}

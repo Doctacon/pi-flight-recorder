@@ -1,0 +1,2 @@
+package.json runtime dependency count: 0
+integration policy scan passed: explicit flags only, status privacy copy updated, no new visible command markers, no hosted/provider/download/process tokens in extension, no runtime dependencies

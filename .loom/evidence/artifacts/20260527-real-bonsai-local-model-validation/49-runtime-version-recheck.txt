@@ -1,0 +1,24 @@
+date=2026-05-27T18:43:14Z
+which_llama_server=/opt/homebrew/bin/llama-server
+which_llama_cli=/opt/homebrew/bin/llama-cli
+llama_server_version_output=
+version: 9360 (6b4e4bd58)
+built with AppleClang 17.0.0.17000604 for Darwin arm64
+llama_cli_version_output=
+version: 9360 (6b4e4bd58)
+built with AppleClang 17.0.0.17000604 for Darwin arm64
+brew_info_llama_cpp=
+==> llama.cpp: stable 9360 (bottled), HEAD
+LLM inference in C/C++
+https://github.com/ggml-org/llama.cpp
+Installed (on request)
+From: https://github.com/Homebrew/homebrew-core/blob/HEAD/Formula/l/llama.cpp.rb
+License: MIT
+==> Installed Kegs and Versions
+llama.cpp 9360 (71 files, 23MB) [Linked]
+==> Dependencies
+Required (2): ggml, openssl@3
+Recursive Runtime (4): all installed ✔
+==> Options
+--HEAD
+	Install HEAD version

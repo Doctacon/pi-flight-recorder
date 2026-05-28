@@ -1,0 +1,61 @@
+date=2026-05-27T20:53:16Z
+git_status_short=
+ M .loom/plans/20260527-flight-learn-local-model-diagnosis-polish.md
+ M .loom/research/20260527-local-diagnosis-model-runtime.md
+ M .loom/tickets/20260523-real-corpus-evaluation-and-tuning.md
+ M .loom/tickets/20260527-flight-learn-local-model-polish-integration.md
+ M .loom/tickets/20260527-flight-learn-local-model-polish-validation.md
+ M .loom/tickets/20260527-local-diagnosis-model-adapter.md
+ M .loom/tickets/20260527-local-diagnosis-model-contract-harness.md
+ M .loom/tickets/20260527-local-diagnosis-model-runtime-research.md
+ M src/flight-learn-inbox.test.ts
+ M src/flight-learn-inbox.ts
+ M src/pi-extension.test.ts
+ M src/pi-extension.ts
+?? .loom/audit/20260527-flight-learn-local-model-polish-integration-followup-review.md
+?? .loom/audit/20260527-flight-learn-local-model-polish-integration-review.md
+?? .loom/audit/20260527-flight-learn-local-model-polish-validation-review.md
+?? .loom/audit/20260527-local-diagnosis-model-adapter-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-adapter-review.md
+?? .loom/audit/20260527-local-diagnosis-model-adapter-second-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-fifth-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-fourth-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-second-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-sixth-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-third-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-eval-corpus-rubric-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-eval-corpus-rubric-review.md
+?? .loom/audit/20260527-local-diagnosis-model-eval-harness-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-eval-harness-review.md
+?? .loom/audit/20260527-local-diagnosis-model-runtime-research-review.md
+?? .loom/audit/20260527-real-bonsai-local-model-validation-followup-review.md
+?? .loom/audit/20260527-real-bonsai-local-model-validation-review.md
+?? .loom/audit/20260527-real-bonsai-local-model-validation-second-followup-review.md
+?? .loom/evidence/20260527-bonsai-diagnosis-model-evaluation.md
+?? .loom/evidence/20260527-flight-learn-local-model-polish-integration-validation.md
+?? .loom/evidence/20260527-flight-learn-local-model-polish-validation.md
+?? .loom/evidence/20260527-local-diagnosis-model-adapter-validation.md
+?? .loom/evidence/20260527-local-diagnosis-model-contract-harness-validation.md
+?? .loom/evidence/20260527-local-diagnosis-model-eval-corpus-rubric.md
+?? .loom/evidence/20260527-local-diagnosis-model-eval-harness.md
+?? .loom/evidence/20260527-real-bonsai-local-model-validation.md
+?? .loom/evidence/artifacts/20260527-bonsai-diagnosis-model-evaluation/
+?? .loom/evidence/artifacts/20260527-flight-learn-local-model-polish-integration/
+?? .loom/evidence/artifacts/20260527-flight-learn-local-model-polish-validation/
+?? .loom/evidence/artifacts/20260527-local-diagnosis-model-adapter-validation/
+?? .loom/evidence/artifacts/20260527-local-diagnosis-model-contract-harness-validation/
+?? .loom/evidence/artifacts/20260527-local-diagnosis-model-eval-corpus-rubric/
+?? .loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness/
+?? .loom/evidence/artifacts/20260527-real-bonsai-local-model-validation/
+?? .loom/plans/20260527-flight-learn-local-model-quality-evaluation.md
+?? .loom/tickets/20260527-bonsai-diagnosis-model-evaluation.md
+?? .loom/tickets/20260527-bonsai-diagnosis-polish-tuning.md
+?? .loom/tickets/20260527-local-diagnosis-model-eval-corpus-rubric.md
+?? .loom/tickets/20260527-local-diagnosis-model-eval-harness.md
+?? .loom/tickets/20260527-real-bonsai-local-model-validation.md
+?? src/flight-learn-llama-cpp-adapter.test.ts
+?? src/flight-learn-llama-cpp-adapter.ts
+?? src/flight-learn-local-diagnosis-model.test.ts
+?? src/flight-learn-local-diagnosis-model.ts

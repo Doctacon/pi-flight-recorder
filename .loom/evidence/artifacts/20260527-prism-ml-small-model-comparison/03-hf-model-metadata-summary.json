@@ -1,0 +1,188 @@
+{
+  "prism-ml/Bonsai-1.7B-gguf": {
+    "id": "prism-ml/Bonsai-1.7B-gguf",
+    "sha": "210a9e99f79cb184909d49595906526eb2b3dd9a",
+    "lastModified": "2026-04-18T20:51:56.000Z",
+    "private": false,
+    "disabled": false,
+    "gated": false,
+    "downloads": 11846,
+    "likes": 73,
+    "library_name": "llama.cpp",
+    "pipeline_tag": "text-generation",
+    "tags": [
+      "llama.cpp",
+      "gguf",
+      "1-bit",
+      "llama-cpp",
+      "cuda",
+      "metal",
+      "on-device",
+      "prismml",
+      "bonsai",
+      "text-generation",
+      "base_model:prism-ml/Bonsai-1.7B-unpacked",
+      "base_model:quantized:prism-ml/Bonsai-1.7B-unpacked",
+      "license:apache-2.0",
+      "eval-results",
+      "endpoints_compatible",
+      "region:us",
+      "conversational"
+    ],
+    "siblings": [
+      {
+        "rfilename": ".eval_results/gsm8k.yaml",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": ".gitattributes",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "Bonsai-1.7B-Q1_0.gguf",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "Bonsai-1.7B.gguf",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "LICENSE",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "NOTICE.txt",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "README.md",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "assets/bonsai-logo.svg",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "assets/frontier.png",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "assets/frontier.svg",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      }
+    ]
+  },
+  "prism-ml/Bonsai-4B-gguf": {
+    "id": "prism-ml/Bonsai-4B-gguf",
+    "sha": "78f2c2bacd0904ffaba24b4873ed975e5818354a",
+    "lastModified": "2026-04-18T20:51:23.000Z",
+    "private": false,
+    "disabled": false,
+    "gated": false,
+    "downloads": 5390,
+    "likes": 44,
+    "library_name": "llama.cpp",
+    "pipeline_tag": "text-generation",
+    "tags": [
+      "llama.cpp",
+      "gguf",
+      "1-bit",
+      "llama-cpp",
+      "cuda",
+      "metal",
+      "on-device",
+      "prismml",
+      "bonsai",
+      "text-generation",
+      "base_model:prism-ml/Bonsai-4B-unpacked",
+      "base_model:quantized:prism-ml/Bonsai-4B-unpacked",
+      "license:apache-2.0",
+      "eval-results",
+      "endpoints_compatible",
+      "region:us",
+      "conversational"
+    ],
+    "siblings": [
+      {
+        "rfilename": ".eval_results/gsm8k.yaml",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": ".gitattributes",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "Bonsai-4B-Q1_0.gguf",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "Bonsai-4B.gguf",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "LICENSE",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "NOTICE.txt",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "README.md",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "assets/bonsai-logo.svg",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "assets/frontier.png",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      },
+      {
+        "rfilename": "assets/frontier.svg",
+        "size": null,
+        "blobId": null,
+        "lfs": {}
+      }
+    ]
+  }
+}

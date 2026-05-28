@@ -1,0 +1,9 @@
+
+ RUN  v4.1.7 /Users/crlough/Code/personal/pi-flight-recorder
+
+
+ Test Files  2 passed (2)
+      Tests  23 passed (23)
+   Start at  10:10:47
+   Duration  391ms (transform 92ms, setup 0ms, import 122ms, tests 265ms, environment 0ms)
+

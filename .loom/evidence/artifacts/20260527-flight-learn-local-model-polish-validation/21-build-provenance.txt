@@ -1,0 +1,60 @@
+git_commit=8e2ba30637ffc8c07738b43c8b5b6f56d08bbf53
+git_status_short=
+ M .loom/research/20260527-local-diagnosis-model-runtime.md
+ M .loom/tickets/20260527-flight-learn-local-model-polish-integration.md
+ M .loom/tickets/20260527-flight-learn-local-model-polish-validation.md
+ M .loom/tickets/20260527-local-diagnosis-model-adapter.md
+ M .loom/tickets/20260527-local-diagnosis-model-contract-harness.md
+ M .loom/tickets/20260527-local-diagnosis-model-runtime-research.md
+ M src/flight-learn-inbox.test.ts
+ M src/flight-learn-inbox.ts
+ M src/pi-extension.test.ts
+ M src/pi-extension.ts
+?? .loom/audit/20260527-flight-learn-local-model-polish-integration-followup-review.md
+?? .loom/audit/20260527-flight-learn-local-model-polish-integration-review.md
+?? .loom/audit/20260527-local-diagnosis-model-adapter-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-adapter-review.md
+?? .loom/audit/20260527-local-diagnosis-model-adapter-second-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-fifth-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-fourth-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-second-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-sixth-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-contract-harness-third-followup-review.md
+?? .loom/audit/20260527-local-diagnosis-model-runtime-research-review.md
+?? .loom/evidence/20260527-flight-learn-local-model-polish-integration-validation.md
+?? .loom/evidence/20260527-local-diagnosis-model-adapter-validation.md
+?? .loom/evidence/20260527-local-diagnosis-model-contract-harness-validation.md
+?? .loom/evidence/artifacts/20260527-flight-learn-local-model-polish-integration/
+?? .loom/evidence/artifacts/20260527-flight-learn-local-model-polish-validation/
+?? .loom/evidence/artifacts/20260527-local-diagnosis-model-adapter-validation/
+?? .loom/evidence/artifacts/20260527-local-diagnosis-model-contract-harness-validation/
+?? src/flight-learn-llama-cpp-adapter.test.ts
+?? src/flight-learn-llama-cpp-adapter.ts
+?? src/flight-learn-local-diagnosis-model.test.ts
+?? src/flight-learn-local-diagnosis-model.ts
+package_pi_extension=
+{
+  "extensions": [
+    "./dist/pi-extension.js"
+  ]
+}
+dist_pi_extension_stat=dist/pi-extension.js 85318 May 27 10:44:24 2026
+dist_flight_learn_inbox_stat=dist/flight-learn-inbox.js 32019 May 27 10:44:24 2026
+947ddd9ab9cb819ca987e4a4d17b88d6e63ac891b5f46214ae1423a122f7ad54  dist/pi-extension.js
+ff2a7ea8687c68beef50058344fa3af4a70beb3f1f906ca130558930249e9363  dist/flight-learn-inbox.js
+ce66e95cbdbedc0fd1a8082fec4760315018971d73b9ad7a935ba776307858c5  dist/flight-learn-local-diagnosis-model.js
+90db9ff22279c4c22c8a4cc25b090bd7111722207ceaf5252b9b681049f23858  dist/flight-learn-llama-cpp-adapter.js
+dist_fingerprints=
+dist/pi-extension.js:6:import { buildFlightLearnDiagnosisViewWithLocalPolish } from "./flight-learn-local-diagnosis-model.js";
+dist/pi-extension.js:346:        "- /flight-learn --local-model-polish --local-model-url http://127.0.0.1:PORT",
+dist/pi-extension.js:459:            "Privacy: local SQLite only by default; no model calls unless explicitly enabled by `/flight-learn reflect --model`, model reflection settings, or `/flight-learn --local-model-polish --local-model-url ...`.",
+dist/pi-extension.js:785:    if (!args.includes("--local-model-polish"))
+dist/pi-extension.js:808:    first.localDiagnosisPolish = await buildFlightLearnDiagnosisViewWithLocalPolish({ delta: first.delta, signals: first.signals }, localDiagnosisPolish);
+dist/flight-learn-inbox.js:123:        return "Local model phrasing; deterministic fallback available.";
+dist/flight-learn-inbox.js:126:    return `Local model unavailable (${fallbackReasonLabel(result.fallbackReason)}); deterministic wording shown.`;
+dist/flight-learn-local-diagnosis-model.js:339:export async function buildFlightLearnDiagnosisViewWithLocalPolish(input, options = {}) {
+dist/flight-learn-local-diagnosis-model.js:415:            `Local model phrasing was requested but rejected (${reason}); deterministic display text is shown.`,
+dist/flight-learn-llama-cpp-adapter.js:20:const DIRECT_LOOPBACK_HTTP_AGENT = new Agent({ keepAlive: false, proxyEnv: {} });
+project_settings=/Users/crlough/Code/personal/pi-flight-recorder/.loom/evidence/artifacts/20260527-flight-learn-local-model-polish-validation/06-project-settings.json

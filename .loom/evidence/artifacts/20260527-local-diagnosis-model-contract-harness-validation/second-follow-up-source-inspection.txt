@@ -1,0 +1,39 @@
+$ git status --short -- src/flight-learn-local-diagnosis-model.ts src/flight-learn-local-diagnosis-model.test.ts .loom/tickets/20260527-local-diagnosis-model-contract-harness.md .loom/evidence/20260527-local-diagnosis-model-contract-harness-validation.md .loom/evidence/artifacts/20260527-local-diagnosis-model-contract-harness-validation
+ M .loom/tickets/20260527-local-diagnosis-model-contract-harness.md
+?? .loom/evidence/20260527-local-diagnosis-model-contract-harness-validation.md
+?? .loom/evidence/artifacts/20260527-local-diagnosis-model-contract-harness-validation/
+?? src/flight-learn-local-diagnosis-model.test.ts
+?? src/flight-learn-local-diagnosis-model.ts
+
+$ grep -nE "^import .* from" src/flight-learn-local-diagnosis-model.ts
+1:import { buildFlightLearnDiagnosisView, type FlightLearnDiagnosisInput, type FlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
+2:import { sanitizeStoredText } from "./redact.js";
+3:import type { DeltaDetectorSignal, DeltaEvidenceRef, ExpectationDelta } from "./types.js";
+
+$ grep -nE "fetch\\(|https?://|node:fs|node:child_process|child_process|writeFile|appendFile|mkdir|rm\\(|process\\.|open\\(|createWriteStream|createReadStream" src/flight-learn-local-diagnosis-model.ts src/flight-learn-local-diagnosis-model.test.ts || true
+
+$ grep -nE "(store|artifact|rule|source|docs|prompt|skill|route)" src/flight-learn-local-diagnosis-model.ts | head -n 40
+31: * Provider boundary for explicitly enabled local/open-source diagnosis polish.
+33: * The interface intentionally carries a bounded prompt and has no generic URL,
+43:  prompt: string;
+58:    source: ExpectationDelta["source"];
+89:  sourceType: DeltaEvidenceRef["sourceType"];
+136:const DELTA_SOURCE_VALUES = new Set<ExpectationDelta["source"]>(["manual", "detector", "reflection", "import"]);
+137:const DELTA_STATUS_VALUES = new Set<ExpectationDelta["status"]>(["candidate", "accepted", "dismissed", "routed", "resolved", "recurring"]);
+140:const EVIDENCE_SOURCE_TYPE_VALUES = new Set<DeltaEvidenceRef["sourceType"]>(["occurrence", "episode", "cluster", "proposal", "rule-candidate", "flight-rule", "session-entry", "manual"]);
+170:  /\broute\s+(?:this|it|the|to)\b/i,
+172:  /(?:^|[.!?]\s+)(?:then\s+|please\s+)*(?:add|edit|modify|change|delete|remove|fix|write|create|update)\s+(?:a\s+|an\s+|the\s+)?(?:test|tests|file|files|code|source|module|dependency|prompt|rule|ticket|artifact|candidate|loom|skill)\b/i,
+173:  /\b(?:you\s+|we\s+|they\s+|the\s+assistant\s+|the\s+user\s+)?(?:could|should|might|may|would|must|need|needs|will)\s+(?:then\s+|also\s+|please\s+)*(?:add|edit|modify|change|delete|remove|fix|write|create|update|route|rank|store|save|persist|apply)\s+(?:this|it|them|a\s+|an\s+|the\s+)?(?:test|tests|file|files|code|source|module|dependency|prompt|rule|ticket|artifact|candidate|loom|skill|card|diagnosis|output|record)?\b/i,
+174:  /\b(?:create|apply|store|save|persist|write)\s+(?:a\s+)?(?:route|artifact|candidate|rule|ticket|loom|file|prompt|skill|source)/i,
+175:  /\b(?:artifact|candidate|flight\s*rule|loom\s+(?:ticket|spec|research|knowledge|record)|classifier|route\s+ranking)\b/i,
+176:  /\b(?:source files?|docs?|prompts?|skills?)\s+(?:should|must|need|needs|will)\s+(?:be\s+)?(?:changed|updated|created|written|mutated)\b/i,
+180:  /\b(?:system|developer|user)\s+prompt\b/i,
+181:  /\bfull\s+prompt\b/i,
+372:  if (looksLikePrompt(normalized)) return "[prompt text omitted]";
+409:    sourceType: safeEnumValue(ref.sourceType, EVIDENCE_SOURCE_TYPE_VALUES, "manual"),
+429:      source: safeEnumValue(input.delta.source, DELTA_SOURCE_VALUES, "manual"),
+458:    "Use only the bounded redacted fact packet. Do not add facts, routes, actions, artifacts, file paths, secrets, stack traces, commands, or transcript text.",
+461:    "The JSON is display-only wording for the current card and must not instruct routing, ranking, storage, artifact creation, source edits, Loom records, rules, skills, or prompt changes.",
+476:  const prompt = buildLocalDiagnosisPrompt(factPacket);
+484:      Promise.resolve(options.provider.completeLocalDiagnosisPolish({ prompt, factPacket: providerFactPacket, signal: controller.signal })),
+579:      "Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed.",

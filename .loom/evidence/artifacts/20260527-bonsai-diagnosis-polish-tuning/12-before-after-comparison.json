@@ -1,0 +1,81 @@
+{
+  "preTuningSource": "evidence:20260527-bonsai-diagnosis-model-evaluation final fresh-server pass",
+  "postTuningSource": "evidence:20260527-bonsai-diagnosis-polish-tuning final fresh-server pass",
+  "change": "prompt-only explicit non-display/metadata/fact-packet-echo prohibition",
+  "metrics": {
+    "acceptedCount": {
+      "before": 5,
+      "after": 8,
+      "delta": 3
+    },
+    "fallbackCount": {
+      "before": 7,
+      "after": 4,
+      "delta": -3
+    },
+    "fallbackReasonCounts": {
+      "before": {
+        "null": 5,
+        "schema-invalid": 6,
+        "unsupported-facts": 1
+      },
+      "after": {
+        "null": 8,
+        "malformed-json": 3,
+        "schema-invalid": 1
+      }
+    },
+    "modelOutcomeCounts": {
+      "before": {
+        "accepted-equivalent": 5,
+        "fallback-unexpected": 3,
+        "fallback-expected": 4
+      },
+      "after": {
+        "accepted-equivalent": 8,
+        "fallback-unexpected": 1,
+        "fallback-expected": 3
+      }
+    },
+    "acceptedWithinDefaultTimeoutCount": {
+      "before": 1,
+      "after": 1,
+      "delta": 0
+    },
+    "latencyAllMeanMs": {
+      "before": 869.791,
+      "after": 972.052,
+      "delta": 102.261
+    },
+    "latencyAllP95Ms": {
+      "before": 1157.965,
+      "after": 1323.008,
+      "delta": 165.043
+    },
+    "hardFailResultCount": {
+      "before": 0,
+      "after": 0,
+      "delta": 0
+    },
+    "outputSafetyFailureCount": {
+      "before": 0,
+      "after": 0,
+      "delta": 0
+    },
+    "promptSafetyFailureCount": {
+      "before": 0,
+      "after": 0,
+      "delta": 0
+    }
+  },
+  "recommendationAfterTuning": {
+    "decision": "keep-opt-in-experimental-with-timeout-guidance",
+    "rationale": "Real Bonsai produced accepted display wording under the explicit 5000ms evaluation timeout, but only 1/8 accepted case(s) completed within the current 750ms default timeout posture."
+  },
+  "limits": [
+    "single synthetic/redacted corpus",
+    "single local runtime/hardware pass",
+    "automatic rubric marks changed safe outputs equivalent pending manual review",
+    "does not prove broad quality or release readiness"
+  ]
+}

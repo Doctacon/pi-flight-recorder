@@ -1,0 +1,8 @@
+artifact_dir=.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-corpus-rubric
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-corpus-rubric/artifact-listing.txt
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-corpus-rubric/build-eval-corpus.mjs
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-corpus-rubric/build-output.txt
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-corpus-rubric/corpus-summary.json
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-corpus-rubric/diagnosis-polish-eval-corpus.v1.json
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-corpus-rubric/diff-check.txt
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-corpus-rubric/privacy-scan.json

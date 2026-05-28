@@ -1,0 +1,5 @@
+date=2026-05-27T18:34:26Z
+  PID    RSS      VSZ ELAPSED COMMAND
+53325 645184 412552368   05:15 llama-server -m /Users/crlough/.cache/pi-flight-recorder/bonsai/Bonsai-1.7B-Q1_0.gguf --host 127.0.0.1 --port 18117 -c 2048 --no-webui --jinja
+health=
+{"status":"ok"}

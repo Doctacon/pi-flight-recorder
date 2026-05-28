@@ -2,7 +2,7 @@
 
 ID: ticket:20260527-flight-learn-local-model-polish-integration
 Type: Ticket
-Status: open
+Status: closed
 Created: 2026-05-27
 Updated: 2026-05-27
 Risk: high - this touches the primary `/flight-learn` review UI and must not change routing, storage, artifact, or command-surface semantics.
@@ -22,6 +22,9 @@ Single closure claim: `/flight-learn` can display optional local-model-polished 
 - `ticket:20260527-local-diagnosis-model-contract-harness` - owns prompt/schema/validation/fallback semantics.
 - `spec:flight-learn-inbox-ux` - REQ-024 through REQ-029 and SCN-008/SCN-009 define optional model polish behavior.
 - `spec:visible-command-surface` - default visible commands must remain only `/flight-status` and `/flight-learn`.
+- `evidence:20260527-flight-learn-local-model-polish-integration-validation` - implementation validation artifacts and acceptance support.
+- `audit:20260527-flight-learn-local-model-polish-integration-review` - first audit; verdict `changes-needed`, with follow-up now applied.
+- `audit:20260527-flight-learn-local-model-polish-integration-followup-review` - follow-up audit; verdict `clear`.
 - `ticket:20260527-flight-learn-diagnosis-card-integration` - completed deterministic focused-card diagnosis integration.
 - `src/flight-learn-inbox.ts` - likely focused-card renderer and custom UI seam.
 - `src/pi-extension.ts` - likely command/options seam.
@@ -86,8 +89,18 @@ Stop conditions:
 
 ## Current State
 
-Open but not ready to execute until the local adapter ticket is closed. No source implementation has started. The first likely Ralph run should wire a fake/local-polish provider into the focused-card path and prove default/fallback behavior before any real runtime validation.
+Closed. Implemented optional local-model diagnosis polish in the focused-card inbox behind explicit `/flight-learn --local-model-polish --local-model-url http://127.0.0.1:PORT` flags. The deterministic diagnosis remains default/fallback. Validated model wording is passed as display-only item data, rendered with unobtrusive disclosure, hidden when editable fields change, and never persisted into delta or artifact source-of-truth fields. No visible top-level command, runtime dependency, hosted provider path, download, subprocess, or route/storage semantics change was added.
+
+First audit `audit:20260527-flight-learn-local-model-polish-integration-review` returned `changes-needed`; follow-up fixed stale `/flight-status` privacy copy and documented/tested the accepted explicit-flag custom-throw behavior. Final audit `audit:20260527-flight-learn-local-model-polish-integration-followup-review` returned `clear`.
+
+Validation evidence is refreshed in `evidence:20260527-flight-learn-local-model-polish-integration-validation`: focused integration tests passed (4 files / 63 tests), `npm run typecheck` passed, `npm run build` passed, full `npm test` passed (21 files / 126 tests), source/package policy scan passed, and diff whitespace check passed.
+
+Intentional scope limit: optional model wording is precomputed for the initial selected delta to avoid blocking the entire inbox; other items remain deterministic unless reviewed through a future path. Real Bonsai/`llama.cpp` and real Pi TUI validation remain for the validation ticket.
 
 ## Journal
 
 - 2026-05-27: Created as the UI integration slice for optional Bonsai/local-model diagnosis polish. This ticket explicitly preserves the two-command surface and candidate-only learning semantics.
+- 2026-05-27: Set active after `ticket:20260527-local-diagnosis-model-adapter` closed. Began wiring explicit flag-based local polish into the focused-card path without new visible commands.
+- 2026-05-27: Implemented explicit flag-based focused-card integration, added component and Pi extension tests for enabled/fallback/display-only behavior, recorded `evidence:20260527-flight-learn-local-model-polish-integration-validation`, and moved to review.
+- 2026-05-27: Recorded `audit:20260527-flight-learn-local-model-polish-integration-review` with verdict `changes-needed`. Follow-up updated status privacy copy/test and added explicit custom-throw behavior test/documentation, refreshed validation evidence, and kept ticket in review for follow-up audit.
+- 2026-05-27: Recorded `audit:20260527-flight-learn-local-model-polish-integration-followup-review` with verdict `clear`. Closed ticket with real Bonsai/real Pi validation deferred to the validation ticket.

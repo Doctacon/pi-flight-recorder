@@ -1,0 +1,4 @@
+date=2026-05-27T23:50:27Z
+model=Bonsai-4B-Q1_0
+pid=89255
+server_stopped=true

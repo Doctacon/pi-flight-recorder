@@ -1,4 +1,5 @@
 import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -9,6 +10,51 @@ import { SessionWatchService } from "./watch-service.js";
 
 function line(value: unknown): string {
   return JSON.stringify(value);
+}
+
+interface TestChatServer {
+  baseUrl: string;
+  requests: string[];
+  close: () => Promise<void>;
+}
+
+async function readBody(request: IncomingMessage): Promise<string> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of request) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)));
+  return Buffer.concat(chunks).toString("utf8");
+}
+
+function writeJson(response: ServerResponse, value: unknown): void {
+  const body = JSON.stringify(value);
+  response.writeHead(200, { "content-type": "application/json", "content-length": Buffer.byteLength(body, "utf8").toString() });
+  response.end(body);
+}
+
+function closeServer(server: Server): Promise<void> {
+  return new Promise((resolve, reject) => {
+    server.close((error) => {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+}
+
+async function startLocalChatServer(content: string): Promise<TestChatServer> {
+  const requests: string[] = [];
+  const server = createServer(async (request, response) => {
+    requests.push(await readBody(request));
+    writeJson(response, { choices: [{ message: { content } }] });
+  });
+  await new Promise<void>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      server.off("error", reject);
+      resolve();
+    });
+  });
+  const address = server.address();
+  if (!address || typeof address === "string") throw new Error("expected local chat server port");
+  return { baseUrl: `http://127.0.0.1:${address.port}`, requests, close: () => closeServer(server) };
 }
 
 async function makeSessionSource(): Promise<{ root: string; dataDir: string }> {
@@ -103,6 +149,8 @@ describe("Pi extension wrapper", () => {
       const output = notifications.join("\n");
       expect(output).toContain("Flight recorder: suggest-on-failure");
       expect(output).toContain("User-bash capture: disabled");
+      expect(output).toContain("Privacy: local SQLite only by default; no model calls unless explicitly enabled");
+      expect(output).toContain("/flight-learn --local-model-polish --local-model-url ...");
       const store = new FlightRecorderStore(defaultDatabasePath(getDefaultDataDir()));
       try {
         expect(store.count("episodes")).toBe(1);
@@ -600,6 +648,210 @@ describe("Pi extension wrapper", () => {
     expect(rendered[0]?.join("\n")).not.toContain("Pending deltas");
     expect(notifications.join("\n")).toContain("Flight Learn: reviewing the next pending delta");
     expect(notifications.join("\n")).toContain("No artifact was created or applied");
+  });
+
+  it("shows explicitly enabled local-model diagnosis polish without persisting model wording", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-learn-local-polish-data-"));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    const chatServer = await startLocalChatServer(JSON.stringify({
+      headline: "A validation check failed repeatedly in this project.",
+      whatHappened: "Pi saw the same validation check failed twice in recent sessions.",
+      whyItMatters: "Repeated validation friction makes the result hard to trust.",
+      expectedBehavior: "Validation should run from a fresh shell.",
+    }));
+    let deltaId = "";
+    try {
+      const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+      try {
+        const delta = store.createExpectationDelta({
+          source: "detector",
+          summary: "Repeated failure pattern: bash cd /Users/alice/project && npm test",
+          expectation: "Validation should run from a fresh shell.",
+          reality: "Observed 2 related failure occurrences in reflection cluster cluster_local_polish.",
+          impact: "Repeated validation friction makes the result hard to trust.",
+          severity: "medium",
+          cwd: "/Users/alice/project",
+          evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/Users/alice/project", entryId: null, timestamp: null, snippet: "bash cd /Users/alice/project && npm test failed twice", note: "manual" }],
+        });
+        deltaId = delta.id;
+        store.recordDeltaDetectorSignal({ deltaId, type: "failed-validation", explanation: "Validation failed twice from the same stale shell pattern.", confidence: 0.74, evidenceRefs: delta.evidenceRefs });
+      } finally {
+        store.close();
+      }
+
+      const notifications: string[] = [];
+      const rendered: string[][] = [];
+      const ctx = {
+        cwd: "/repo",
+        ui: {
+          notify: (message: string) => notifications.push(message),
+          custom: async (factory: any) => {
+            let result: unknown;
+            const component = factory({ requestRender: () => undefined }, { fg: (_color: string, value: string) => value, bold: (value: string) => value }, {}, (value: unknown) => {
+              result = value;
+            });
+            rendered.push(component.render(112));
+            component.handleInput?.("2");
+            component.handleInput?.("\r");
+            return result;
+          },
+          editor: (message: string) => {
+            if (message.includes("Why this follow-up?")) return "A validation check follow-up should preserve the local evidence.";
+            throw new Error("only follow-up reason editor should run after custom route selection");
+          },
+        },
+        sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
+      };
+
+      await commands.get("flight-learn")?.handler(`--data-dir ${dataDir} --local-model-polish --local-model-url ${chatServer.baseUrl}`, ctx);
+
+      const output = rendered[0]?.join("\n") ?? "";
+      expect(output).toContain("Local model phrasing; deterministic fallback available.");
+      expect(output).toContain("A validation check failed repeatedly in this project.");
+      expect(output).toContain("Pi saw the same validation check failed twice in recent sessions.");
+      expect(chatServer.requests).toHaveLength(1);
+      expect(chatServer.requests[0]).toContain("Fact packet JSON");
+      expect(chatServer.requests[0]).toContain("/Users/<user>");
+      expect(chatServer.requests[0]).not.toContain("/Users/alice");
+
+      const check = new FlightRecorderStore(defaultDatabasePath(dataDir));
+      try {
+        const routed = check.getExpectationDelta(deltaId);
+        const candidate = check.listArtifactCandidates({ deltaId })[0];
+        expect(routed?.status).toBe("routed");
+        expect(routed?.summary).toContain("Repeated failure pattern: bash cd");
+        expect(routed?.summary).not.toContain("validation check failed repeatedly");
+        expect(candidate?.artifactType).toBe("test-check");
+        expect(candidate?.status).toBe("accepted");
+        expect(candidate?.applied).toBe(false);
+        expect(candidate?.rationale).toContain("validation check follow-up");
+        expect(candidate?.proposedDraft).not.toContain("validation check failed repeatedly");
+        expect(check.count("rule_candidates")).toBe(0);
+        expect(check.count("flight_rules")).toBe(0);
+      } finally {
+        check.close();
+      }
+      expect(notifications.join("\n")).toContain("No artifact was created or applied");
+    } finally {
+      await chatServer.close();
+    }
+  });
+
+  it("documents explicit local-model call behavior when custom inbox throws before primitive fallback", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-learn-local-polish-custom-throw-data-"));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    const chatServer = await startLocalChatServer(JSON.stringify({
+      headline: "A validation check failed repeatedly in this project.",
+      whatHappened: "Pi saw the same validation check failed twice in recent sessions.",
+      whyItMatters: "Repeated validation friction makes the result hard to trust.",
+      expectedBehavior: "Validation should run from a fresh shell.",
+    }));
+    let deltaId = "";
+    try {
+      const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+      try {
+        const delta = store.createExpectationDelta({
+          source: "detector",
+          summary: "Repeated failure pattern: bash cd /Users/alice/project && npm test",
+          expectation: "Validation should run from a fresh shell.",
+          reality: "Observed 2 related failure occurrences in reflection cluster cluster_custom_throw.",
+          impact: "Repeated validation friction makes the result hard to trust.",
+          severity: "medium",
+          cwd: "/Users/alice/project",
+          evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/Users/alice/project", entryId: null, timestamp: null, snippet: "npm test failed twice", note: "manual" }],
+        });
+        deltaId = delta.id;
+        store.recordDeltaDetectorSignal({ deltaId, type: "failed-validation", explanation: "Validation failed twice from the same stale shell pattern.", confidence: 0.74, evidenceRefs: delta.evidenceRefs });
+      } finally {
+        store.close();
+      }
+
+      const ctx = {
+        cwd: "/repo",
+        ui: {
+          notify: () => undefined,
+          custom: () => {
+            throw new Error("custom UI unavailable after entry");
+          },
+          select: (message: string, choices: string[]) => {
+            if (message.includes("Choose an expectation delta")) return choices[0];
+            if (message.includes("Route expectation delta")) return choices.find((choice) => choice.startsWith("Test/check"));
+            return undefined;
+          },
+          editor: (message: string, prefilled: string) => {
+            if (message.includes("Review expectation delta")) return prefilled;
+            if (message.includes("Why this follow-up?")) return "Primitive fallback still requires a human reason.";
+            return undefined;
+          },
+        },
+        sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
+      };
+
+      await commands.get("flight-learn")?.handler(`delta-review --data-dir ${dataDir} --local-model-polish --local-model-url ${chatServer.baseUrl}`, ctx);
+
+      expect(chatServer.requests).toHaveLength(1);
+      const check = new FlightRecorderStore(defaultDatabasePath(dataDir));
+      try {
+        const candidate = check.listArtifactCandidates({ deltaId })[0];
+        expect(check.getExpectationDelta(deltaId)?.status).toBe("routed");
+        expect(candidate?.artifactType).toBe("test-check");
+        expect(candidate?.applied).toBe(false);
+        expect(candidate?.rationale).toContain("Primitive fallback");
+      } finally {
+        check.close();
+      }
+    } finally {
+      await chatServer.close();
+    }
+  });
+
+  it("falls back to deterministic diagnosis when enabled local-model config is unavailable", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-learn-local-polish-fallback-data-"));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    try {
+      const delta = store.createExpectationDelta({
+        source: "detector",
+        summary: "Repeated failure pattern: bash cd /Users/alice/project && npm test",
+        expectation: null,
+        reality: "Observed 2 related failure occurrences in reflection cluster cluster_local_fallback.",
+        impact: "Repeated local friction across tools/cwds: bash.",
+        severity: "medium",
+        cwd: "/Users/alice/project",
+        evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/Users/alice/project", entryId: null, timestamp: null, snippet: "npm test failed twice", note: "manual" }],
+      });
+      store.recordDeltaDetectorSignal({ deltaId: delta.id, type: "failed-validation", explanation: "Validation failed twice from the same stale shell pattern.", confidence: 0.74, evidenceRefs: delta.evidenceRefs });
+    } finally {
+      store.close();
+    }
+
+    const rendered: string[][] = [];
+    const ctx = {
+      cwd: "/repo",
+      ui: {
+        notify: () => undefined,
+        custom: async (factory: any) => {
+          let result: unknown;
+          const component = factory({ requestRender: () => undefined }, {}, {}, (value: unknown) => {
+            result = value;
+          });
+          rendered.push(component.render(112));
+          component.handleInput?.("q");
+          return result;
+        },
+      },
+      sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
+    };
+
+    await commands.get("flight-learn")?.handler(`delta-review --data-dir ${dataDir} --local-model-polish`, ctx);
+
+    const output = rendered[0]?.join("\n") ?? "";
+    expect(output).toContain("Local model unavailable (runtime unavailable); deterministic wording shown.");
+    expect(output).toContain("A validation command failed repeatedly in this project.");
+    expect(output).not.toContain("provider failed before returning JSON");
   });
 
   it("cancels after custom route selection without storing a candidate when rationale editor is dismissed", async () => {

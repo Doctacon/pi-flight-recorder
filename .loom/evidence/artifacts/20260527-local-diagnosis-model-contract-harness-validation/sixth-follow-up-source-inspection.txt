@@ -1,0 +1,14 @@
+## Implementation imports
+1:import { buildFlightLearnDiagnosisView, type FlightLearnDiagnosisInput, type FlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
+2:import { sanitizeStoredText } from "./redact.js";
+3:import type { DeltaDetectorSignal, DeltaEvidenceRef, ExpectationDelta } from "./types.js";
+
+## Test imports
+1:import { describe, expect, it } from "vitest";
+2:import { buildFlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
+3:import {
+10:import type { DeltaDetectorSignal, DeltaDetectorSignalType, DeltaEvidenceRef, ExpectationDelta } from "./types.js";
+
+## Filesystem/process/network scan in implementation
+
+## Mutation API name scan in implementation

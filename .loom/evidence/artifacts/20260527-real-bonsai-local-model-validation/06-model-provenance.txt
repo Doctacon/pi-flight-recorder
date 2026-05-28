@@ -1,0 +1,16 @@
+date=2026-05-27T18:28:53Z
+model_path=/Users/crlough/.cache/pi-flight-recorder/bonsai/Bonsai-1.7B-Q1_0.gguf
+model_size_bytes=248302272
+3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3  /Users/crlough/.cache/pi-flight-recorder/bonsai/Bonsai-1.7B-Q1_0.gguf
+hf_api_summary=
+id=prism-ml/Bonsai-1.7B-gguf
+sha=210a9e99f79cb184909d49595906526eb2b3dd9a
+library_name=llama.cpp
+pipeline_tag=text-generation
+license_tags=license:apache-2.0
+format_tags=llama.cpp,gguf,1-bit,llama-cpp,cuda,metal
+sibling=Bonsai-1.7B-Q1_0.gguf
+sibling=Bonsai-1.7B.gguf
+sibling=LICENSE
+sibling=NOTICE.txt
+sibling=README.md

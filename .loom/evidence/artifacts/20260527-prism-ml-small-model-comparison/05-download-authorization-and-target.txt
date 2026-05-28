@@ -1,0 +1,8 @@
+date=2026-05-27T23:48:14Z
+authorized_by_operator=true
+repo=prism-ml/Bonsai-4B-gguf
+file=Bonsai-4B-Q1_0.gguf
+url=https://huggingface.co/prism-ml/Bonsai-4B-gguf/resolve/main/Bonsai-4B-Q1_0.gguf
+target=/Users/<user>/.cache/pi-flight-recorder/bonsai/Bonsai-4B-Q1_0.gguf
+no_runtime_install=true
+no_ternary_or_custom_fork=true

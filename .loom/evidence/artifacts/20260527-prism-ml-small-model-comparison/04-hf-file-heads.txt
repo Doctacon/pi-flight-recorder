@@ -1,0 +1,28 @@
+--- https://huggingface.co/prism-ml/Bonsai-4B-gguf/resolve/main/Bonsai-4B-Q1_0.gguf
+content-length: 1357
+location: <redacted-signed-download-url>
+x-linked-size: 572270624
+Content-Length: 572270624
+Content-Disposition: inline; filename*=UTF-8''Bonsai-4B-Q1_0.gguf; filename="Bonsai-4B-Q1_0.gguf";
+ETag: "1d56cbb4bb05e3e603971b9c3f256ac56ae83d698fda0befae95cd90233e3191"
+--- https://huggingface.co/prism-ml/Bonsai-4B-gguf/resolve/main/Bonsai-4B.gguf
+content-length: 1347
+location: <redacted-signed-download-url>
+x-linked-size: 572270624
+Content-Length: 572270624
+Content-Disposition: inline; filename*=UTF-8''Bonsai-4B.gguf; filename="Bonsai-4B.gguf";
+ETag: "1d56cbb4bb05e3e603971b9c3f256ac56ae83d698fda0befae95cd90233e3191"
+--- https://huggingface.co/prism-ml/Bonsai-1.7B-gguf/resolve/main/Bonsai-1.7B-Q1_0.gguf
+content-length: 1355
+location: <redacted-signed-download-url>
+x-linked-size: 248302272
+Content-Length: 248302272
+Content-Disposition: inline; filename*=UTF-8''Bonsai-1.7B-Q1_0.gguf; filename="Bonsai-1.7B-Q1_0.gguf";
+ETag: "1f3f6c9cd49b9a54bab50ccdff7abd2d9a255b905f4b8a345cbf8cf3f8653bea"
+--- https://huggingface.co/prism-ml/Bonsai-1.7B-gguf/resolve/main/Bonsai-1.7B.gguf
+content-length: 1345
+location: <redacted-signed-download-url>
+x-linked-size: 248302272
+Content-Length: 248302272
+Content-Disposition: inline; filename*=UTF-8''Bonsai-1.7B.gguf; filename="Bonsai-1.7B.gguf";
+ETag: "1f3f6c9cd49b9a54bab50ccdff7abd2d9a255b905f4b8a345cbf8cf3f8653bea"

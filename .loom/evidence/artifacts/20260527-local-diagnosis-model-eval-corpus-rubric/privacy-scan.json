@@ -1,0 +1,12 @@
+{
+  "checkedFile": "diagnosis-polish-eval-corpus.v1.json",
+  "allowedPlaceholders": [
+    "/Users/<user>",
+    "<pi-session-file:redacted>",
+    "[REDACTED_CREDENTIAL]",
+    "[stack trace omitted]",
+    "[local path omitted]"
+  ],
+  "forbiddenPatternCount": 0,
+  "matches": []
+}

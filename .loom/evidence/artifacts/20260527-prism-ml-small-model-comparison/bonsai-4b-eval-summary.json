@@ -1,0 +1,85 @@
+{
+  "corpusId": "local-diagnosis-model-eval-corpus-v1",
+  "corpusPath": ".loom/evidence/artifacts/20260527-local-diagnosis-model-eval-corpus-rubric/diagnosis-polish-eval-corpus.v1.json",
+  "baseUrl": "http://127.0.0.1:18132",
+  "endpoint": "http://127.0.0.1:18132/v1/chat/completions",
+  "generatedAt": "2026-05-27T23:50:26.621Z",
+  "modelRuntimeStarted": true,
+  "hostedProviderUsed": false,
+  "productBehaviorChanged": false,
+  "productBehaviorChangeScope": "no source/default/runtime lifecycle change in this comparison ticket; using tuned prompt from ticket:20260527-bonsai-diagnosis-polish-tuning",
+  "model": "PrismML Bonsai 4B GGUF Q1_0",
+  "timeoutMs": 5000,
+  "maxOutputTokens": 128,
+  "productDefaultTimeoutMs": 750,
+  "totalCases": 12,
+  "caseIds": [
+    "LDM-EVAL-001",
+    "LDM-EVAL-002",
+    "LDM-EVAL-003",
+    "LDM-EVAL-004",
+    "LDM-EVAL-005",
+    "LDM-EVAL-006",
+    "LDM-EVAL-007",
+    "LDM-EVAL-008",
+    "LDM-EVAL-009",
+    "LDM-EVAL-010",
+    "LDM-EVAL-011",
+    "LDM-EVAL-012"
+  ],
+  "acceptedCount": 1,
+  "fallbackCount": 11,
+  "acceptedWithinDefaultTimeoutCount": 0,
+  "acceptedWithinEvaluationTimeoutCount": 1,
+  "modelOutcomeCounts": {
+    "fallback-unexpected": 6,
+    "fallback-expected": 5,
+    "accepted-equivalent": 1
+  },
+  "validatorOutcomeCounts": {
+    "fallback": 11,
+    "accepted": 1
+  },
+  "rubricRatingCounts": {
+    "invalidFallback": 11,
+    "equivalent": 1
+  },
+  "fallbackReasonCounts": {
+    "unsupported-facts": 11,
+    "null": 1
+  },
+  "latencyAll": {
+    "count": 12,
+    "minMs": 1185.212,
+    "medianMs": 1574.961,
+    "p95Ms": 2306.825,
+    "maxMs": 2306.825,
+    "meanMs": 1675.834
+  },
+  "latencyAccepted": {
+    "count": 1,
+    "minMs": 2209.657,
+    "medianMs": 2209.657,
+    "p95Ms": 2209.657,
+    "maxMs": 2209.657,
+    "meanMs": 2209.657
+  },
+  "latencyFallback": {
+    "count": 11,
+    "minMs": 1185.212,
+    "medianMs": 1574.961,
+    "p95Ms": 2306.825,
+    "maxMs": 2306.825,
+    "meanMs": 1627.305
+  },
+  "hardFailResultCount": 0,
+  "hardFailCaseIds": [],
+  "outputSafetyFailureCount": 0,
+  "outputSafetyFailureCaseIds": [],
+  "promptSafetyFailureCount": 0,
+  "promptSafetyFailureCaseIds": [],
+  "recommendation": {
+    "decision": "create-follow-up-tuning-ticket-before-release-claim",
+    "rationale": "Real Bonsai accepted 1/12 cases and had 6 unexpected fallback(s); quality/reliability is not strong enough for a release claim without prompt/schema/timeout tuning evidence."
+  }
+}

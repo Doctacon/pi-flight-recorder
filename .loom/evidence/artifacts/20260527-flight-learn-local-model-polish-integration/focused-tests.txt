@@ -1,0 +1,11 @@
+
+ RUN  v4.1.7 /Users/crlough/Code/personal/pi-flight-recorder
+
+(node:72474) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  4 passed (4)
+      Tests  63 passed (63)
+   Start at  10:31:06
+   Duration  2.27s (transform 477ms, setup 0ms, import 543ms, tests 2.29s, environment 0ms)
+

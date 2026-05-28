@@ -17,6 +17,7 @@ Run the seamless capture/suggestion/reflection flow against the user's real Pi s
 
 - `spec:seamless-failure-memory-ux` - quality bar and all scenarios.
 - `plan:20260523-seamless-failure-memory-ux` - final validation milestone.
+- `plan:20260527-flight-learn-local-model-quality-evaluation` - narrower follow-up for optional `/flight-learn` diagnosis-polish model quality; does not by itself close this broader corpus/provider tuning ticket.
 - `evidence:20260522-live-monitoring-validation` - previous fixture/fake-Pi validation baseline.
 - `constitution:main` - evidence-backed and human-feedback principles.
 
@@ -71,3 +72,4 @@ Do not close this ticket until the corpus/provider evaluation acceptance is eith
 - 2026-05-23: Review run recorded `audit:20260523-seamless-ux-review` with verdict `changes-needed`; pending disposition: FIND-002 plus real occurrence/model/provider evidence gaps.
 - 2026-05-23: Dispositioned review finding(s) for this ticket with `evidence:20260523-live-pi-tui-smoke` and/or `evidence:20260523-findings-fix-validation`; follow-up audit `audit:20260523-seamless-ux-followup-review` returned `clear` in the inspected scope; residual high-confidence notification/model-provider/long-run tuning gaps remain as follow-up where applicable.
 - 2026-05-23: Final review-state reconciliation moved this ticket from stale `review` to `blocked`; current-flow smoke gaps are resolved, but long-run corpus/provider evaluation remains unsatisfied.
+- 2026-05-27: Added related `plan:20260527-flight-learn-local-model-quality-evaluation` as a narrower diagnosis-polish model-quality effort. This ticket remains blocked for broader real-corpus precision/noise and seamless UX claims.

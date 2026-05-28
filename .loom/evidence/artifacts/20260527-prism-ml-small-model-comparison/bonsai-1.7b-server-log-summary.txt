@@ -1,0 +1,29 @@
+date=2026-05-27T23:51:00Z
+model=bonsai-1.7b
+prompt_eval_time_line_count=12
+generation_time_line_count=0
+server_log_cache_state_and_timing_lines=
+53:0.01.230.513 I srv        update:  - cache state: 0 prompts, 0.000 MiB (limits: 8192.000 MiB, 2048 tokens, 8589934592 est)
+56:0.02.486.025 I slot print_timing: id  3 | task 0 | prompt eval time =     672.50 ms /   568 tokens (    1.18 ms per token,   844.61 tokens per second)
+67:0.02.521.325 I srv        update:  - cache state: 1 prompts, 70.008 MiB (limits: 8192.000 MiB, 2048 tokens, 74889 est)
+71:0.03.403.624 I slot print_timing: id  3 | task 74 | prompt eval time =     356.68 ms /   299 tokens (    1.19 ms per token,   838.28 tokens per second)
+82:0.03.421.664 I srv        update:  - cache state: 2 prompts, 137.281 MiB (limits: 8192.000 MiB, 2048 tokens, 74889 est)
+87:0.04.245.942 I slot print_timing: id  3 | task 150 | prompt eval time =     287.93 ms /   300 tokens (    0.96 ms per token,  1041.92 tokens per second)
+99:0.04.274.641 I srv        update:  - cache state: 2 prompts, 138.156 MiB (limits: 8192.000 MiB, 2048 tokens, 74889 est)
+104:0.05.093.812 I slot print_timing: id  3 | task 233 | prompt eval time =     287.85 ms /   314 tokens (    0.92 ms per token,  1090.86 tokens per second)
+115:0.05.114.429 I srv        update:  - cache state: 3 prompts, 207.836 MiB (limits: 8192.000 MiB, 2048 tokens, 74889 est)
+121:0.05.794.717 I slot print_timing: id  3 | task 315 | prompt eval time =     259.47 ms /   276 tokens (    0.94 ms per token,  1063.71 tokens per second)
+132:0.05.806.980 I srv        update:  - cache state: 4 prompts, 271.500 MiB (limits: 8192.000 MiB, 2048 tokens, 74889 est)
+139:0.06.469.066 I slot print_timing: id  3 | task 381 | prompt eval time =     199.25 ms /   204 tokens (    0.98 ms per token,  1023.83 tokens per second)
+150:0.06.484.016 I srv        update:  - cache state: 5 prompts, 327.725 MiB (limits: 8192.000 MiB, 2048 tokens, 74889 est)
+159:0.07.637.050 I slot print_timing: id  3 | task 451 | prompt eval time =     258.29 ms /   270 tokens (    0.96 ms per token,  1045.35 tokens per second)
+170:0.07.663.503 I srv        update:  - cache state: 6 prompts, 397.733 MiB (limits: 8192.000 MiB, 2048 tokens, 74889 est)
+179:0.08.518.100 I slot print_timing: id  3 | task 580 | prompt eval time =     290.04 ms /   317 tokens (    0.91 ms per token,  1092.95 tokens per second)
+191:0.08.543.253 I srv        update:  - cache state: 6 prompts, 405.390 MiB (limits: 8192.000 MiB, 2048 tokens, 74889 est)
+200:0.09.759.765 I slot print_timing: id  3 | task 661 | prompt eval time =     287.31 ms /   297 tokens (    0.97 ms per token,  1033.74 tokens per second)
+212:0.09.801.412 I srv        update:  - cache state: 6 prompts, 408.344 MiB (limits: 8192.000 MiB, 2048 tokens, 74889 est)
+221:0.10.568.238 I slot print_timing: id  3 | task 790 | prompt eval time =     261.88 ms /   287 tokens (    0.91 ms per token,  1095.91 tokens per second)
+233:0.10.597.272 I srv        update:  - cache state: 6 prompts, 407.140 MiB (limits: 8192.000 MiB, 2048 tokens, 74889 est)
+242:0.11.720.184 I slot print_timing: id  3 | task 861 | prompt eval time =     462.86 ms /   508 tokens (    0.91 ms per token,  1097.53 tokens per second)
+254:0.11.765.755 I srv        update:  - cache state: 6 prompts, 427.486 MiB (limits: 8192.000 MiB, 2048 tokens, 74889 est)
+263:0.12.635.602 I slot print_timing: id  3 | task 949 | prompt eval time =     287.48 ms /   297 tokens (    0.97 ms per token,  1033.12 tokens per second)

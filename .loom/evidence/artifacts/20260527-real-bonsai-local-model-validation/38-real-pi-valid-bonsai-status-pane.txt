@@ -1,0 +1,62 @@
+
+ pi v0.75.5
+ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+[Extensions]
+  pi-extension.js
+
+
+ Warning: No models available. Use /login to log into a provider via OAuth or API key. See:
+   /Users/crlough/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/docs/providers.md
+   /Users/crlough/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/docs/models.md
+
+ Flight recorder: suggest-on-failure (autostart on)
+ Data dir: /tmp/pfr-real-bonsai-pi-valid-LgalaK/home/.pi/flight-recorder
+ Capture/index: active; watched 0; last sync never
+ Failures captured: 0; last occurrence: none
+ Suggestions: minConfidence=0.78, emittedInWindow=0, last=none, last suppression=none
+ Reflection: session-end=true, daily=false, model=disabled
+ Flight Rules: active=0, pending=0, last injected=none
+ Deltas: pending=1, artifact candidates=1
+ Delta outcomes: unresolved=1, insufficient evidence=1, no recurrence observed=0, recurring after applied=0
+ Learning loop: run /flight-learn to review the next delta or outcome item.
+ User-bash capture: disabled (Pi user_bash is pre-execution; command semantics are not wrapped).
+ Errors: none
+ Recent feedback: none
+ Privacy: local SQLite only by default; no model calls unless explicitly enabled by `/flight-learn reflect --model`, model reflection settings, or `/flight-learn --local-model-polish --local-model-url ...`.
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/private/tmp/pfr-real-bonsai-pi-valid-LgalaK/workspace
+0.0%/0 (auto)                                                                                                                                                                                                                 unknown
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

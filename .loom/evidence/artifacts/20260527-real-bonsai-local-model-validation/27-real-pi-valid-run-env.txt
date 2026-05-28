@@ -1,0 +1,16 @@
+run_root=/tmp/pfr-real-bonsai-pi-valid-LgalaK
+home=/tmp/pfr-real-bonsai-pi-valid-LgalaK/home
+workspace=/tmp/pfr-real-bonsai-pi-valid-LgalaK/workspace
+agent_dir=/tmp/pfr-real-bonsai-pi-valid-LgalaK/home/.pi/agent
+session_dir=/tmp/pfr-real-bonsai-pi-valid-LgalaK/home/.pi/agent/sessions
+data_dir=/tmp/pfr-real-bonsai-pi-valid-LgalaK/home/.pi/flight-recorder
+tui_log_dir=/tmp/pfr-real-bonsai-pi-valid-LgalaK/tui-logs
+repo=/Users/crlough/Code/personal/pi-flight-recorder
+base_url=http://127.0.0.1:18117
+server_pid=53325
+server_command=llama-server -m /Users/crlough/.cache/pi-flight-recorder/bonsai/Bonsai-1.7B-Q1_0.gguf --host 127.0.0.1 --port 18117 -c 2048 --no-webui --jinja
+tmux_version=tmux 3.5a
+node_version=v24.6.0
+tmux_session=pfr_real_bonsai_valid_pi_1779906832_75966
+command=env -i HOME=<temp-home> PATH=<redacted-path> TERM=xterm-256color SHELL=/bin/bash PI_OFFLINE=1 PI_CODING_AGENT_DIR=<temp-agent-dir> PI_CODING_AGENT_SESSION_DIR=<temp-session-dir> PI_TUI_WRITE_LOG=<temp-tui-log-dir> pi --offline --no-skills --no-prompt-templates --no-context-files --no-session --no-tools
+forced_kill=false

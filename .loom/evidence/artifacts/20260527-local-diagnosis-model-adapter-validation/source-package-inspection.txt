@@ -1,0 +1,4 @@
+package.json runtime dependency count: 0
+adapter policy scan passed: explicit proxy-empty node:http Agent present; direct agent assigned; no fetch/proxy dispatcher/subprocess/download/hosted-provider tokens found
+adapter endpoint path, content-length, and response-size policy markers present
+--- git diff -- package.json ---

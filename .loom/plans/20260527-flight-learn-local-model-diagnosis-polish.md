@@ -2,7 +2,7 @@
 
 ID: plan:20260527-flight-learn-local-model-diagnosis-polish
 Type: Plan
-Status: open
+Status: closed
 Created: 2026-05-27
 Updated: 2026-05-27
 Risk: high - this introduces optional local model execution into a privacy-sensitive UI path and must preserve local-first, explicit opt-in, deterministic fallback, and candidate-only safety boundaries.
@@ -19,7 +19,11 @@ This needs more than one ticket because the work crosses several trust boundarie
 - `spec:flight-learn-inbox-ux` - now owns optional local-model diagnosis polish requirements REQ-024 through REQ-029 and SCN-008/SCN-009.
 - `spec:delta-artifact-learning-loop` - owns human-gated routing and artifact semantics; local model polish must not classify, route, or mutate artifacts.
 - `spec:visible-command-surface` - owns the two-command default visible surface; this plan must not add top-level commands.
-- `research:20260527-local-diagnosis-model-runtime` - active runtime investigation; preliminary conclusion favors PrismML Bonsai GGUF through `llama.cpp`, with Bonsai 1.7B as first low-memory validation candidate and 4B/8B as quality fallbacks.
+- `research:20260527-local-diagnosis-model-runtime` - completed runtime investigation; recommendation favors PrismML Bonsai GGUF through explicit loopback `llama.cpp` server, with Bonsai 1.7B as first low-memory validation candidate and 4B/8B as quality fallbacks.
+- `evidence:20260527-local-diagnosis-model-contract-harness-validation` - contract harness validation.
+- `evidence:20260527-local-diagnosis-model-adapter-validation` - adapter validation.
+- `evidence:20260527-flight-learn-local-model-polish-integration-validation` - UI/command integration validation.
+- `evidence:20260527-flight-learn-local-model-polish-validation` - final validation with real Pi fallback and blocked real Bonsai proof.
 - `plan:20260527-flight-learn-plain-english-diagnosis-cards` - completed deterministic baseline that this plan augments, not replaces.
 - `ticket:20260527-flight-learn-diagnosis-view-model` - implemented deterministic display-only helper and tests.
 - `ticket:20260527-flight-learn-diagnosis-card-integration` - integrated deterministic diagnosis into focused-card UI.
@@ -140,12 +144,20 @@ Evidence either proves the full path with an approved local runtime/model in dis
 
 ## Current State
 
-Open. The operator approved the hybrid direction: deterministic local diagnosis stays as baseline/fallback, and a very small local model may optionally polish the description. The UX spec has been amended to allow only local/open-source, opt-in, bounded, validated, display-only model polish. The runtime research record is active and preserves preliminary Bonsai findings. All five child tickets now exist. No implementation has started under this plan.
+Closed. All five execution tickets are closed:
 
-Next move: execute `ticket:20260527-local-diagnosis-model-runtime-research` to complete the runtime decision before any contract, adapter, or UI implementation begins.
+- `ticket:20260527-local-diagnosis-model-runtime-research` - closed; researched Bonsai/`llama.cpp` and recommended explicit loopback `llama.cpp` server, Bonsai 1.7B GGUF Q1_0 first.
+- `ticket:20260527-local-diagnosis-model-contract-harness` - closed; implemented bounded redacted fact packet, prompt, structured response validation, timeout/fallback, and fake-provider tests.
+- `ticket:20260527-local-diagnosis-model-adapter` - closed; implemented explicit `llama-cpp-server` loopback adapter with proxy-safe direct HTTP agent, no dependencies/downloads/runtime lifecycle, and audit `clear`.
+- `ticket:20260527-flight-learn-local-model-polish-integration` - closed; wired optional display-only polish into focused-card `/flight-learn` behind explicit flags without changing command surface or routing/storage semantics, and audit `clear`.
+- `ticket:20260527-flight-learn-local-model-polish-validation` - closed as validation complete with real-model proof blocked; focused tests/typecheck/build/full tests passed, real Pi fallback and candidate-only route safety were validated, and audit `clear` preserved the limitation.
+
+Result: optional local-model diagnosis polish is implemented as guarded display-only phrasing. Initial closure left actual real Bonsai/`llama.cpp` model behavior unproven, but follow-up `ticket:20260527-real-bonsai-local-model-validation` later ran an operator-approved real Bonsai 1.7B GGUF Q1_0 / `llama.cpp` validation. It proves the real local-model path can work on one supported synthetic fixture and preserve candidate-only safety. Do not broaden that into a claim about arbitrary delta quality, long-run latency distribution, memory across environments, or all Bonsai model sizes.
 
 ## Journal
 
 - 2026-05-27: Created plan after operator agreed that a small local model would be preferable for phrasing, provided the deterministic path remains fallback and the model is local/open-source, opt-in, bounded, validated, and display-only.
 - 2026-05-27: Operator named PrismML Bonsai 1-bit as the preferred candidate because of its low memory footprint. Updated runtime research scope to evaluate Bonsai first, especially GGUF/llama.cpp portability versus MLX Apple-Silicon specialization.
 - 2026-05-27: Created `research:20260527-local-diagnosis-model-runtime` with preliminary Bonsai source findings and created the remaining child tickets: `ticket:20260527-local-diagnosis-model-contract-harness`, `ticket:20260527-local-diagnosis-model-adapter`, `ticket:20260527-flight-learn-local-model-polish-integration`, and `ticket:20260527-flight-learn-local-model-polish-validation`.
+- 2026-05-27: Executed and closed all child tickets with evidence and audits. Closed plan with real Bonsai/`llama.cpp` behavior explicitly blocked/unproven until an approved local runtime/model is available.
+- 2026-05-27: After operator approval, completed `ticket:20260527-real-bonsai-local-model-validation`. Real Bonsai 1.7B Q1_0 via `llama.cpp` worked for one supported fixture and was validated in real Pi with local-model disclosure and candidate-only route safety; broad quality remains unproven.

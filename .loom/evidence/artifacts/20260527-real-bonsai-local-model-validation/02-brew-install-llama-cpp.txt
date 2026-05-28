@@ -1,0 +1,51 @@
+==> Auto-updating Homebrew...
+Adjust how often this is run with `$HOMEBREW_AUTO_UPDATE_SECS` or disable with
+`$HOMEBREW_NO_AUTO_UPDATE=1`. Hide these hints with `$HOMEBREW_NO_ENV_HINTS=1` (see `man brew`).
+==> Downloading https://ghcr.io/v2/homebrew/core/portable-ruby/blobs/sha256:4ba8d535df01e4bf97e6661c3815796fd77364ea2552606e891659133a76f0e1
+#=#=#                                                                          ##O#-#                                                                         ##O=#  #                                                                       #=#=-#  #                                                                      ######                                                                     8.7%##########################################                                58.9%######################################################################## 100.0%
+==> Pouring portable-ruby-4.0.5_1.arm64_big_sur.bottle.tar.gz
+==> Auto-updated Homebrew!
+Updated 3 taps (anomalyco/tap, homebrew/core and homebrew/cask).
+==> New Formulae
+cloudmonkey: Apache CloudStack CloudMonkey CLI
+goenv@2: Go version management
+herdr: Agent multiplexer that lives in your terminal
+ladder: Selfhosted alternative to 12ft.io and 1ft.io HTTP web proxies
+mips-linux-gnu-binutils: GNU Binutils for mips-linux-gnu cross development
+vs-preview: Previewer for VapourSynth scripts
+==> New Casks
+airi: AI companion and VTuber application
+chronoid: Automatic time tracker and productivity insights app
+dusklight: Reverse-engineered reimplementation of Twilight Princess
+eurkey-next: Keyboard layout for Europeans, coders, and translators
+font-pliant
+macmd-viewer: Markdown viewer with QuickLook and Mermaid support
+smoothcapture: Screen recorder and video editor
+tldraw: Editor for .tldr files
+trickster: Quickly access recently changed or modified files with a keyboard shortcut
+
+You have 177 outdated formulae and 2 outdated casks installed.
+
+Inspect the formula dependency plan before installing with `brew install --ask`.
+Enable ask mode by setting `HOMEBREW_ASK=1`.
+Hide these hints with `HOMEBREW_NO_ENV_HINTS=1` (see `man brew`).
+==> Fetching downloads for: llama.cpp
+✔︎ Bottle Manifest llama.cpp (9360)
+✔︎ Bottle Manifest libomp (22.1.6)
+✔︎ Bottle Manifest ggml (0.13.0)
+✔︎ Bottle libomp (22.1.6)
+✔︎ Bottle ggml (0.13.0)
+✔︎ Bottle llama.cpp (9360)
+==> Installing dependencies for llama.cpp: libomp and ggml
+==> Installing llama.cpp dependency: libomp
+==> Pouring libomp--22.1.6.arm64_sequoia.bottle.tar.gz
+🍺  /opt/homebrew/Cellar/libomp/22.1.6: 11 files, 1.8MB
+==> Installing llama.cpp dependency: ggml
+==> Pouring ggml--0.13.0.arm64_sequoia.bottle.tar.gz
+🍺  /opt/homebrew/Cellar/ggml/0.13.0: 38 files, 3.4MB
+==> Installing llama.cpp
+==> Pouring llama.cpp--9360.arm64_sequoia.bottle.tar.gz
+🍺  /opt/homebrew/Cellar/llama.cpp/9360: 71 files, 23MB
+==> Running `brew cleanup llama.cpp`...
+Disable this behaviour by setting `HOMEBREW_NO_INSTALL_CLEANUP=1`.
+Hide these hints with `HOMEBREW_NO_ENV_HINTS=1` (see `man brew`).

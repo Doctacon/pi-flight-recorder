@@ -1,0 +1,7 @@
+Imports in local diagnosis model module:
+import { buildFlightLearnDiagnosisView, type FlightLearnDiagnosisInput, type FlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
+import { sanitizeStoredText } from "./redact.js";
+import type { DeltaDetectorSignal, DeltaEvidenceRef, ExpectationDelta } from "./types.js";
+
+Mutation/runtime/network import or call scan:
+No storage/artifact/rule/source-doc mutation imports, filesystem/process runtime imports, fetch calls, or URL literals matched.

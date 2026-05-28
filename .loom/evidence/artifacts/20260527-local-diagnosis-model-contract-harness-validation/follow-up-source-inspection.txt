@@ -1,0 +1,34 @@
+$ git status --short -- src/flight-learn-local-diagnosis-model.ts src/flight-learn-local-diagnosis-model.test.ts .loom/evidence/20260527-local-diagnosis-model-contract-harness-validation.md .loom/tickets/20260527-local-diagnosis-model-contract-harness.md package.json package-lock.json src/pi-extension.ts
+ M .loom/tickets/20260527-local-diagnosis-model-contract-harness.md
+?? .loom/evidence/20260527-local-diagnosis-model-contract-harness-validation.md
+?? src/flight-learn-local-diagnosis-model.test.ts
+?? src/flight-learn-local-diagnosis-model.ts
+
+$ grep -n "^import" src/flight-learn-local-diagnosis-model.ts
+1:import { buildFlightLearnDiagnosisView, type FlightLearnDiagnosisInput, type FlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
+2:import { sanitizeStoredText } from "./redact.js";
+3:import type { DeltaDetectorSignal, DeltaEvidenceRef, ExpectationDelta } from "./types.js";
+
+$ grep -nE "fetch\\(|https?://|XMLHttpRequest|from \\\"(node:fs|node:process|node:http|node:https|fs|process|http|https)" src/flight-learn-local-diagnosis-model.ts
+no network/fs/process import or fetch/url literal matched
+
+$ grep -nE "writeFile|appendFile|mkdir|unlink|rename|ExpectationDeltaStore|ArtifactStore|RuleStore|Repository|Database" src/flight-learn-local-diagnosis-model.ts
+no mutation/storage API names matched
+
+$ grep -nE "/workspace/acme|/opt/pi|/mnt/shared|/var/lib" src/flight-learn-local-diagnosis-model.test.ts
+169:      summary: "Failure referenced /workspace/acme/private/project/src/secret.ts and /opt/pi/app/index.ts.",
+170:      expectation: "Keep validation local without exposing /mnt/shared/project/private/config.json.",
+171:      reality: "A mounted checkout at /var/lib/pi-flight/private/project was used for the rerun.",
+172:      impact: "The path detail from /workspace/acme/private/project/src/secret.ts is not needed for display phrasing.",
+175:          timestamp: "2026-05-27T01:00:00.000Z /workspace/acme/private/project/src/secret.ts API_KEY=<fixture-api-key>",
+176:          snippet: "Failure came from /workspace/acme/private/project/src/secret.ts and /opt/pi/app/index.ts.",
+186:    const packet = buildLocalDiagnosisFactPacket({ delta: nonHomeDelta, signals: [signal("failed-validation", { explanation: "Signal mentioned /workspace/acme/private/project/src/secret.ts." })] });
+192:    expect(serialized).not.toContain("/workspace/acme");
+193:    expect(serialized).not.toContain("/opt/pi");
+194:    expect(serialized).not.toContain("/mnt/shared");
+196:    expect(serialized).not.toContain("/var/lib");
+200:    expect(prompt).not.toContain("/workspace/acme");
+201:    expect(prompt).not.toContain("/opt/pi");
+202:    expect(prompt).not.toContain("/mnt/shared");
+204:    expect(prompt).not.toContain("/var/lib");
+239:    const nonHomePath = await polishWithResponse(JSON.stringify({ headline: "Validation failed in /workspace/acme/private/project." }));

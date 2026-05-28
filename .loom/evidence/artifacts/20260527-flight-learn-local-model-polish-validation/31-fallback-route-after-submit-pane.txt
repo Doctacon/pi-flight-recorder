@@ -1,0 +1,62 @@
+
+ pi v0.75.5
+ escape interrupt · ctrl+c/ctrl+d clear/exit · / commands · ! bash · ctrl+o more
+ Press ctrl+o to show full startup help and loaded resources.
+
+ Pi can explain its own features and look up its docs. Ask it how to use or extend Pi.
+
+[Extensions]
+  pi-extension.js
+
+
+ Warning: No models available. Use /login to log into a provider via OAuth or API key. See:
+   /Users/crlough/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/docs/providers.md
+   /Users/crlough/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/docs/models.md
+
+ Routed expectation delta delta_realpi_plain_english_raw to Test/check.
+ Artifact candidate: artifact_cand_87131b1ba115698b [accepted; applied=false]
+ Next step: Create the test/check in a separate implementation ticket; this candidate does not write tests or change validation behavior.
+ Draft/handoff text was stored locally. No artifact was created or applied.
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/private/tmp/pfr-local-polish-fallbackroute-WFTopo/workspace
+0.0%/0 (auto)                                                                                                                                                                                                                 unknown
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

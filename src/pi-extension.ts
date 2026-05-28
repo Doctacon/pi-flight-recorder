@@ -2,6 +2,8 @@ import { writeFile } from "node:fs/promises";
 import { buildArtifactCandidateDraft } from "./artifact-drafts.js";
 import { formatDeltaOutcomeSummary, recordArtifactCandidateOutcomeWithStore, recordDeltaRecurrenceWithStore, summarizeDeltaOutcomes } from "./delta-outcomes.js";
 import { askFlightLearnDeltaInbox, type FlightLearnDeltaInboxItem, type FlightLearnDeltaInboxResult } from "./flight-learn-inbox.js";
+import { createLlamaCppLocalDiagnosisPolishOptions, type LlamaCppLocalDiagnosisPolishConfig } from "./flight-learn-llama-cpp-adapter.js";
+import { buildFlightLearnDiagnosisViewWithLocalPolish, type LocalDiagnosisPolishOptions } from "./flight-learn-local-diagnosis-model.js";
 import { formatFlightRule, formatRuleCandidate, formatRuleInjectionBlock, formatRulesMarkdown } from "./flight-rules.js";
 import { askReviewChoice, askReviewEditor, fallbackMessage, type ReviewChoice } from "./interactive-review.js";
 import { compactSnippet } from "./redact.js";
@@ -349,6 +351,7 @@ function flightLearnHelp(): string {
   return [
     "Flight Learn commands:",
     "- /flight-learn                           Guided learning inbox",
+    "- /flight-learn --local-model-polish --local-model-url http://127.0.0.1:PORT",
     "- /flight-learn seen <error text>          Search prior local fixes",
     "- /flight-learn reflect [--model]          Reflect on repeated local failures",
     "- /flight-learn review                     Guided reflection/rule review",
@@ -464,7 +467,7 @@ async function handleFlightStatus(argsText: string, ctx: PiCommandContext, state
       `User-bash capture: disabled (Pi user_bash is pre-execution; command semantics are not wrapped).`,
       `Errors: ${state.lastBootstrapError ?? (watchStatus?.state === "watched-by-another-process" ? null : watchStatus?.lastError) ?? "none"}`,
       `Recent feedback: ${recentFeedback.map((item) => `${item.action}:${item.targetType}/${item.targetId}`).join(", ") || "none"}`,
-      "Privacy: local SQLite only by default; no model calls unless `/flight-learn reflect --model` or model reflection is enabled.",
+      "Privacy: local SQLite only by default; no model calls unless explicitly enabled by `/flight-learn reflect --model`, model reflection settings, or `/flight-learn --local-model-polish --local-model-url ...`.",
     ];
     notify(ctx, lines.join("\n"), state.lastBootstrapError ? "warning" : "info");
   } finally {
@@ -800,8 +803,28 @@ function storeDeltaRoute(store: FlightRecorderStore, delta: ExpectationDelta, ar
   return store.acceptArtifactCandidate(candidate.id) ?? candidate;
 }
 
-function deltaInboxItems(store: FlightRecorderStore, deltas: ExpectationDelta[]): FlightLearnDeltaInboxItem[] {
-  return deltas.map((delta) => ({ delta, signals: store.listDeltaDetectorSignals(delta.id, 5) }));
+function localDiagnosisPolishOptionsFromArgs(args: string[]): LocalDiagnosisPolishOptions {
+  if (!args.includes("--local-model-polish")) return { enabled: false };
+  const config: LlamaCppLocalDiagnosisPolishConfig = {
+    enabled: true,
+    kind: "llama-cpp-server",
+    baseUrl: readOption(args, "--local-model-url") ?? "",
+  };
+  const model = readOption(args, "--local-model-name");
+  const timeoutMs = parseNumber(readOption(args, "--local-model-timeout-ms"));
+  const maxOutputTokens = parseNumber(readOption(args, "--local-model-max-output-tokens"));
+  if (model) config.model = model;
+  if (timeoutMs !== undefined) config.timeoutMs = timeoutMs;
+  if (maxOutputTokens !== undefined) config.maxOutputTokens = maxOutputTokens;
+  return createLlamaCppLocalDiagnosisPolishOptions(config);
+}
+
+async function deltaInboxItems(store: FlightRecorderStore, deltas: ExpectationDelta[], localDiagnosisPolish: LocalDiagnosisPolishOptions = { enabled: false }): Promise<FlightLearnDeltaInboxItem[]> {
+  const items: FlightLearnDeltaInboxItem[] = deltas.map((delta) => ({ delta, signals: store.listDeltaDetectorSignals(delta.id, 5) }));
+  if (localDiagnosisPolish.enabled !== true || items.length === 0) return items;
+  const first = items[0]!;
+  first.localDiagnosisPolish = await buildFlightLearnDiagnosisViewWithLocalPolish({ delta: first.delta, signals: first.signals }, localDiagnosisPolish);
+  return items;
 }
 
 type DeltaInboxRouteResult = Extract<FlightLearnDeltaInboxResult, { kind: "routed" | "route-selected" }>;
@@ -840,8 +863,9 @@ function applyDeltaInboxResult(store: FlightRecorderStore, result: Exclude<Fligh
   notify(ctx, [`Routed expectation delta ${delta.id} to ${artifactRouteLabel(candidate.artifactType)}.`, `Artifact candidate: ${candidate.id} [${candidate.status}; applied=${candidate.applied}]`, `Next step: ${candidate.nextStep ?? "review candidate draft"}`, "Draft/handoff text was stored locally. No artifact was created or applied."].join("\n"), "success");
 }
 
-async function maybeHandleDeltaInbox(store: FlightRecorderStore, deltas: ExpectationDelta[], ctx: PiCommandContext): Promise<boolean> {
-  const result = await askFlightLearnDeltaInbox(ctx, { items: deltaInboxItems(store, deltas), routeChoices: ARTIFACT_ROUTE_CHOICES });
+async function maybeHandleDeltaInbox(store: FlightRecorderStore, deltas: ExpectationDelta[], ctx: PiCommandContext, localDiagnosisPolish: LocalDiagnosisPolishOptions = { enabled: false }): Promise<boolean> {
+  if (!ctx.ui?.custom) return false;
+  const result = await askFlightLearnDeltaInbox(ctx, { items: await deltaInboxItems(store, deltas, localDiagnosisPolish), routeChoices: ARTIFACT_ROUTE_CHOICES });
   if (result.kind === "unavailable") return false;
   if (result.kind === "route-selected") {
     const rationale = await askReviewEditor(ctx, "Why this follow-up?", followupReasonPrefill(result.artifactType));
@@ -880,7 +904,7 @@ async function handleFlightDeltaReview(argsText: string, ctx: PiCommandContext, 
       notify(ctx, explicitDeltaId ? `No expectation delta found for ${explicitDeltaId}.` : "No pending expectation delta candidates are ready for review.", "warning");
       return;
     }
-    if (await maybeHandleDeltaInbox(store, deltas, ctx)) return;
+    if (await maybeHandleDeltaInbox(store, deltas, ctx, localDiagnosisPolishOptionsFromArgs(args))) return;
     let delta = deltas[0]!;
     if (!explicitDeltaId || deltas.length > 1) {
       const choice = await askReviewChoice(ctx, "Choose an expectation delta", deltas.map((item, index) => ({ value: item.id, label: deltaChoiceLabel(item, index) })));

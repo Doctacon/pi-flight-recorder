@@ -1,0 +1,36 @@
+{
+  "dataDir": "/tmp/pfr-real-bonsai-pi-valid-LgalaK/home/.pi/flight-recorder",
+  "databasePath": "/tmp/pfr-real-bonsai-pi-valid-LgalaK/home/.pi/flight-recorder/flight-recorder.db",
+  "deltas": [
+    {
+      "id": "delta_real_bonsai_valid_model",
+      "status": "candidate",
+      "summary": "Repeated failure pattern: bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm test",
+      "expectation": "Validation should run from a fresh project shell after changes.",
+      "evidenceRefs": 1,
+      "updatedAt": "2026-05-27T18:55:00.000Z"
+    },
+    {
+      "id": "delta_real_bonsai_secondary",
+      "status": "candidate",
+      "summary": "Assistant repeatedly confused the storage mapper ownership boundary.",
+      "expectation": "Check the mapper before editing storage.",
+      "evidenceRefs": 1,
+      "updatedAt": "2026-05-27T18:50:00.000Z"
+    }
+  ],
+  "signals": [
+    {
+      "id": "sig_real_bonsai_valid_model",
+      "deltaId": "delta_real_bonsai_valid_model",
+      "type": "failed-validation",
+      "confidence": 0.74
+    },
+    {
+      "id": "sig_real_bonsai_secondary",
+      "deltaId": "delta_real_bonsai_secondary",
+      "type": "manual-capture",
+      "confidence": null
+    }
+  ]
+}

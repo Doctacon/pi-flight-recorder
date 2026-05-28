@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createFlightLearnDeltaInboxComponent, type FlightLearnDeltaInboxInput, type FlightLearnDeltaInboxResult } from "./flight-learn-inbox.js";
+import type { LocalDiagnosisPolishResult } from "./flight-learn-local-diagnosis-model.js";
 import type { DeltaDetectorSignal, ExpectationDelta } from "./types.js";
 
 function stripAnsi(value: string): string {
@@ -91,6 +92,33 @@ function fixtureInput(): FlightLearnDeltaInboxInput {
       { delta: second, signals: [fixtureSignal(second.id)] },
     ],
     routeChoices: routeChoices(),
+  };
+}
+
+function localPolishResult(overrides: Partial<LocalDiagnosisPolishResult> = {}): LocalDiagnosisPolishResult {
+  return {
+    view: {
+      headline: "A local model rewrote this problem in plain language.",
+      whatHappened: "The local model summarized the repeated failure from redacted facts.",
+      whyItMatters: "The polished text is easier to scan, but it stays display-only.",
+      expectedBehavior: "Use deterministic text if the model is unavailable.",
+      rawClue: "deterministic raw clue remains secondary",
+      confidence: "medium",
+      limits: ["Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed."],
+    },
+    deterministicView: {
+      headline: "Deterministic problem.",
+      whatHappened: "Deterministic what happened.",
+      whyItMatters: "Deterministic why it matters.",
+      expectedBehavior: null,
+      rawClue: "deterministic raw clue remains secondary",
+      confidence: "medium",
+      limits: [],
+    },
+    usedLocalModel: true,
+    fallbackReason: null,
+    validationIssue: null,
+    ...overrides,
   };
 }
 
@@ -229,6 +257,77 @@ describe("Flight Learn custom inbox component", () => {
     for (const line of primaryContent) expect(line.length).toBeLessThanOrEqual(86);
     for (const line of lines) expect(line.length).toBeLessThanOrEqual(132);
     expect(results).toEqual([]);
+  });
+
+  it("renders optional local-model-polished diagnosis as display-only wording with disclosure", () => {
+    const input = fixtureInput();
+    input.items[0]!.localDiagnosisPolish = localPolishResult();
+    const results: FlightLearnDeltaInboxResult[] = [];
+    const component = createFlightLearnDeltaInboxComponent({ input, done: (result) => results.push(result), layout: "focused-card" });
+
+    const output = component.render(100).map(stripAnsi).join("\n");
+
+    expect(output).toContain("Local model phrasing; deterministic fallback available.");
+    expect(output).toContain("A local model rewrote this problem in plain language.");
+    expect(output).toContain("The local model summarized the repeated failure from redacted facts.");
+    expect(output).toContain("The polished text is easier to scan, but it stays display-only.");
+    expect(output).toContain("Use deterministic text if the model is unavailable.");
+
+    component.handleInput?.("2");
+    component.handleInput?.("\r");
+
+    expect(results).toEqual([
+      expect.objectContaining({
+        kind: "route-selected",
+        deltaId: "delta-one",
+        artifactType: "test-check",
+        expectation: "The assistant should identify the storage/mapper seam before editing.",
+      }),
+    ]);
+    expect(input.items[0]!.delta.summary).toContain("Repeated failure pattern");
+  });
+
+  it("falls back to deterministic focused-card text when local model polish is unavailable", () => {
+    const input = rawCommandInput();
+    input.items[0]!.localDiagnosisPolish = localPolishResult({
+      view: {
+        headline: "A validation command failed repeatedly in this project.",
+        whatHappened: "Pi saw the same validation-failure pattern twice in recent sessions.",
+        whyItMatters: "Repeated validation friction makes it harder to trust whether the latest code actually passed.",
+        expectedBehavior: null,
+        rawClue: "bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm test > pi-flight-recorder.log",
+        confidence: "medium",
+        limits: ["Local model phrasing was requested but rejected (timeout); deterministic display text is shown."],
+      },
+      usedLocalModel: false,
+      fallbackReason: "timeout",
+      validationIssue: "provider timed out before returning JSON",
+    });
+    const component = createFlightLearnDeltaInboxComponent({ input, done: () => undefined, layout: "focused-card" });
+
+    const output = component.render(100).map(stripAnsi).join("\n");
+
+    expect(output).toContain("Local model unavailable (timed out); deterministic wording shown.");
+    expect(output).toContain("A validation command failed repeatedly in this project.");
+    expect(output).not.toContain("provider timed out before returning JSON");
+  });
+
+  it("does not keep stale model-polished wording after editable fields change", () => {
+    const input = fixtureInput();
+    input.items[0]!.localDiagnosisPolish = localPolishResult();
+    const component = createFlightLearnDeltaInboxComponent({ input, done: () => undefined, layout: "focused-card" });
+
+    expect(component.render(100).map(stripAnsi).join("\n")).toContain("A local model rewrote this problem");
+
+    component.handleInput?.("e");
+    component.handleInput?.("\u0015");
+    component.handleInput?.("Fresh edited expectation");
+    component.handleInput?.("\r");
+    const output = component.render(100).map(stripAnsi).join("\n");
+
+    expect(output).not.toContain("Local model phrasing; deterministic fallback available.");
+    expect(output).not.toContain("A local model rewrote this problem");
+    expect(output).toContain("Fresh edited expectation");
   });
 
   it("keeps rendered visible lines within narrow and wide terminal widths", () => {

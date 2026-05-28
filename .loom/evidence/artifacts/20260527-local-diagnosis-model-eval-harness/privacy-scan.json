@@ -1,0 +1,29 @@
+{
+  "artifactDir": ".loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness",
+  "checkedFiles": [
+    "artifact-listing.txt",
+    "deterministic-baseline-results.json",
+    "diagnosis-polish-eval-harness-results.json",
+    "diff-check.txt",
+    "fake-provider-exercise-results.json",
+    "full-test.txt",
+    "harness-run-output.txt",
+    "harness-summary.json",
+    "run-diagnosis-polish-eval-harness.mjs",
+    "typecheck.txt"
+  ],
+  "allowedPlaceholders": [
+    "/Users/<user>",
+    "<pi-session-file:redacted>",
+    "[REDACTED_CREDENTIAL]",
+    "[stack trace omitted]",
+    "[local path omitted]"
+  ],
+  "redactionsApplied": {
+    "full-test.txt": [
+      "/Users/<user>/Code/personal/pi-flight-recorder"
+    ]
+  },
+  "forbiddenPatternCount": 0,
+  "matches": []
+}

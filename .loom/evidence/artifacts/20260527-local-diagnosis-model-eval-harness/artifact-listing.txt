@@ -1,0 +1,12 @@
+artifact_dir=.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness/artifact-listing.txt
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness/deterministic-baseline-results.json
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness/diagnosis-polish-eval-harness-results.json
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness/diff-check.txt
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness/fake-provider-exercise-results.json
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness/full-test.txt
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness/harness-run-output.txt
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness/harness-summary.json
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness/privacy-scan.json
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness/run-diagnosis-polish-eval-harness.mjs
+.loom/evidence/artifacts/20260527-local-diagnosis-model-eval-harness/typecheck.txt

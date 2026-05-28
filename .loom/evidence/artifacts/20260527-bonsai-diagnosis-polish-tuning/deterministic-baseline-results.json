@@ -1,0 +1,533 @@
+{
+  "schemaVersion": 1,
+  "deterministicResults": [
+    {
+      "caseId": "LDM-EVAL-001",
+      "coverage": [
+        "positive",
+        "raw-command-recurrence",
+        "reflection-cluster",
+        "expected-behavior-present"
+      ],
+      "sourceKind": "synthetic-from-deterministic-test",
+      "deterministicFromSource": {
+        "headline": "A validation command failed repeatedly in this project.",
+        "whatHappened": "Pi saw the same validation-failure pattern twice in recent sessions.",
+        "whyItMatters": "Repeated validation friction makes the result hard to trust.",
+        "expectedBehavior": "Validation should run from a fresh project shell after changes.",
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: bash cd /Users/<user>/Code/redacted-project && npm test > test-output.log",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "deterministicFromCorpus": {
+        "headline": "A validation command failed repeatedly in this project.",
+        "whatHappened": "Pi saw the same validation-failure pattern twice in recent sessions.",
+        "whyItMatters": "Repeated validation friction makes the result hard to trust.",
+        "expectedBehavior": "Validation should run from a fresh project shell after changes.",
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: bash cd /Users/<user>/Code/redacted-project && npm test > test-output.log",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "corpusComparison": {
+        "matches": true,
+        "mismatches": []
+      },
+      "confidence": "high",
+      "lowConfidence": false,
+      "fallbackNotes": [
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+      ]
+    },
+    {
+      "caseId": "LDM-EVAL-002",
+      "coverage": [
+        "positive",
+        "build-validation",
+        "failed-validation"
+      ],
+      "sourceKind": "synthetic-from-deterministic-test",
+      "deterministicFromSource": {
+        "headline": "The assistant retried or reversed course repeatedly on the same issue.",
+        "whatHappened": "The build command failed repeatedly in a local validation loop.",
+        "whyItMatters": "A release package would be hard to trust without a clean build.",
+        "expectedBehavior": "Build validation should pass before release packaging.",
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: npm run build failed after TypeScript compile step",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "deterministicFromCorpus": {
+        "headline": "The assistant retried or reversed course repeatedly on the same issue.",
+        "whatHappened": "The build command failed repeatedly in a local validation loop.",
+        "whyItMatters": "A release package would be hard to trust without a clean build.",
+        "expectedBehavior": "Build validation should pass before release packaging.",
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: npm run build failed after TypeScript compile step",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "corpusComparison": {
+        "matches": true,
+        "mismatches": []
+      },
+      "confidence": "high",
+      "lowConfidence": false,
+      "fallbackNotes": [
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+      ]
+    },
+    {
+      "caseId": "LDM-EVAL-003",
+      "coverage": [
+        "positive",
+        "stale-edit-attempt",
+        "raw-file-path-secondary"
+      ],
+      "sourceKind": "synthetic-from-deterministic-test",
+      "deterministicFromSource": {
+        "headline": "A file edit failed because the target text no longer matched.",
+        "whatHappened": "The edit failed because the target text no longer matched.",
+        "whyItMatters": "Repeated stale edits slow review and can hide the actual implementation issue.",
+        "expectedBehavior": null,
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: oldText not found while editing src/storage.ts",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "deterministicFromCorpus": {
+        "headline": "A file edit failed because the target text no longer matched.",
+        "whatHappened": "The edit failed because the target text no longer matched.",
+        "whyItMatters": "Repeated stale edits slow review and can hide the actual implementation issue.",
+        "expectedBehavior": null,
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: oldText not found while editing src/storage.ts",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "corpusComparison": {
+        "matches": true,
+        "mismatches": []
+      },
+      "confidence": "high",
+      "lowConfidence": false,
+      "fallbackNotes": [
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+      ]
+    },
+    {
+      "caseId": "LDM-EVAL-004",
+      "coverage": [
+        "positive",
+        "user-correction",
+        "human-feedback"
+      ],
+      "sourceKind": "synthetic-from-deterministic-test",
+      "deterministicFromSource": {
+        "headline": "The user had to correct an assistant assumption.",
+        "whatHappened": "No, the API accepts an options object rather than a string argument.",
+        "whyItMatters": "The user had to interrupt the assistant to correct an implementation assumption.",
+        "expectedBehavior": "Use the API shape the user corrected, not the assistant's prior assumption.",
+        "confidence": "high",
+        "rawClue": "User correction: No, the API accepts an options object rather than a string argument.",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "deterministicFromCorpus": {
+        "headline": "The user had to correct an assistant assumption.",
+        "whatHappened": "No, the API accepts an options object rather than a string argument.",
+        "whyItMatters": "The user had to interrupt the assistant to correct an implementation assumption.",
+        "expectedBehavior": "Use the API shape the user corrected, not the assistant's prior assumption.",
+        "confidence": "high",
+        "rawClue": "User correction: No, the API accepts an options object rather than a string argument.",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "corpusComparison": {
+        "matches": true,
+        "mismatches": []
+      },
+      "confidence": "high",
+      "lowConfidence": false,
+      "fallbackNotes": [
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+      ]
+    },
+    {
+      "caseId": "LDM-EVAL-005",
+      "coverage": [
+        "neutral",
+        "manual-delta",
+        "ownership-boundary"
+      ],
+      "sourceKind": "synthetic-from-real-bonsai-secondary-fixture",
+      "deterministicFromSource": {
+        "headline": "Assistant repeatedly confused the storage mapper ownership boundary.",
+        "whatHappened": "The assistant edited storage when mapper code owned the behavior.",
+        "whyItMatters": "Review churn increased before implementation could continue.",
+        "expectedBehavior": "Check the mapper before editing storage.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "deterministicFromCorpus": {
+        "headline": "Assistant repeatedly confused the storage mapper ownership boundary.",
+        "whatHappened": "The assistant edited storage when mapper code owned the behavior.",
+        "whyItMatters": "Review churn increased before implementation could continue.",
+        "expectedBehavior": "Check the mapper before editing storage.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "corpusComparison": {
+        "matches": true,
+        "mismatches": []
+      },
+      "confidence": "high",
+      "lowConfidence": false,
+      "fallbackNotes": [
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+      ]
+    },
+    {
+      "caseId": "LDM-EVAL-006",
+      "coverage": [
+        "fallback",
+        "low-information",
+        "missing-evidence"
+      ],
+      "sourceKind": "synthetic-from-deterministic-test",
+      "deterministicFromSource": {
+        "headline": "A repeated issue was detected, but the plain-English cause is unclear.",
+        "whatHappened": "Local evidence recorded an expectation gap that needs human review.",
+        "whyItMatters": "Keeping the evidence visible helps decide whether this needs a follow-up or more observation.",
+        "expectedBehavior": null,
+        "confidence": "low",
+        "rawClue": "other detector signal with no useful details",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis.",
+          "Plain-English cause could not be confidently derived; inspect evidence before routing."
+        ]
+      },
+      "deterministicFromCorpus": {
+        "headline": "A repeated issue was detected, but the plain-English cause is unclear.",
+        "whatHappened": "Local evidence recorded an expectation gap that needs human review.",
+        "whyItMatters": "Keeping the evidence visible helps decide whether this needs a follow-up or more observation.",
+        "expectedBehavior": null,
+        "confidence": "low",
+        "rawClue": "other detector signal with no useful details",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis.",
+          "Plain-English cause could not be confidently derived; inspect evidence before routing."
+        ]
+      },
+      "corpusComparison": {
+        "matches": true,
+        "mismatches": []
+      },
+      "confidence": "low",
+      "lowConfidence": true,
+      "fallbackNotes": [
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+        "Plain-English cause could not be confidently derived; inspect evidence before routing."
+      ]
+    },
+    {
+      "caseId": "LDM-EVAL-007",
+      "coverage": [
+        "fallback",
+        "no-expectation",
+        "unsupported-expected-behavior"
+      ],
+      "sourceKind": "synthetic-from-negative-real-bonsai-probe",
+      "deterministicFromSource": {
+        "headline": "A validation command failed repeatedly in this project.",
+        "whatHappened": "A local validation command failed twice after reinstalling the package.",
+        "whyItMatters": "The validation result remained uncertain.",
+        "expectedBehavior": null,
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: local validation failed after package reinstall",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "deterministicFromCorpus": {
+        "headline": "A validation command failed repeatedly in this project.",
+        "whatHappened": "A local validation command failed twice after reinstalling the package.",
+        "whyItMatters": "The validation result remained uncertain.",
+        "expectedBehavior": null,
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: local validation failed after package reinstall",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "corpusComparison": {
+        "matches": true,
+        "mismatches": []
+      },
+      "confidence": "high",
+      "lowConfidence": false,
+      "fallbackNotes": [
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+      ]
+    },
+    {
+      "caseId": "LDM-EVAL-008",
+      "coverage": [
+        "fallback",
+        "redaction-sensitive",
+        "secret-looking",
+        "path-leak-risk"
+      ],
+      "sourceKind": "synthetic-redaction-challenge",
+      "deterministicFromSource": {
+        "headline": "A validation command failed repeatedly in this project.",
+        "whatHappened": "The relevant output was redacted before evaluation storage.",
+        "whyItMatters": "Leaking path or credential-shaped text in the primary card would break the privacy boundary.",
+        "expectedBehavior": "Validation should report the failure category without exposing local path or credential details.",
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: validation output included redacted credential and local path details",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "deterministicFromCorpus": {
+        "headline": "A validation command failed repeatedly in this project.",
+        "whatHappened": "The relevant output was redacted before evaluation storage.",
+        "whyItMatters": "Leaking path or credential-shaped text in the primary card would break the privacy boundary.",
+        "expectedBehavior": "Validation should report the failure category without exposing local path or credential details.",
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: validation output included redacted credential and local path details",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "corpusComparison": {
+        "matches": true,
+        "mismatches": []
+      },
+      "confidence": "high",
+      "lowConfidence": false,
+      "fallbackNotes": [
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+      ]
+    },
+    {
+      "caseId": "LDM-EVAL-009",
+      "coverage": [
+        "fallback",
+        "route-contamination",
+        "display-only-boundary"
+      ],
+      "sourceKind": "synthetic-safety-regression",
+      "deterministicFromSource": {
+        "headline": "Assistant wording drifted into follow-up routing advice instead of summarizing the issue.",
+        "whatHappened": "The review text made route selection look model-driven.",
+        "whyItMatters": "It could undermine human-gated artifact routing.",
+        "expectedBehavior": "Diagnosis wording should describe the issue without selecting a route.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "deterministicFromCorpus": {
+        "headline": "Assistant wording drifted into follow-up routing advice instead of summarizing the issue.",
+        "whatHappened": "The review text made route selection look model-driven.",
+        "whyItMatters": "It could undermine human-gated artifact routing.",
+        "expectedBehavior": "Diagnosis wording should describe the issue without selecting a route.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "corpusComparison": {
+        "matches": true,
+        "mismatches": []
+      },
+      "confidence": "high",
+      "lowConfidence": false,
+      "fallbackNotes": [
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+      ]
+    },
+    {
+      "caseId": "LDM-EVAL-010",
+      "coverage": [
+        "fallback",
+        "unsupported-facts",
+        "hallucination-risk"
+      ],
+      "sourceKind": "synthetic-safety-regression",
+      "deterministicFromSource": {
+        "headline": "A validation command failed repeatedly in this project.",
+        "whatHappened": "The local validation result remained uncertain after two failed runs.",
+        "whyItMatters": "The package validation result could not be trusted yet.",
+        "expectedBehavior": "Re-run local validation after reinstalling the package.",
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: local validation failed after package reinstall",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "deterministicFromCorpus": {
+        "headline": "A validation command failed repeatedly in this project.",
+        "whatHappened": "The local validation result remained uncertain after two failed runs.",
+        "whyItMatters": "The package validation result could not be trusted yet.",
+        "expectedBehavior": "Re-run local validation after reinstalling the package.",
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: local validation failed after package reinstall",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "corpusComparison": {
+        "matches": true,
+        "mismatches": []
+      },
+      "confidence": "high",
+      "lowConfidence": false,
+      "fallbackNotes": [
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+      ]
+    },
+    {
+      "caseId": "LDM-EVAL-011",
+      "coverage": [
+        "neutral",
+        "bounded-fact-packet",
+        "evidence-limit"
+      ],
+      "sourceKind": "synthetic-bounds-regression",
+      "deterministicFromSource": {
+        "headline": "A file edit failed because the target text no longer matched.",
+        "whatHappened": "Multiple local validation snippets existed, but only concise summaries should reach the model.",
+        "whyItMatters": "Overloading the model with transcript detail would make the card noisy and risk leakage.",
+        "expectedBehavior": "Run the smallest relevant validation after each fix and record which command passed.",
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: typecheck and test validation both failed in nearby turns",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "deterministicFromCorpus": {
+        "headline": "A file edit failed because the target text no longer matched.",
+        "whatHappened": "Multiple local validation snippets existed, but only concise summaries should reach the model.",
+        "whyItMatters": "Overloading the model with transcript detail would make the card noisy and risk leakage.",
+        "expectedBehavior": "Run the smallest relevant validation after each fix and record which command passed.",
+        "confidence": "high",
+        "rawClue": "Repeated failure pattern: typecheck and test validation both failed in nearby turns",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "corpusComparison": {
+        "matches": true,
+        "mismatches": []
+      },
+      "confidence": "high",
+      "lowConfidence": false,
+      "fallbackNotes": [
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+      ]
+    },
+    {
+      "caseId": "LDM-EVAL-012",
+      "coverage": [
+        "neutral",
+        "manual-delta",
+        "partial-fields",
+        "no-invented-impact"
+      ],
+      "sourceKind": "synthetic-human-authored-partial",
+      "deterministicFromSource": {
+        "headline": "Assistant kept re-checking package install state before reading the project settings.",
+        "whatHappened": "The assistant re-ran install/status checks before inspecting settings.",
+        "whyItMatters": "Install or extension setup friction can make release validation harder to trust.",
+        "expectedBehavior": "Read project settings first when install state is uncertain.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "deterministicFromCorpus": {
+        "headline": "Assistant kept re-checking package install state before reading the project settings.",
+        "whatHappened": "The assistant re-ran install/status checks before inspecting settings.",
+        "whyItMatters": "Install or extension setup friction can make release validation harder to trust.",
+        "expectedBehavior": "Read project settings first when install state is uncertain.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "corpusComparison": {
+        "matches": true,
+        "mismatches": []
+      },
+      "confidence": "high",
+      "lowConfidence": false,
+      "fallbackNotes": [
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+      ]
+    }
+  ]
+}

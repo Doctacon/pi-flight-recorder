@@ -1,0 +1,34 @@
+{
+  "elapsedMs": 1463,
+  "result": {
+    "view": {
+      "headline": "A validation command failed repeatedly in this project.",
+      "whatHappened": "Pi saw the same validation-failure pattern twice in recent sessions.",
+      "whyItMatters": "Repeated validation friction makes the result hard to trust.",
+      "expectedBehavior": "Validation should run from a fresh project shell after changes.",
+      "rawClue": "Repeated failure pattern: bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm test",
+      "confidence": "high",
+      "limits": [
+        "Display-only diagnosis; stored delta fields were not changed.",
+        "Raw command, path, detector, or provenance details should stay secondary to this diagnosis.",
+        "Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed."
+      ]
+    },
+    "deterministicView": {
+      "headline": "A validation command failed repeatedly in this project.",
+      "whatHappened": "Pi saw the same validation-failure pattern twice in recent sessions.",
+      "whyItMatters": "Repeated validation friction makes the result hard to trust.",
+      "expectedBehavior": "Validation should run from a fresh project shell after changes.",
+      "rawClue": "Repeated failure pattern: bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm test",
+      "confidence": "high",
+      "limits": [
+        "Display-only diagnosis; stored delta fields were not changed.",
+        "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+        "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+      ]
+    },
+    "usedLocalModel": true,
+    "fallbackReason": null,
+    "validationIssue": null
+  }
+}

@@ -1,0 +1,5 @@
+date=2026-05-27T22:54:59Z
+server_command=llama-server -m /Users/<user>/.cache/pi-flight-recorder/bonsai/Bonsai-1.7B-Q1_0.gguf --host 127.0.0.1 --port 18124 -c 2048 --no-webui --jinja
+base_url=http://127.0.0.1:18124
+endpoint=http://127.0.0.1:18124/v1/chat/completions
+fresh_server_pass=true

@@ -1,0 +1,86 @@
+{
+  "corpusId": "local-diagnosis-model-eval-corpus-v1",
+  "corpusPath": ".loom/evidence/artifacts/20260527-local-diagnosis-model-eval-corpus-rubric/diagnosis-polish-eval-corpus.v1.json",
+  "baseUrl": "http://127.0.0.1:18131",
+  "endpoint": "http://127.0.0.1:18131/v1/chat/completions",
+  "generatedAt": "2026-05-27T23:49:40.742Z",
+  "modelRuntimeStarted": true,
+  "hostedProviderUsed": false,
+  "productBehaviorChanged": false,
+  "productBehaviorChangeScope": "no source/default/runtime lifecycle change in this comparison ticket; using tuned prompt from ticket:20260527-bonsai-diagnosis-polish-tuning",
+  "model": "PrismML Bonsai 1.7B GGUF Q1_0",
+  "timeoutMs": 5000,
+  "maxOutputTokens": 128,
+  "productDefaultTimeoutMs": 750,
+  "totalCases": 12,
+  "caseIds": [
+    "LDM-EVAL-001",
+    "LDM-EVAL-002",
+    "LDM-EVAL-003",
+    "LDM-EVAL-004",
+    "LDM-EVAL-005",
+    "LDM-EVAL-006",
+    "LDM-EVAL-007",
+    "LDM-EVAL-008",
+    "LDM-EVAL-009",
+    "LDM-EVAL-010",
+    "LDM-EVAL-011",
+    "LDM-EVAL-012"
+  ],
+  "acceptedCount": 8,
+  "fallbackCount": 4,
+  "acceptedWithinDefaultTimeoutCount": 1,
+  "acceptedWithinEvaluationTimeoutCount": 8,
+  "modelOutcomeCounts": {
+    "accepted-equivalent": 8,
+    "fallback-unexpected": 1,
+    "fallback-expected": 3
+  },
+  "validatorOutcomeCounts": {
+    "accepted": 8,
+    "fallback": 4
+  },
+  "rubricRatingCounts": {
+    "equivalent": 8,
+    "invalidFallback": 4
+  },
+  "fallbackReasonCounts": {
+    "null": 8,
+    "schema-invalid": 2,
+    "malformed-json": 2
+  },
+  "latencyAll": {
+    "count": 12,
+    "minMs": 674.32,
+    "medianMs": 880.682,
+    "p95Ms": 1283.614,
+    "maxMs": 1283.614,
+    "meanMs": 952.035
+  },
+  "latencyAccepted": {
+    "count": 8,
+    "minMs": 700.865,
+    "medianMs": 880.682,
+    "p95Ms": 1283.614,
+    "maxMs": 1283.614,
+    "meanMs": 937.217
+  },
+  "latencyFallback": {
+    "count": 4,
+    "minMs": 674.32,
+    "medianMs": 842.628,
+    "p95Ms": 1241.32,
+    "maxMs": 1241.32,
+    "meanMs": 981.671
+  },
+  "hardFailResultCount": 0,
+  "hardFailCaseIds": [],
+  "outputSafetyFailureCount": 0,
+  "outputSafetyFailureCaseIds": [],
+  "promptSafetyFailureCount": 0,
+  "promptSafetyFailureCaseIds": [],
+  "recommendation": {
+    "decision": "keep-opt-in-experimental-with-timeout-guidance",
+    "rationale": "Real Bonsai produced accepted display wording under the explicit 5000ms evaluation timeout, but only 1/8 accepted case(s) completed within the current 750ms default timeout posture."
+  }
+}

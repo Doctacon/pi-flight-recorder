@@ -1,4 +1,5 @@
 import { buildFlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
+import type { LocalDiagnosisPolishFallbackReason, LocalDiagnosisPolishResult } from "./flight-learn-local-diagnosis-model.js";
 import { compactSnippet } from "./redact.js";
 import type { ArtifactCandidateType, DeltaDetectorSignal, DeltaEvidenceRef, ExpectationDelta } from "./types.js";
 
@@ -11,6 +12,7 @@ export interface FlightLearnRouteChoice<T extends string = string> {
 export interface FlightLearnDeltaInboxItem {
   delta: ExpectationDelta;
   signals: DeltaDetectorSignal[];
+  localDiagnosisPolish?: LocalDiagnosisPolishResult;
 }
 
 export interface FlightLearnDeltaInboxInput {
@@ -151,6 +153,46 @@ function atAGlanceLines(delta: ExpectationDelta, fields: Record<EditableField, s
 
 function routeGuideLine(): string {
   return "How to choose: Rule=behavior reminder | Code=confusing source | Test=missing check | Ticket=larger work | Observe=not sure";
+}
+
+function fallbackReasonLabel(reason: LocalDiagnosisPolishFallbackReason): string {
+  switch (reason) {
+    case "disabled":
+      return "disabled";
+    case "provider-unavailable":
+      return "not configured";
+    case "timeout":
+      return "timed out";
+    case "provider-error":
+      return "runtime unavailable";
+    case "malformed-json":
+      return "invalid JSON";
+    case "schema-invalid":
+      return "invalid shape";
+    case "unsafe-output":
+      return "unsafe wording";
+    case "unsupported-facts":
+      return "unsupported fact";
+    case "empty-output":
+      return "empty output";
+  }
+}
+
+function localDiagnosisStatusLine(result: LocalDiagnosisPolishResult | undefined): string | null {
+  if (!result) return null;
+  if (result.usedLocalModel) return "Local model phrasing; deterministic fallback available.";
+  if (!result.fallbackReason || result.fallbackReason === "disabled") return null;
+  return `Local model unavailable (${fallbackReasonLabel(result.fallbackReason)}); deterministic wording shown.`;
+}
+
+function originalFieldValue(value: string | null): string {
+  return (value ?? "").replace(/\s+/g, " ").trim();
+}
+
+function fieldsStillMatchDelta(delta: ExpectationDelta, fields: Record<EditableField, string>): boolean {
+  return originalFieldValue(delta.expectation) === originalFieldValue(fields.expectation)
+    && originalFieldValue(delta.reality) === originalFieldValue(fields.reality)
+    && originalFieldValue(delta.impact) === originalFieldValue(fields.impact);
 }
 
 function signalLine(signal: DeltaDetectorSignal): string {
@@ -365,7 +407,7 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
       if (index === 0) return this.accent(this.bold(line));
       if (line.startsWith("Active follow-up:") || line.startsWith("▶")) return this.accent(this.bold(line));
       if (this.focusedSectionHeading(line)) return this.bold(line);
-      if (line.startsWith("Keys:") || line.includes("hidden by default") || line.includes("more follow-up")) return this.dim(line);
+      if (line.startsWith("Keys:") || line.startsWith("Local model ") || line.includes("hidden by default") || line.includes("more follow-up")) return this.dim(line);
       if (this.statusMessage && line.includes(this.statusMessage)) return this.warning(line);
       return line;
     });
@@ -429,12 +471,15 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
       reality: fields.reality.trim() || null,
       impact: fields.impact.trim() || null,
     };
-    const diagnosis = buildFlightLearnDiagnosisView({ delta: displayDelta, signals: item.signals });
+    const polishedResult = fieldsStillMatchDelta(delta, fields) ? item.localDiagnosisPolish : undefined;
+    const diagnosis = polishedResult?.view ?? buildFlightLearnDiagnosisView({ delta: displayDelta, signals: item.signals });
+    const modelStatus = localDiagnosisStatusLine(polishedResult);
     const expectedText = diagnosis.expectedBehavior ?? "unknown — press e to add what should have happened";
     const rawClueLines = diagnosis.rawClue ? ["", "Raw clue", ...wrapFocusedProse(diagnosis.rawClue, width)] : [];
     const lines: string[] = [
       clip(`Flight Learn — Issue ${this.selectedItemIndex + 1} of ${this.items.length}`, width),
       clip(`${this.items.length} pending · ${delta.evidenceRefs.length} evidence ref${delta.evidenceRefs.length === 1 ? "" : "s"} · ↑/↓ changes issue`, width),
+      ...(modelStatus ? [clip(modelStatus, width)] : []),
       "",
       "Problem",
       ...wrapFocusedProse(diagnosis.headline, width),

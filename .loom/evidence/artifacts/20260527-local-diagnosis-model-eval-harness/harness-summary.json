@@ -1,0 +1,132 @@
+{
+  "corpusId": "local-diagnosis-model-eval-corpus-v1",
+  "corpusPath": ".loom/evidence/artifacts/20260527-local-diagnosis-model-eval-corpus-rubric/diagnosis-polish-eval-corpus.v1.json",
+  "generatedAt": "2026-05-27T20:22:28.180Z",
+  "modelRuntimeStarted": false,
+  "hostedProviderUsed": false,
+  "productBehaviorChanged": false,
+  "totalCases": 12,
+  "caseIds": [
+    "LDM-EVAL-001",
+    "LDM-EVAL-002",
+    "LDM-EVAL-003",
+    "LDM-EVAL-004",
+    "LDM-EVAL-005",
+    "LDM-EVAL-006",
+    "LDM-EVAL-007",
+    "LDM-EVAL-008",
+    "LDM-EVAL-009",
+    "LDM-EVAL-010",
+    "LDM-EVAL-011",
+    "LDM-EVAL-012"
+  ],
+  "contractValidation": {
+    "ok": true,
+    "errors": [],
+    "caseIds": [
+      "LDM-EVAL-001",
+      "LDM-EVAL-002",
+      "LDM-EVAL-003",
+      "LDM-EVAL-004",
+      "LDM-EVAL-005",
+      "LDM-EVAL-006",
+      "LDM-EVAL-007",
+      "LDM-EVAL-008",
+      "LDM-EVAL-009",
+      "LDM-EVAL-010",
+      "LDM-EVAL-011",
+      "LDM-EVAL-012"
+    ],
+    "totalCases": 12,
+    "modelOutcomeEnum": [
+      "accepted-better",
+      "accepted-equivalent",
+      "accepted-worse",
+      "accepted-unsafe",
+      "accepted-unsupported",
+      "fallback-expected",
+      "fallback-unexpected",
+      "runtime-error",
+      "not-run"
+    ],
+    "validatorOutcomeEnum": [
+      "accepted",
+      "fallback",
+      "provider-error",
+      "timeout",
+      "not-run"
+    ],
+    "rubricRatingEnum": [
+      "better",
+      "equivalent",
+      "worse",
+      "invalidFallback",
+      "unsafe"
+    ]
+  },
+  "deterministicMismatchCount": 0,
+  "perCaseModelOutcomeCounts": {
+    "accepted-equivalent": 7,
+    "fallback-expected": 5
+  },
+  "perCaseValidatorOutcomeCounts": {
+    "accepted": 7,
+    "fallback": 5
+  },
+  "perCaseFallbackReasonCounts": {
+    "null": 7,
+    "unsupported-facts": 4,
+    "unsafe-output": 1
+  },
+  "exerciseFallbackReasonCounts": {
+    "null": 2,
+    "malformed-json": 1,
+    "schema-invalid": 1,
+    "unsafe-output": 1,
+    "unsupported-facts": 1,
+    "timeout": 1,
+    "provider-error": 1
+  },
+  "promptSafetyFailureCount": 0,
+  "perCaseHardFailResultCount": 0,
+  "exerciseHardFailResultCount": 1,
+  "allHardFailResultCount": 1,
+  "metricFieldValidation": {
+    "expectedFields": [
+      "modelOutcome",
+      "validatorOutcome",
+      "usedLocalModel",
+      "fallbackReason",
+      "validationIssue",
+      "elapsedMs",
+      "rubricRating",
+      "reviewerNotes"
+    ],
+    "perCase": {
+      "ok": true,
+      "missing": []
+    },
+    "exercises": {
+      "ok": true,
+      "missing": []
+    }
+  },
+  "exercisedFallbackReasons": [
+    "malformed-json",
+    "provider-error",
+    "schema-invalid",
+    "timeout",
+    "unsafe-output",
+    "unsupported-facts"
+  ],
+  "exercisedScenarioIds": [
+    "exercise-valid",
+    "exercise-malformed-json",
+    "exercise-schema-invalid-extra-field",
+    "exercise-unsafe-redaction-placeholder",
+    "exercise-unsafe-route-action",
+    "exercise-unsupported-fact",
+    "exercise-timeout",
+    "exercise-provider-error"
+  ]
+}

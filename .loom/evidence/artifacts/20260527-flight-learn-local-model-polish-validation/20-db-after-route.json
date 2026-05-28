@@ -1,0 +1,44 @@
+{
+  "dataDir": "/tmp/pfr-local-polish-realpi-DVTSzG/home/.pi/flight-recorder",
+  "databasePath": "/tmp/pfr-local-polish-realpi-DVTSzG/home/.pi/flight-recorder/flight-recorder.db",
+  "counts": {
+    "deltas": 2,
+    "candidates": 1,
+    "ruleCandidates": 0,
+    "flightRules": 0
+  },
+  "deltas": [
+    {
+      "id": "delta_realpi_plain_english_raw",
+      "status": "routed",
+      "summary": "Repeated failure pattern: bash cd /Users/<user>/Code/personal/pi-flight-recorder && npm test > pi-flight-recorder.log",
+      "expectation": null,
+      "reality": "Observed 2 related failure occurrences in reflection cluster cluster_73111b7e16551a58.",
+      "impact": "Repeated local friction across tools/cwds: bash.",
+      "activeArtifactCandidateId": "artifact_cand_64b1e921a540fd2b",
+      "evidenceRefCount": 2
+    },
+    {
+      "id": "delta_realpi_plain_english_secondary",
+      "status": "candidate",
+      "summary": "Assistant repeatedly confused the storage mapper ownership boundary.",
+      "expectation": "Check the mapper before editing storage.",
+      "reality": "The assistant edited storage when mapper code owned the behavior.",
+      "impact": "Review churn increased before implementation could continue.",
+      "activeArtifactCandidateId": null,
+      "evidenceRefCount": 1
+    }
+  ],
+  "candidates": [
+    {
+      "id": "artifact_cand_64b1e921a540fd2b",
+      "deltaId": "delta_realpi_plain_english_raw",
+      "artifactType": "test-check",
+      "status": "accepted",
+      "applied": false,
+      "rationale": "I chose Test/check because ... this local-model fallback should still route only a candidate.",
+      "evidenceRefCount": 2,
+      "nextStep": "Create the test/check in a separate implementation ticket; this candidate does not write tests or change validation behavior."
+    }
+  ]
+}

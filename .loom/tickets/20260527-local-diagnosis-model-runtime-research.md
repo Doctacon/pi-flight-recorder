@@ -2,7 +2,7 @@
 
 ID: ticket:20260527-local-diagnosis-model-runtime-research
 Type: Ticket
-Status: open
+Status: closed
 Created: 2026-05-27
 Updated: 2026-05-27
 Risk: medium - this decides the local model runtime boundary for a privacy-sensitive UI path, but does not change source behavior.
@@ -66,10 +66,21 @@ Stop conditions:
 
 ## Current State
 
-Open and ready to start. This is the first child of `plan:20260527-flight-learn-local-model-diagnosis-polish`. `research:20260527-local-diagnosis-model-runtime` exists in active state with preliminary Bonsai findings, but the ticket is not complete until that research is completed with a concrete adapter recommendation or an explicit blocker.
+Closed. `research:20260527-local-diagnosis-model-runtime` is completed with a bounded recommendation: implement the first real-runtime adapter as an explicitly configured external `llama.cpp` server over validated loopback HTTP, starting validation with Bonsai 1.7B GGUF Q1_0 and keeping 4B/8B only as quality fallbacks. No source code was edited and no runtime/model install or inference was performed.
+
+Acceptance posture:
+
+- ACC-001: satisfied by the completed research record's comparison of Bonsai GGUF/`llama.cpp`, Bonsai MLX, Ollama, Node-native/local library options, CLI/server modes, and rejected hosted/non-loopback/auto-download paths.
+- ACC-002: satisfied by the research recommendation for a `kind: "llama-cpp-server"` loopback-only adapter and explicit opt-in config shape.
+- ACC-003: satisfied by the research validation preconditions for fake-provider/no-runtime tests, adapter tests, and future real Bonsai proof.
+
+Audit posture: `audit:20260527-local-diagnosis-model-runtime-research-review` returned `concerns`, not acceptance blockers. `FIND-001` warned that downstream plan/adapter wording lagged the completed research. The actionable adapter-ticket portion was resolved by updating `ticket:20260527-local-diagnosis-model-adapter` to narrow first-adapter scope to loopback-only `llama.cpp` server and explicitly exclude CLI/process runtime lifecycle, MLX, Ollama, Node-native, generic provider URLs, hosted endpoints, and downloads. The parent plan remains a direction-setting record and was not edited by Driver; downstream tickets now point at the completed research for adapter scope. Residual risk is intentionally preserved: no real local-model behavior, latency, JSON compliance, or Bonsai quality has been proven.
 
 ## Journal
 
 - 2026-05-27: Created ticket from the local-model diagnosis polish plan. The first move is research, not implementation.
 - 2026-05-27: Operator expressed interest in PrismML Bonsai 1-bit because of its low memory usage. Research should evaluate Bonsai first rather than treating it as a generic local-model option.
 - 2026-05-27: Seeded `research:20260527-local-diagnosis-model-runtime` with preliminary source findings: Bonsai GGUF/`llama.cpp` looks like the best first candidate, Bonsai 1.7B should be tried first for memory, and 4B/8B remain quality fallbacks pending real JSON/prompt validation.
+- 2026-05-27: Set status to active to start runtime research execution under the parent plan.
+- 2026-05-27: Completed `research:20260527-local-diagnosis-model-runtime` with public-source findings and a concrete adapter recommendation: loopback-only external `llama.cpp` server, Bonsai 1.7B GGUF Q1_0 first, deterministic fallback always, no hosted/non-loopback/auto-download/runtime-management paths. Moved ticket to review because audit is the next acceptance step.
+- 2026-05-27: Recorded `audit:20260527-local-diagnosis-model-runtime-research-review` with verdict `concerns`. Dispositioned `FIND-001` by reconciling `ticket:20260527-local-diagnosis-model-adapter` to the completed research. Closed this ticket; the remaining limitations are explicit future validation risks, not blockers for the model-agnostic contract harness.

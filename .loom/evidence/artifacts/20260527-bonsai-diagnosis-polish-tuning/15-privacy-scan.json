@@ -1,0 +1,50 @@
+{
+  "artifactDir": ".loom/evidence/artifacts/20260527-bonsai-diagnosis-polish-tuning",
+  "checkedFiles": [
+    "01-runtime-provenance.txt",
+    "02-model-provenance.txt",
+    "03-llama-server.log",
+    "03-llama-server.pid",
+    "03-server-start.txt",
+    "04-server-health.err",
+    "04-server-health.json",
+    "05-real-bonsai-eval-output.txt",
+    "06-server-final-status.txt",
+    "07-server-stop.txt",
+    "08-typecheck.txt",
+    "09-full-test.txt",
+    "10-diff-check.txt",
+    "11-focused-local-model-test.txt",
+    "12-before-after-comparison.json",
+    "13-artifact-listing.txt",
+    "14-server-log-summary.txt",
+    "16-source-change-excerpt.txt",
+    "deterministic-baseline-results.json",
+    "diagnosis-polish-eval-harness-results.json",
+    "fake-harness-run-output.txt",
+    "fake-provider-exercise-results.json",
+    "harness-summary.json",
+    "pre-tuning-real-bonsai-eval-summary.json",
+    "real-bonsai-eval-results.json",
+    "real-bonsai-eval-summary.json",
+    "run-diagnosis-polish-eval-harness.mjs",
+    "run-real-bonsai-eval.mjs"
+  ],
+  "allowedPlaceholders": [
+    "/Users/<user>",
+    "/Users/<fixture>",
+    "<pi-session-file:redacted>",
+    "[REDACTED_CREDENTIAL]",
+    "[stack trace omitted]",
+    "[local path omitted]"
+  ],
+  "redactionsApplied": [
+    "local /Users/<user> model path and project workspace path placeholders",
+    "test fixture user path in source excerpt redacted to /Users/<fixture>"
+  ],
+  "notes": [
+    "llama.cpp log vocabulary such as token: <number> is not treated as a credential token assignment."
+  ],
+  "forbiddenPatternCount": 0,
+  "matches": []
+}

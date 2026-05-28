@@ -1,0 +1,7 @@
+date=2026-05-27T20:52:50Z
+pid=40756
+server_status=
+  PID  PPID    RSS ELAPSED COMMAND
+40756 40681 1125232   00:12 llama-server -m /Users/<user>/.cache/pi-flight-recorder/bonsai/Bonsai-1.7B-Q1_0.gguf --host 127.0.0.1 --port 18121 -c 2048 --no-webui --jinja
+health=
+{"status":"ok"}

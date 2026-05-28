@@ -2,7 +2,7 @@
 
 ID: ticket:20260527-flight-learn-local-model-polish-validation
 Type: Ticket
-Status: open
+Status: closed
 Created: 2026-05-27
 Updated: 2026-05-27
 Risk: high - release claims about local model behavior require real runtime and real Pi evidence, while unavailable-runtime cases must not be laundered through mocks.
@@ -18,6 +18,8 @@ Single closure claim: the project has honest evidence for the integrated local-m
 ## Related Records
 
 - `plan:20260527-flight-learn-local-model-diagnosis-polish` - parent strategy and sequencing.
+- `evidence:20260527-flight-learn-local-model-polish-validation` - validation evidence and real-model blocker.
+- `audit:20260527-flight-learn-local-model-polish-validation-review` - validation audit; verdict `clear` with blocked real-model limitation preserved.
 - `research:20260527-local-diagnosis-model-runtime` - identifies expected runtime/model validation constraints.
 - `ticket:20260527-flight-learn-local-model-polish-integration` - implementation slice to validate.
 - `spec:flight-learn-inbox-ux` - REQ-024 through REQ-029 and SCN-008/SCN-009 define validation expectations.
@@ -82,8 +84,14 @@ Stop conditions:
 
 ## Current State
 
-Open but not ready to execute until integration is complete. No validation has been run under this ticket. Real Bonsai proof depends on explicit local runtime/model availability; if unavailable, that portion must be blocked rather than simulated.
+Closed as validation complete with real-model proof blocked. Validation evidence is recorded in `evidence:20260527-flight-learn-local-model-polish-validation`. Focused fake-provider/adapter tests passed (4 files / 63 tests), typecheck passed, build passed, full tests passed (21 files / 126 tests), and diff checks passed. Disposable real Pi project-local install loaded `pi-extension.js`; `/flight` showed only `flight-status` and `flight-learn`; `/flight-learn delta-review --local-model-polish --local-model-url http://127.0.0.1:9` rendered `Local model unavailable (runtime unavailable); deterministic wording shown.`; route submission stored an accepted `test-check` artifact candidate with `applied=false` and zero rule records. Status privacy copy includes the explicit local-polish model-call path.
+
+Actual real Bonsai/`llama.cpp` proof was blocked at this ticket's closure: no approved local runtime/model env or binary was available, and no download/install/hosted/non-loopback probe was attempted. Audit `audit:20260527-flight-learn-local-model-polish-validation-review` returned `clear` on the condition that closure preserved this limitation. That limitation was later addressed by follow-up `ticket:20260527-real-bonsai-local-model-validation`, which proves the real local-model path can work on one supported synthetic fixture but does not prove broad Bonsai quality.
 
 ## Journal
 
 - 2026-05-27: Created as the final validation slice for optional Bonsai/local-model diagnosis polish. The ticket separates fake-provider proof, real Pi fallback proof, and actual real-model proof to prevent evidence laundering.
+- 2026-05-27: Set active after integration closed. Beginning focused/unit validation, disposable real Pi fallback validation, and real-model availability check without downloading/installing model weights.
+- 2026-05-27: Recorded `evidence:20260527-flight-learn-local-model-polish-validation` with focused tests, typecheck, build, full tests, diff checks, real Pi fallback/card/route/status artifacts, and an explicit real Bonsai/`llama.cpp` blocker. Moved to review.
+- 2026-05-27: Recorded `audit:20260527-flight-learn-local-model-polish-validation-review` with verdict `clear`. Closed as validation complete with real-model proof blocked/unproven.
+- 2026-05-27: Follow-up `ticket:20260527-real-bonsai-local-model-validation` later unblocked and validated Bonsai 1.7B Q1_0 through `llama.cpp` for one supported fixture; this ticket remains historically closed with its original blocked-state evidence.

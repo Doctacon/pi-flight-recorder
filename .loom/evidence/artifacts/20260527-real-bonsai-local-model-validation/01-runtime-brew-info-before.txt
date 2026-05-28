@@ -1,0 +1,13 @@
+date=2026-05-27T18:22:27Z
+brew_info_before=
+==> llama.cpp: stable 9290 (bottled), HEAD
+LLM inference in C/C++
+https://github.com/ggml-org/llama.cpp
+Not installed
+From: https://github.com/Homebrew/homebrew-core/blob/HEAD/Formula/l/llama.cpp.rb
+License: MIT
+==> Dependencies
+Required (2): ggml, openssl@3
+==> Options
+--HEAD
+	Install HEAD version
