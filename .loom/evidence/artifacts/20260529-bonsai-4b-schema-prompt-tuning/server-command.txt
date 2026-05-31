@@ -1,0 +1,1 @@
+llama-server -m ~/.cache/pi-flight-recorder/bonsai/Bonsai-4B-Q1_0.gguf --host 127.0.0.1 --port 18119 -c 4096 --no-webui --jinja

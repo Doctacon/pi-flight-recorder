@@ -1,0 +1,48 @@
+Flight Learn — Issue 1 of 1
+1 pending · 1 evidence ref · ↑/↓ changes issue
+Local LLM draft — facts below are source of truth; not judge-accepted.
+
+Problem
+ A draft says the build check made validation trust unclear.
+
+What happened?
+ The draft connects the failed build check to the surrounding validation loop, so the
+ card reads as a build-trust problem rather than a claim about production behavior.
+
+Why it matters
+ That context helps the reviewer decide whether the evidence points to validation
+ coverage or a broader follow-up.
+
+Expected
+ Build validation should pass before release packaging.
+
+Source facts
+ Problem: A local build check failed during validation.
+ What happened: A build check failed in a nearby validation loop.
+ Why it matters: A release package is hard to trust without a clean build signal.
+ Expected: Build validation should pass before release packaging.
+
+Raw clue
+ Redacted build validation clue
+
+Why suggested
+ failed-validation (0.74): Redacted note: a local build check failed during release
+ validation.
+
+Evidence
+ 1 ref hidden by default — press v to view concise refs.
+
+Choose a follow-up
+▶ [1] Code legibility
+ Use when confusing source shape caused repeated mistakes
+ [2] Test/check
+ Use when a missing or weak validation check would have caught this
+ [3] Flight Rule
+ Use when Pi needs reusable guidance, still requiring approval later
+ [4] Ticket
+ Use when the issue needs a bounded follow-up work item
+ [5] Observe
+ Keep evidence and watch recurrence without creating an artifact
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose
+Actions: e edit · v evidence · d dismiss · s skip · q quit

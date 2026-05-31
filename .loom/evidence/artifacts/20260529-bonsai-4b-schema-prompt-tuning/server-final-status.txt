@@ -1,0 +1,5 @@
+before-stop:
+  PID  PPID    RSS      VSZ ELAPSED COMMAND
+35929     1 1167728 418281248   03:53 /opt/homebrew/bin/llama-server -m ~/.cache/pi-flight-recorder/bonsai/Bonsai-4B-Q1_0.gguf --host 127.0.0.1 --port 18119 -c 4096 --no-webui --jinja
+stopping pid 35929
+stopped

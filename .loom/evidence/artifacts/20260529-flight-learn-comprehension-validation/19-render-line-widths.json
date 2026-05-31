@@ -1,0 +1,102 @@
+{
+  "generatedAt": "2026-05-29T14:18:05.923Z",
+  "pass": true,
+  "widths": [
+    {
+      "cardId": "card-01-draft-repeated-workflow",
+      "width": 92,
+      "maxLineLength": 87,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-01-draft-repeated-workflow",
+      "width": 72,
+      "maxLineLength": 70,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-02-fallback-repeated-workflow",
+      "width": 92,
+      "maxLineLength": 87,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-02-fallback-repeated-workflow",
+      "width": 72,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-03-draft-validation-build",
+      "width": 92,
+      "maxLineLength": 85,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-03-draft-validation-build",
+      "width": 72,
+      "maxLineLength": 70,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-04-fallback-validation-build",
+      "width": 92,
+      "maxLineLength": 83,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-04-fallback-validation-build",
+      "width": 72,
+      "maxLineLength": 72,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-05-draft-stale-edit",
+      "width": 92,
+      "maxLineLength": 88,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-05-draft-stale-edit",
+      "width": 72,
+      "maxLineLength": 71,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-06-fallback-stale-edit",
+      "width": 92,
+      "maxLineLength": 88,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-06-fallback-stale-edit",
+      "width": 72,
+      "maxLineLength": 71,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-07-draft-low-information",
+      "width": 92,
+      "maxLineLength": 89,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-07-draft-low-information",
+      "width": 72,
+      "maxLineLength": 71,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-08-fallback-safety-adversarial",
+      "width": 92,
+      "maxLineLength": 84,
+      "overLimit": []
+    },
+    {
+      "cardId": "card-08-fallback-safety-adversarial",
+      "width": 72,
+      "maxLineLength": 72,
+      "overLimit": []
+    }
+  ]
+}

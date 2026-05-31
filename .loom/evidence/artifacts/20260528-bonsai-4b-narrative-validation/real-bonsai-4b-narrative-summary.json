@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-05-29T00:22:46.164Z",
+  "baseUrl": "http://127.0.0.1:18118",
+  "modelRuntimeStartedByHarness": false,
+  "hostedProviderUsed": false,
+  "model": "Bonsai-4B-Q1_0.gguf",
+  "judgeMode": "same Bonsai 4B model via explicit local judge adapter; experimental self-judge risk",
+  "totalCases": 15,
+  "acceptedCount": 0,
+  "fallbackCount": 15,
+  "runtimeErrorCount": 0,
+  "fallbackReasons": {
+    "malformed-json": 12,
+    "schema-invalid": 2,
+    "timeout": 1
+  },
+  "rubricOutcomes": {
+    "fallback-unexpected": 7,
+    "fallback-expected": 8
+  },
+  "latencyMs": {
+    "min": 2367,
+    "max": 5007,
+    "avg": 4052
+  }
+}

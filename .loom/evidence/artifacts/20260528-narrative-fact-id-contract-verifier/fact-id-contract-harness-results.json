@@ -1,0 +1,217 @@
+{
+  "generatedAt": "2026-05-28T19:54:34.624Z",
+  "modelRuntimeStarted": false,
+  "hostedProviderUsed": false,
+  "productSourceMutatedByHarness": false,
+  "factPacketVersion": 2,
+  "factIds": [
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F6",
+    "F7",
+    "F8",
+    "F9",
+    "F10",
+    "F20",
+    "F21"
+  ],
+  "factCount": 12,
+  "totalExercises": 18,
+  "passCount": 18,
+  "failCount": 0,
+  "outcomes": {
+    "accepted": 1,
+    "schema-invalid": 4,
+    "unsupported-facts": 1,
+    "unsafe-output": 8,
+    "empty-output": 1,
+    "malformed-json": 1,
+    "provider-error": 1,
+    "timeout": 1
+  },
+  "exercises": [
+    {
+      "id": "accepted-fact-id-narrative",
+      "expected": "accepted",
+      "actual": "accepted",
+      "pass": true,
+      "usedLocalModel": true,
+      "fallbackReason": null,
+      "validationIssue": null,
+      "outputWhatHappened": "The validation check repeated from an old shell after the package changed. The repeated pattern makes the card about validation trust rather than an isolated check."
+    },
+    {
+      "id": "string-what-happened-rejected",
+      "expected": "schema-invalid",
+      "actual": "schema-invalid",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "schema-invalid",
+      "validationIssue": "whatHappened must be a fact-cited sentence object",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "missing-fact-ids-rejected",
+      "expected": "schema-invalid",
+      "actual": "schema-invalid",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "schema-invalid",
+      "validationIssue": "whatHappened sentence must cite one or more factIds",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "unknown-fact-id-rejected",
+      "expected": "unsupported-facts",
+      "actual": "unsupported-facts",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsupported-facts",
+      "validationIssue": "whatHappened cited an unknown factId",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "hard-unsafe-raw-command-rejected",
+      "expected": "unsafe-output",
+      "actual": "unsafe-output",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included unsafe or non-display content",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "hard-unsafe-common-command-rejected",
+      "expected": "unsafe-output",
+      "actual": "unsafe-output",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included unsafe or non-display content",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "hard-unsafe-shell-command-rejected",
+      "expected": "unsafe-output",
+      "actual": "unsafe-output",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included unsafe or non-display content",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "hard-unsafe-network-command-rejected",
+      "expected": "unsafe-output",
+      "actual": "unsafe-output",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included unsafe or non-display content",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "hard-unsafe-project-command-rejected",
+      "expected": "unsafe-output",
+      "actual": "unsafe-output",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included unsafe or non-display content",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "display-only-route-advice-rejected",
+      "expected": "unsafe-output",
+      "actual": "unsafe-output",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included unsafe or non-display content",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "display-only-passive-route-advice-rejected",
+      "expected": "unsafe-output",
+      "actual": "unsafe-output",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included unsafe or non-display content",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "display-only-followup-advice-rejected",
+      "expected": "unsafe-output",
+      "actual": "unsafe-output",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included unsafe or non-display content",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "duplicate-deterministic-rejected-as-empty",
+      "expected": "empty-output",
+      "actual": "empty-output",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "empty-output",
+      "validationIssue": "provider response did not include useful display wording",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "duplicate-fact-id-rejected",
+      "expected": "schema-invalid",
+      "actual": "schema-invalid",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "schema-invalid",
+      "validationIssue": "whatHappened sentence repeated a factId",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "sentence-role-extra-key-rejected",
+      "expected": "schema-invalid",
+      "actual": "schema-invalid",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "schema-invalid",
+      "validationIssue": "whatHappened sentence included unsupported fields",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "malformed-json-rejected",
+      "expected": "malformed-json",
+      "actual": "malformed-json",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "malformed-json",
+      "validationIssue": "provider response was not valid JSON",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "provider-error-fallback",
+      "expected": "provider-error",
+      "actual": "provider-error",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "provider-error",
+      "validationIssue": "provider failed before returning JSON",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    },
+    {
+      "id": "timeout-fallback",
+      "expected": "timeout",
+      "actual": "timeout",
+      "pass": true,
+      "usedLocalModel": false,
+      "fallbackReason": "timeout",
+      "validationIssue": "provider timed out before returning JSON",
+      "outputWhatHappened": "The validation check was repeated from an old shell after the package changed."
+    }
+  ]
+}

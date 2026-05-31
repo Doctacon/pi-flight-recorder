@@ -1,0 +1,42 @@
+Flight Learn — Issue 1 of 1
+1 pending · 1 evidence ref · ↑/↓ changes issue
+Local model unavailable (timed out); deterministic wording shown.
+
+Problem
+ The same review workflow repeated without a clear outcome.
+
+What happened?
+ Pi saw the same local review pattern twice in recent evidence.
+
+Why it matters
+ Repeated review churn can hide whether the underlying issue was
+ resolved.
+
+Expected
+ The workflow should leave an explicit review outcome in the local
+ record.
+
+Raw clue
+ Redacted repeated review workflow clue
+
+Why suggested
+ reflection-cluster (0.74): Redacted note: two similar review passes
+ repeated without a clear route or outcome.
+
+Evidence
+ 1 ref hidden by default — press v to view concise refs.
+
+Choose a follow-up
+▶ [1] Code legibility
+ Use when confusing source shape caused repeated mistakes
+ [2] Test/check
+ Use when a missing or weak validation check would have caught this
+ [3] Flight Rule
+ Use when Pi needs reusable guidance, still requiring approval later
+ [4] Ticket
+ Use when the issue needs a bounded follow-up work item
+ [5] Observe
+ Keep evidence and watch recurrence without creating an artifact
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose
+Actions: e edit · v evidence · d dismiss · s skip · q quit

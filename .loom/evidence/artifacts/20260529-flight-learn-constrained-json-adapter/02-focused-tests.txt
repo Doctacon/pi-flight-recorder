@@ -1,0 +1,14 @@
+$ npm test -- src/flight-learn-llama-cpp-adapter.test.ts src/flight-learn-local-diagnosis-model.test.ts
+
+> pi-flight-recorder@0.1.0 test
+> vitest run src/flight-learn-llama-cpp-adapter.test.ts src/flight-learn-local-diagnosis-model.test.ts
+
+
+ RUN  v4.1.7 <repo>
+
+
+ Test Files  2 passed (2)
+      Tests  37 passed (37)
+   Start at  22:12:04
+   Duration  569ms (transform 164ms, setup 0ms, import 212ms, tests 468ms, environment 0ms)
+

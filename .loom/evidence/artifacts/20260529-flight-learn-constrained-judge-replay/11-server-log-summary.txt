@@ -1,0 +1,8 @@
+stdout-bytes-captured-temp-before-delete: 0
+stderr-bytes-captured-temp-before-delete: 44201
+stdout-temp-log-deleted-in-original-run: false
+stderr-temp-log-deleted-in-original-run: false
+Raw server logs were originally captured to temporary files and not copied into Loom artifacts, but audit found stale temp files still existed after the run.
+Follow-up cleanup removed matching stale temp log files without reading or persisting their contents; see 21-temp-log-cleanup.md.
+Harness follow-up: run-constrained-judge-replay.mjs now unlinks stdout/stderr temp logs in finally after byte-count summarization.
+Lifecycle status is recorded in server-start/server-health/server-final artifacts.

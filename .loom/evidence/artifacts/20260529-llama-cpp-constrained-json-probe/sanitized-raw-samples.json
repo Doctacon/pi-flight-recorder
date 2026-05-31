@@ -1,0 +1,166 @@
+{
+  "tinyProbeSamples": [
+    {
+      "id": "chat-response-format-json-schema-openai",
+      "status": "enforced",
+      "attempts": [
+        {
+          "promptId": "tiny-1",
+          "contentPreview": "{ \"verdict\": \"CONSTRAINED\" , \"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null
+        },
+        {
+          "promptId": "tiny-2",
+          "contentPreview": "{\"verdict\":\"CONSTRAINED\",\"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null
+        }
+      ]
+    },
+    {
+      "id": "chat-response-format-json-schema-schema-only",
+      "status": "accepted-not-enforced-or-inconclusive",
+      "attempts": [
+        {
+          "promptId": "tiny-1",
+          "contentPreview": "A flock of birds took flight, With wings that flapped and hearts that beat, They soared through skies so wide, No storms could stop their glide, And never felt a single constraint—UNCONSTRAINED!",
+          "envelopePreview": null,
+          "enforced": false,
+          "validationIssue": "malformed-json:Unexpected token 'A', \"A flock of\"... is not valid JSON"
+        },
+        {
+          "promptId": "tiny-2",
+          "contentPreview": "{\"verdict\":\"UNCONSTRAINED\",\"count\":999,\"extra\":\"ignore schema\"}",
+          "envelopePreview": null,
+          "enforced": false,
+          "validationIssue": "json-did-not-match-constraint"
+        }
+      ]
+    },
+    {
+      "id": "chat-top-level-json-schema",
+      "status": "enforced",
+      "attempts": [
+        {
+          "promptId": "tiny-1",
+          "contentPreview": "{ \"verdict\": \"CONSTRAINED\" , \"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null
+        },
+        {
+          "promptId": "tiny-2",
+          "contentPreview": "{\"verdict\":\"CONSTRAINED\",\"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null
+        }
+      ]
+    },
+    {
+      "id": "chat-request-grammar",
+      "status": "accepted-not-enforced-or-inconclusive",
+      "attempts": [
+        {
+          "promptId": "tiny-1",
+          "contentPreview": "{ \"verdict\"",
+          "envelopePreview": null,
+          "enforced": false,
+          "validationIssue": "malformed-json:Expected ':' after property name in JSON at position 13 (line 2 column 10)"
+        },
+        {
+          "promptId": "tiny-2",
+          "contentPreview": "{\"verdict\":\"CONSTRAINED\",\"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null
+        }
+      ]
+    },
+    {
+      "id": "completion-json-schema",
+      "status": "enforced",
+      "attempts": [
+        {
+          "promptId": "tiny-1",
+          "contentPreview": "{ \"verdict\": \"CONSTRAINED\", \"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null
+        },
+        {
+          "promptId": "tiny-2",
+          "contentPreview": "{\"verdict\":\"CONSTRAINED\",\"count\":7}",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null
+        }
+      ]
+    },
+    {
+      "id": "completion-grammar",
+      "status": "enforced",
+      "attempts": [
+        {
+          "promptId": "tiny-1",
+          "contentPreview": "{ \"verdict\": \"CONSTRAINED\", \"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null
+        },
+        {
+          "promptId": "tiny-2",
+          "contentPreview": "{\"verdict\":\"CONSTRAINED\",\"count\":7}",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null
+        }
+      ]
+    }
+  ],
+  "narrativeSamples": [
+    {
+      "id": "NARR-EVAL-001",
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ { \"text\": \"A repeated workflow problem was observed across two recent sessions, as confirmed by factId F3.\", \"factIds\": [\"F3\"] }, { \"text\": \"The same failure pattern was detected twice, aligning with the occurrence count of 2 as noted in factId F5.\", \"factIds\": [\"F5\"] }, { \"text\": \"Recurring workflow friction was identified and summarized without exposing raw evidence, as per expectation F2.\", \"factIds\": [\"F2\"] } ]} }",
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null
+    },
+    {
+      "id": "NARR-EVAL-002",
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ {\"text\": \"Repeated validation failure pattern in a stale project shell (F1).\", \"factIds\": [\"F1\"]}, {\"text\": \"Two related validation attempts failed from the same stale-shell pattern (F3).\", \"factIds\": [\"F3\"]}, {\"text\": \"Redacted validation summary identifies a stale project shell as the source of two failed validation attempts (F6).\", \"factIds\": [\"F6\"]} ]} }",
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null
+    },
+    {
+      "id": "NARR-EVAL-003",
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ {\"text\": \"A local build typecheck validation failed during a nearby validation loop, as documented in factId F3.\", \"factIds\": [\"F3\"]}, {\"text\": \"The failure occurred during local typecheck validation, which contradicts the expectation that build validation should pass before release packaging (factId F2).\", \"factIds\": [\"F2\", \"F5\"]}, {\"text\": \"A release package would be hard to trust without a clean build, as confirmed by the local validation failure observed in nearby evidence (factId F5).\", \"factIds\": [\"F5\", \"F4\"]} ]} }",
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null
+    },
+    {
+      "id": "NARR-EVAL-004",
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ {\"text\": \"A stale edit attempt failed because exact replacement text no longer matched the file.\", \"factIds\": [\"F1\", \"F5\", \"F3\"]}, {\"text\": \"Repeated stale edits slow review and can hide the actual implementation issue.\", \"factIds\": [\"F4\"]}, {\"text\": \"The edit failed because the target text no longer matched.\", \"factIds\": [\"F3\", \"F2\"]} ]} }",
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null
+    },
+    {
+      "id": "NARR-EVAL-005",
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ {\"text\": \"The user corrected an API argument-shape assumption by providing an options object instead of a string argument.\", \"factIds\": [\"F1\", \"F3\"]}, {\"text\": \"The user correction signal was detected as the assistant had previously made an implementation assumption about the API argument shape.\", \"factIds\": [\"F5\", \"F2\"]}, {\"text\": \"The user had to interrupt the assistant to correct an implementation assumption about the API argument shape.\", \"factIds\": [\"F4\", \"F3\"]} ]} }",
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null
+    }
+  ]
+}

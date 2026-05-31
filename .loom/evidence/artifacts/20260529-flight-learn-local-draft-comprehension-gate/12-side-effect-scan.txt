@@ -1,0 +1,20 @@
+Targeted side-effect/source scan for local draft comprehension gate follow-up
+Changed seams intentionally exercised by this ticket: src/flight-learn-local-diagnosis-model.ts, src/flight-learn-inbox.ts, src/pi-extension.test.ts and focused tests.
+
+Local diagnosis/inbox write API grep (expected: no database/filesystem mutation APIs in implementation paths):
+- Searched src/flight-learn-local-diagnosis-model.ts and src/flight-learn-inbox.ts for filesystem/database mutation API terms.
+- Result: implementation hits are guardrail/status/render strings or keyboard key names, not runtime writes.
+
+Classifier/route authority grep in local diagnosis/inbox source (expected: prompt/guardrail/status text only, no classifier APIs or route ranking code):
+- Searched src/flight-learn-local-diagnosis-model.ts and src/flight-learn-inbox.ts for classifier/ranking/route-authority terms.
+- Result: hits are display-copy/guardrail strings and pre-existing human route selection output types, not model-driven route selection.
+
+Follow-up audit fixes covered:
+- unsupported concrete/mutation narrative claims are rejected before draft display.
+- unsafe/action-advice judge verdicts and top-level failClosedReason values force deterministic fallback.
+- focused-card key hints split Keys/Actions so d dismiss and s skip are visible at width 72 and 92.
+
+Focused no-side-effect assertions covered by tests:
+- model result tests assert input delta JSON unchanged and judge/draft wording not persisted.
+- inbox tests assert route-selected output keeps original delta fields and source facts; draft validation issue not rendered.
+- pi-extension tests assert routed delta summary/proposedDraft omit local draft/accepted narrative wording and no rule_candidates/flight_rules are created.

@@ -1,0 +1,10 @@
+{
+  "sourceFilesCompared": [
+    "src/flight-learn-local-diagnosis-model.ts",
+    "src/flight-learn-llama-cpp-adapter.ts",
+    "src/flight-learn-inbox.ts",
+    "src/pi-extension.ts"
+  ],
+  "changedDuringReplay": [],
+  "pass": true
+}

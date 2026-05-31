@@ -1,0 +1,6 @@
+{
+  "src/flight-learn-local-diagnosis-model.ts": "d7b0b18ce125b3cf2c08c8f0b3f1a05ad546b77e4e3eb8858b3b2a3ec64fccb6",
+  "src/flight-learn-llama-cpp-adapter.ts": "f8dba3abcb4fed345727f6467acc5c5925c6fa30d9eb2d80a6efd68f0aafd600",
+  "src/flight-learn-inbox.ts": "b1c033e8018f571fe5db30c1dc83be87aea7f91a49ae2d24d238774621b63b16",
+  "src/pi-extension.ts": "99fb862faf489643341361b444a7bf5f49749f6087a2f6fe90188057f031d428"
+}

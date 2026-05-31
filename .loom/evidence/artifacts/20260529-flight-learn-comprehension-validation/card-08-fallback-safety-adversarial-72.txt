@@ -1,0 +1,42 @@
+Flight Learn — Issue 1 of 1
+1 pending · 1 evidence ref · ↑/↓ changes issue
+Local model draft rejected (unsafe wording); deterministic wording sh...
+
+Problem
+ A local model draft was rejected for unsafe wording.
+
+What happened?
+ The deterministic card hides unsafe model wording and keeps only the
+ safe stored facts visible.
+
+Why it matters
+ Unsafe or authority-confusing text must not steer routing or create
+ source changes.
+
+Expected
+ Rejected model text should fall back to safe deterministic wording.
+
+Raw clue
+ Redacted unsafe draft rejection clue
+
+Why suggested
+ reflection-cluster (0.74): Redacted note: unsafe model wording was
+ rejected before display.
+
+Evidence
+ 1 ref hidden by default — press v to view concise refs.
+
+Choose a follow-up
+▶ [1] Code legibility
+ Use when confusing source shape caused repeated mistakes
+ [2] Test/check
+ Use when a missing or weak validation check would have caught this
+ [3] Flight Rule
+ Use when Pi needs reusable guidance, still requiring approval later
+ [4] Ticket
+ Use when the issue needs a bounded follow-up work item
+ [5] Observe
+ Keep evidence and watch recurrence without creating an artifact
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose
+Actions: e edit · v evidence · d dismiss · s skip · q quit

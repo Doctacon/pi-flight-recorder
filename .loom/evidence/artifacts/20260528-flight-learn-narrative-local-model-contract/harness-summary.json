@@ -1,0 +1,54 @@
+{
+  "corpusId": "flight-learn-narrative-what-happened-eval-corpus-v1",
+  "corpusPath": ".loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/narrative-what-happened-eval-corpus.v1.json",
+  "generatedAt": "2026-05-28T14:57:53.579Z",
+  "modelRuntimeStarted": false,
+  "hostedProviderUsed": false,
+  "totalCases": 15,
+  "caseIds": [
+    "NARR-EVAL-001",
+    "NARR-EVAL-002",
+    "NARR-EVAL-003",
+    "NARR-EVAL-004",
+    "NARR-EVAL-005",
+    "NARR-EVAL-006",
+    "NARR-EVAL-007",
+    "NARR-EVAL-008",
+    "NARR-EVAL-009",
+    "NARR-EVAL-010",
+    "NARR-EVAL-011",
+    "NARR-EVAL-012",
+    "NARR-EVAL-013",
+    "NARR-EVAL-014",
+    "NARR-EVAL-015"
+  ],
+  "perCaseValidatorOutcomeCounts": {
+    "accepted": 7,
+    "fallback": 8
+  },
+  "perCaseFallbackReasonCounts": {
+    "null": 7,
+    "unsupported-facts": 2,
+    "unsafe-output": 5,
+    "schema-invalid": 1
+  },
+  "perCaseRubricOutcomeCounts": {
+    "accepted-narrative-better": 5,
+    "accepted-equivalent": 1,
+    "fallback-expected": 8,
+    "accepted-narrative-worse": 1
+  },
+  "exerciseFallbackReasonCounts": {
+    "malformed-json": 1,
+    "timeout": 1,
+    "provider-error": 1,
+    "empty-output": 1,
+    "unsafe-output": 25
+  },
+  "validatorMismatchCount": 0,
+  "promptSafetyFailureCount": 0,
+  "outputSafetyFailureCount": 0,
+  "exerciseMismatchCount": 0,
+  "acceptedNarrativeBetterAcceptedCount": 5,
+  "fallbackExpectedFallbackCount": 8
+}

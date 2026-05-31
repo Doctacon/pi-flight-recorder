@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { buildArtifactCandidateDraft } from "./artifact-drafts.js";
 import { formatDeltaOutcomeSummary, recordArtifactCandidateOutcomeWithStore, recordDeltaRecurrenceWithStore, summarizeDeltaOutcomes } from "./delta-outcomes.js";
 import { askFlightLearnDeltaInbox, type FlightLearnDeltaInboxItem, type FlightLearnDeltaInboxResult } from "./flight-learn-inbox.js";
-import { createLlamaCppLocalDiagnosisPolishOptions, type LlamaCppLocalDiagnosisPolishConfig } from "./flight-learn-llama-cpp-adapter.js";
+import { createLlamaCppLocalDiagnosisPolishOptions, type LlamaCppLocalDiagnosisPolishConfig, type LlamaCppLocalNarrativeJudgeConfig } from "./flight-learn-llama-cpp-adapter.js";
 import { buildFlightLearnDiagnosisViewWithLocalPolish, type LocalDiagnosisPolishOptions } from "./flight-learn-local-diagnosis-model.js";
 import { formatFlightRule, formatRuleCandidate, formatRuleInjectionBlock, formatRulesMarkdown } from "./flight-rules.js";
 import { askReviewChoice, askReviewEditor, fallbackMessage, type ReviewChoice } from "./interactive-review.js";
@@ -351,7 +351,7 @@ function flightLearnHelp(): string {
   return [
     "Flight Learn commands:",
     "- /flight-learn                           Guided learning inbox",
-    "- /flight-learn --local-model-polish --local-model-url http://127.0.0.1:PORT",
+    "- /flight-learn --local-model-polish --local-model-url http://127.0.0.1:PORT [--local-narrative-judge-url http://127.0.0.1:PORT]",
     "- /flight-learn seen <error text>          Search prior local fixes",
     "- /flight-learn reflect [--model]          Reflect on repeated local failures",
     "- /flight-learn review                     Guided reflection/rule review",
@@ -467,7 +467,7 @@ async function handleFlightStatus(argsText: string, ctx: PiCommandContext, state
       `User-bash capture: disabled (Pi user_bash is pre-execution; command semantics are not wrapped).`,
       `Errors: ${state.lastBootstrapError ?? (watchStatus?.state === "watched-by-another-process" ? null : watchStatus?.lastError) ?? "none"}`,
       `Recent feedback: ${recentFeedback.map((item) => `${item.action}:${item.targetType}/${item.targetId}`).join(", ") || "none"}`,
-      "Privacy: local SQLite only by default; no model calls unless explicitly enabled by `/flight-learn reflect --model`, model reflection settings, or `/flight-learn --local-model-polish --local-model-url ...`.",
+      "Privacy: local SQLite only by default; no model calls unless explicitly enabled by `/flight-learn reflect --model`, model reflection settings, or `/flight-learn --local-model-polish --local-model-url ...` with optional `--local-narrative-judge-url ...`.",
     ];
     notify(ctx, lines.join("\n"), state.lastBootstrapError ? "warning" : "info");
   } finally {
@@ -816,6 +816,23 @@ function localDiagnosisPolishOptionsFromArgs(args: string[]): LocalDiagnosisPoli
   if (model) config.model = model;
   if (timeoutMs !== undefined) config.timeoutMs = timeoutMs;
   if (maxOutputTokens !== undefined) config.maxOutputTokens = maxOutputTokens;
+
+  const judgeUrl = readOption(args, "--local-narrative-judge-url");
+  if (judgeUrl) {
+    const judgeConfig: LlamaCppLocalNarrativeJudgeConfig = {
+      enabled: true,
+      kind: "llama-cpp-server",
+      baseUrl: judgeUrl,
+    };
+    const judgeModel = readOption(args, "--local-narrative-judge-model-name");
+    const judgeTimeoutMs = parseNumber(readOption(args, "--local-narrative-judge-timeout-ms"));
+    const judgeMaxOutputTokens = parseNumber(readOption(args, "--local-narrative-judge-max-output-tokens"));
+    if (judgeModel) judgeConfig.model = judgeModel;
+    if (judgeTimeoutMs !== undefined) judgeConfig.timeoutMs = judgeTimeoutMs;
+    if (judgeMaxOutputTokens !== undefined) judgeConfig.maxOutputTokens = judgeMaxOutputTokens;
+    config.judge = judgeConfig;
+  }
+
   return createLlamaCppLocalDiagnosisPolishOptions(config);
 }
 

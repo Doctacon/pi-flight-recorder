@@ -1,0 +1,50 @@
+Flight Learn — Issue 1 of 1
+1 pending · 1 evidence ref · ↑/↓ changes issue
+Local LLM draft — facts below are source of truth; not judge-accepted.
+
+Problem
+ A draft says the edit was based on stale text.
+
+What happened?
+ The draft explains that the requested replacement no longer matched the current
+ content, so the card is about stale context rather than a missing tool.
+
+Why it matters
+ This gives the reviewer sequence context while keeping raw file details behind
+ evidence.
+
+Expected
+ Check current content before applying exact-text replacements.
+
+Source facts
+ Problem: An exact-text edit failed because the target text changed.
+ What happened: The edit failed because the expected target text no longer matched
+ current content.
+ Why it matters: A stale edit can waste review time and obscure whether the intended
+ change was applied.
+ Expected: Check current content before applying exact-text replacements.
+
+Raw clue
+ Redacted stale edit clue
+
+Why suggested
+ reflection-cluster (0.74): Redacted note: an exact-text replacement failed after nearby
+ content changed.
+
+Evidence
+ 1 ref hidden by default — press v to view concise refs.
+
+Choose a follow-up
+▶ [1] Code legibility
+ Use when confusing source shape caused repeated mistakes
+ [2] Test/check
+ Use when a missing or weak validation check would have caught this
+ [3] Flight Rule
+ Use when Pi needs reusable guidance, still requiring approval later
+ [4] Ticket
+ Use when the issue needs a bounded follow-up work item
+ [5] Observe
+ Keep evidence and watch recurrence without creating an artifact
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose
+Actions: e edit · v evidence · d dismiss · s skip · q quit

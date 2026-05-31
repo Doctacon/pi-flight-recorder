@@ -1,0 +1,6 @@
+{
+  "baseUrl": "http://127.0.0.1:18130",
+  "ok": true,
+  "statusCode": 200,
+  "body": "{\"status\":\"ok\"}"
+}

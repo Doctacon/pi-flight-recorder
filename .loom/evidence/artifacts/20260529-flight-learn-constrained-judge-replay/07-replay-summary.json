@@ -1,0 +1,147 @@
+{
+  "generatedAt": "2026-05-29T05:48:45.400Z",
+  "runStartedAt": "2026-05-29T05:47:36.275Z",
+  "adapterPath": "buildFlightLearnDiagnosisViewWithLocalPolish -> createLlamaCppLocalDiagnosisPolishOptions -> llama.cpp generator + judge providers",
+  "hostedProviderUsed": false,
+  "baseUrl": "http://127.0.0.1:18130",
+  "model": {
+    "path": "~/.cache/pi-flight-recorder/bonsai/Bonsai-4B-Q1_0.gguf",
+    "sha256": "4524b3f997f0f06444e568d1f26e2efd69effa3218c7ad3047432fb171e42168"
+  },
+  "runtime": {
+    "path": "/opt/homebrew/bin/llama-server",
+    "versionStdoutPreview": "",
+    "versionStderrPreview": "version: 9360 (6b4e4bd58) built with AppleClang 17.0.0.17000604 for Darwin arm64"
+  },
+  "corpus": {
+    "path": "<repo>/.loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/narrative-what-happened-eval-corpus.v1.json",
+    "id": "flight-learn-narrative-what-happened-eval-corpus-v1",
+    "totalCases": 15,
+    "replayedCases": 15
+  },
+  "constrainedAdapterConfiguration": {
+    "route": "/v1/chat/completions",
+    "responseFormat": "OpenAI-style response_format.type=json_schema via product adapter",
+    "generatorSchemaName": "flight_learn_diagnosis_polish_v2",
+    "judgeSchemaName": "flight_learn_narrative_judge_v1",
+    "generatorTimeoutMs": 5000,
+    "judgeTimeoutMs": 5000,
+    "generatorMaxOutputTokens": 320,
+    "judgeMaxOutputTokens": 512,
+    "loopbackOnly": true,
+    "failClosed": true
+  },
+  "priorBaselines": {
+    "constrainedGeneratorOnly": {
+      "routeId": "chat-response-format-json-schema-openai",
+      "corpusId": "flight-learn-narrative-what-happened-eval-corpus-v1",
+      "totalCases": 15,
+      "parseValidCount": 15,
+      "schemaValidCount": 15,
+      "verifierPassCount": 15,
+      "timeoutCount": 0,
+      "latencyMs": {
+        "min": 1852,
+        "max": 3354,
+        "avg": 2705
+      },
+      "judgeRun": false
+    },
+    "promptOnlyBestVariant": {
+      "id": "exact-example-single-json",
+      "totalCases": 15,
+      "parseValidCount": 8,
+      "schemaValidCount": 8,
+      "verifierPassCount": 7,
+      "judgePassCount": 0,
+      "acceptedCount": 0,
+      "fallbackCount": 15,
+      "timeoutCount": 11,
+      "unsafeAcceptCount": 0,
+      "fallbackReasons": {
+        "timeout": 11,
+        "unsafe-output": 1,
+        "malformed-json": 3
+      },
+      "latencyMs": {
+        "min": 1696,
+        "max": 5003,
+        "avg": 3255
+      },
+      "judgeLatencyMs": {
+        "min": 5001,
+        "max": 5002,
+        "avg": 5002
+      }
+    }
+  },
+  "totalCases": 15,
+  "parseValidCount": 13,
+  "schemaValidCount": 13,
+  "verifierPassCount": 8,
+  "narrativeCandidateCount": 3,
+  "judgeCallCount": 3,
+  "judgePassCount": 0,
+  "acceptedCount": 0,
+  "fallbackCount": 15,
+  "fallbackReasons": {
+    "timeout": 3,
+    "empty-output": 6,
+    "unsupported-facts": 2,
+    "schema-invalid": 1,
+    "unsafe-output": 3
+  },
+  "timeoutCount": 3,
+  "unsafeAcceptedCount": 0,
+  "schemaIssues": {
+    "LlamaCppLocalDiagnosisAdapterError": 2
+  },
+  "validationIssues": {
+    "provider timed out before returning JSON": 2,
+    "display field included unsupported facts": 1,
+    "display field included unsafe or non-display content": 3,
+    "whatHappened cited an unknown factId": 1
+  },
+  "judgeIssues": {
+    "local narrative judge found the narrative not useful": 1,
+    "local narrative judge sentence coverage did not match candidate": 1,
+    "local narrative judge timed out before returning JSON": 1
+  },
+  "latencyMs": {
+    "min": 2593,
+    "max": 9511,
+    "avg": 4444
+  },
+  "generatorLatencyMs": {
+    "min": 2592,
+    "max": 5007,
+    "avg": 3696
+  },
+  "judgeLatencyMs": {
+    "min": 2003,
+    "max": 5003,
+    "avg": 3730
+  },
+  "stoppedEarly": null,
+  "safetyBlocker": false,
+  "recommendation": "Stop/replan before model-enabled inbox integration for this runtime: constrained generator output did not pass the existing verifier + judge gates.",
+  "metricClarification": "In the original replay summary, fallbackCount/fallbackReasons are narrative non-acceptance counts, not product-level deterministic fallback counts. Product-level fallback is tracked separately via productFallbackReason in per-case results.",
+  "narrativeAcceptedCount": 0,
+  "narrativeNonAcceptedCount": 15,
+  "narrativeNonAcceptanceReasons": {
+    "timeout": 3,
+    "empty-output": 6,
+    "unsupported-facts": 2,
+    "schema-invalid": 1,
+    "unsafe-output": 3
+  },
+  "productFallbackCount": 10,
+  "productFallbackReasons": {
+    "timeout": 3,
+    "empty-output": 1,
+    "unsupported-facts": 2,
+    "schema-invalid": 1,
+    "unsafe-output": 3
+  },
+  "productUsedLocalModelWithoutAcceptedNarrativeCount": 5
+}

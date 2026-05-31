@@ -1,0 +1,6 @@
+checked records:
+- .loom/evidence/20260529-flight-learn-local-draft-comprehension-gate.md
+- .loom/tickets/20260529-flight-learn-local-draft-comprehension-gate.md
+- .loom/audit/20260529-flight-learn-local-draft-comprehension-gate-review.md
+findings: []
+checkedFiles: 3

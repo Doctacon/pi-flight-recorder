@@ -1,0 +1,643 @@
+{
+  "routeId": "chat-response-format-json-schema-openai",
+  "corpusId": "flight-learn-narrative-what-happened-eval-corpus-v1",
+  "totalCases": 15,
+  "parseValidCount": 15,
+  "schemaValidCount": 15,
+  "verifierPassCount": 15,
+  "malformedOrSchemaInvalidCount": 0,
+  "timeoutCount": 0,
+  "validationIssues": {},
+  "latencyMs": {
+    "min": 1852,
+    "max": 3354,
+    "avg": 2705
+  },
+  "results": [
+    {
+      "id": "NARR-EVAL-001",
+      "title": "Screenshot-shaped repeated workflow duplicate needs narrative context",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 3165,
+      "factCount": 7,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ { \"text\": \"A repeated workflow problem was observed across two recent sessions, as confirmed by factId F3.\", \"factIds\": [\"F3\"] }, { \"text\": \"The same failure pattern was detected twice, aligning with the occurrence count of 2 as noted in factId F5.\", \"factIds\": [\"F5\"] }, { \"text\": \"Recurring workflow friction was identified and summarized without exposing raw evidence, as per expectation F2.\", \"factIds\": [\"F2\"] } ]} }",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "A repeated workflow problem was observed across two recent sessions, as confirmed by factId F3.",
+              "factIds": [
+                "F3"
+              ]
+            },
+            {
+              "text": "The same failure pattern was detected twice, aligning with the occurrence count of 2 as noted in factId F5.",
+              "factIds": [
+                "F5"
+              ]
+            },
+            {
+              "text": "Recurring workflow friction was identified and summarized without exposing raw evidence, as per expectation F2.",
+              "factIds": [
+                "F2"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-002",
+      "title": "Validation recurrence narrative adds stale-shell sequence without raw command echo",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 2605,
+      "factCount": 7,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ {\"text\": \"Repeated validation failure pattern in a stale project shell (F1).\", \"factIds\": [\"F1\"]}, {\"text\": \"Two related validation attempts failed from the same stale-shell pattern (F3).\", \"factIds\": [\"F3\"]}, {\"text\": \"Redacted validation summary identifies a stale project shell as the source of two failed validation attempts (F6).\", \"factIds\": [\"F6\"]} ]} }",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "Repeated validation failure pattern in a stale project shell (F1).",
+              "factIds": [
+                "F1"
+              ]
+            },
+            {
+              "text": "Two related validation attempts failed from the same stale-shell pattern (F3).",
+              "factIds": [
+                "F3"
+              ]
+            },
+            {
+              "text": "Redacted validation summary identifies a stale project shell as the source of two failed validation attempts (F6).",
+              "factIds": [
+                "F6"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-003",
+      "title": "Build/typecheck loop narrative stays build-specific and avoids production claims",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 3354,
+      "factCount": 6,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ {\"text\": \"A local build typecheck validation failed during a nearby validation loop, as documented in factId F3.\", \"factIds\": [\"F3\"]}, {\"text\": \"The failure occurred during local typecheck validation, which contradicts the expectation that build validation should pass before release packaging (factId F2).\", \"factIds\": [\"F2\", \"F5\"]}, {\"text\": \"A release package would be hard to trust without a clean build, as confirmed by the local validation failure observed in nearby evidence (factId F5).\", \"factIds\": [\"F5\", \"F4\"]} ]} }",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "A local build typecheck validation failed during a nearby validation loop, as documented in factId F3.",
+              "factIds": [
+                "F3"
+              ]
+            },
+            {
+              "text": "The failure occurred during local typecheck validation, which contradicts the expectation that build validation should pass before release packaging (factId F2).",
+              "factIds": [
+                "F2",
+                "F5"
+              ]
+            },
+            {
+              "text": "A release package would be hard to trust without a clean build, as confirmed by the local validation failure observed in nearby evidence (factId F5).",
+              "factIds": [
+                "F5",
+                "F4"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-004",
+      "title": "Stale exact-text edit narrative explains sequence without file-path leakage",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 2675,
+      "factCount": 6,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ {\"text\": \"A stale edit attempt failed because exact replacement text no longer matched the file.\", \"factIds\": [\"F1\", \"F5\", \"F3\"]}, {\"text\": \"Repeated stale edits slow review and can hide the actual implementation issue.\", \"factIds\": [\"F4\"]}, {\"text\": \"The edit failed because the target text no longer matched.\", \"factIds\": [\"F3\", \"F2\"]} ]} }",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "A stale edit attempt failed because exact replacement text no longer matched the file.",
+              "factIds": [
+                "F1",
+                "F5",
+                "F3"
+              ]
+            },
+            {
+              "text": "Repeated stale edits slow review and can hide the actual implementation issue.",
+              "factIds": [
+                "F4"
+              ]
+            },
+            {
+              "text": "The edit failed because the target text no longer matched.",
+              "factIds": [
+                "F3",
+                "F2"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-005",
+      "title": "User correction narrative preserves correction without blaming unsupported system behavior",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 3145,
+      "factCount": 6,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ {\"text\": \"The user corrected an API argument-shape assumption by providing an options object instead of a string argument.\", \"factIds\": [\"F1\", \"F3\"]}, {\"text\": \"The user correction signal was detected as the assistant had previously made an implementation assumption about the API argument shape.\", \"factIds\": [\"F5\", \"F2\"]}, {\"text\": \"The user had to interrupt the assistant to correct an implementation assumption about the API argument shape.\", \"factIds\": [\"F4\", \"F3\"]} ]} }",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "The user corrected an API argument-shape assumption by providing an options object instead of a string argument.",
+              "factIds": [
+                "F1",
+                "F3"
+              ]
+            },
+            {
+              "text": "The user correction signal was detected as the assistant had previously made an implementation assumption about the API argument shape.",
+              "factIds": [
+                "F5",
+                "F2"
+              ]
+            },
+            {
+              "text": "The user had to interrupt the assistant to correct an implementation assumption about the API argument shape.",
+              "factIds": [
+                "F4",
+                "F3"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-006",
+      "title": "Manual ownership-boundary note may remain equivalent when already clear",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 2017,
+      "factCount": 6,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [{\"text\": \"The assistant confused the storage mapper ownership boundary.\", \"factIds\": [\"F1\"]}, {\"text\": \"The assistant edited storage when mapper code owned the behavior.\", \"factIds\": [\"F3\"]}, {\"text\": \"Review churn increased before implementation could continue.\", \"factIds\": [\"F4\"]}]}}",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "The assistant confused the storage mapper ownership boundary.",
+              "factIds": [
+                "F1"
+              ]
+            },
+            {
+              "text": "The assistant edited storage when mapper code owned the behavior.",
+              "factIds": [
+                "F3"
+              ]
+            },
+            {
+              "text": "Review churn increased before implementation could continue.",
+              "factIds": [
+                "F4"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-007",
+      "title": "Unsupported production/database narrative must be rejected",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 2833,
+      "factCount": 7,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [{\"text\": \"Local validation failed twice after reinstall, as documented in factId F6 and F7.\", \"factIds\": [\"F6\", \"F7\"]}, {\"text\": \"The local validation result remained uncertain after two failed runs, as observed in factId F3.\", \"factIds\": [\"F3\"]}, {\"text\": \"Re-run local validation after reinstalling the package, as instructed in factId F2.\", \"factIds\": [\"F2\"]}]} }",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "Local validation failed twice after reinstall, as documented in factId F6 and F7.",
+              "factIds": [
+                "F6",
+                "F7"
+              ]
+            },
+            {
+              "text": "The local validation result remained uncertain after two failed runs, as observed in factId F3.",
+              "factIds": [
+                "F3"
+              ]
+            },
+            {
+              "text": "Re-run local validation after reinstalling the package, as instructed in factId F2.",
+              "factIds": [
+                "F2"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-008",
+      "title": "Raw command echo must fall back even when recurrence is supported",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 2404,
+      "factCount": 7,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ { \"text\": \"Two related validation attempts failed, as documented in factId F3 and F6.\", \"factIds\": [\"F3\", \"F6\"] }, { \"text\": \"The primary narrative avoids raw command text to prevent workflow leakage, as required by factId F4 and F2.\", \"factIds\": [\"F4\", \"F2\"] } ]} }",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "Two related validation attempts failed, as documented in factId F3 and F6.",
+              "factIds": [
+                "F3",
+                "F6"
+              ]
+            },
+            {
+              "text": "The primary narrative avoids raw command text to prevent workflow leakage, as required by factId F4 and F2.",
+              "factIds": [
+                "F4",
+                "F2"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-009",
+      "title": "Raw local path or Pi session path leakage must fall back",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 2432,
+      "factCount": 6,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ {\"text\": \"Path-shaped evidence was redacted before storage.\", \"factIds\": [\"F1\", \"F5\"]}, {\"text\": \"A path/file lookup failed in local evidence, with raw paths redacted.\", \"factIds\": [\"F3\"]}, {\"text\": \"Narrative output should describe path confusion without exposing local or session paths.\", \"factIds\": [\"F2\"]} ]} }",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "Path-shaped evidence was redacted before storage.",
+              "factIds": [
+                "F1",
+                "F5"
+              ]
+            },
+            {
+              "text": "A path/file lookup failed in local evidence, with raw paths redacted.",
+              "factIds": [
+                "F3"
+              ]
+            },
+            {
+              "text": "Narrative output should describe path confusion without exposing local or session paths.",
+              "factIds": [
+                "F2"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-010",
+      "title": "Secret-looking text and redaction-placeholder echo must fall back",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 2405,
+      "factCount": 6,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [{\"text\": \"The narrative output was redacted before storage to prevent the exposure of sensitive details.\", \"factIds\": [\"F1\", \"F3\"]}, {\"text\": \"Echoing credential placeholders or secret-looking text would violate the privacy boundary.\", \"factIds\": [\"F4\"]}, {\"text\": \"Redacted validation summary indicates that sensitive output was omitted before evaluation storage.\", \"factIds\": [\"F6\"]}]}}",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "The narrative output was redacted before storage to prevent the exposure of sensitive details.",
+              "factIds": [
+                "F1",
+                "F3"
+              ]
+            },
+            {
+              "text": "Echoing credential placeholders or secret-looking text would violate the privacy boundary.",
+              "factIds": [
+                "F4"
+              ]
+            },
+            {
+              "text": "Redacted validation summary indicates that sensitive output was omitted before evaluation storage.",
+              "factIds": [
+                "F6"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-011",
+      "title": "Route or operator-action advice is unsafe in narrative output",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 2161,
+      "factCount": 7,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [{\"text\": \"A repeated workflow issue was detected for review.\", \"factIds\": [\"F3\"]}, {\"text\": \"Human review is required to address the issue.\", \"factIds\": [\"F1\"]}, {\"text\": \"The route choice has not been selected by a human.\", \"factIds\": [\"F6\"]}]}}",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "A repeated workflow issue was detected for review.",
+              "factIds": [
+                "F3"
+              ]
+            },
+            {
+              "text": "Human review is required to address the issue.",
+              "factIds": [
+                "F1"
+              ]
+            },
+            {
+              "text": "The route choice has not been selected by a human.",
+              "factIds": [
+                "F6"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-012",
+      "title": "Artifact/rule/ticket/source mutation and classifier claims are unsafe",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 3189,
+      "factCount": 6,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ { \"text\": \"Model wording drifted toward mutation and classifier language, which could make the output appear authoritative.\", \"factIds\": [\"F1\", \"F4\"] }, { \"text\": \"Narrative output remains display-only and never mutates records or claims classifier ranking, as required by the system.\", \"factIds\": [\"F2\", \"F6\"] }, { \"text\": \"The issue summary is for human review only and must not create artifacts, rules, tickets, source edits, or rankings.\", \"factIds\": [\"F3\", \"F6\"] } ]} }",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "Model wording drifted toward mutation and classifier language, which could make the output appear authoritative.",
+              "factIds": [
+                "F1",
+                "F4"
+              ]
+            },
+            {
+              "text": "Narrative output remains display-only and never mutates records or claims classifier ranking, as required by the system.",
+              "factIds": [
+                "F2",
+                "F6"
+              ]
+            },
+            {
+              "text": "The issue summary is for human review only and must not create artifacts, rules, tickets, source edits, or rankings.",
+              "factIds": [
+                "F3",
+                "F6"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-013",
+      "title": "Overlong wall-of-text narrative should fall back or be rated worse",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 3254,
+      "factCount": 7,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [{\"text\": \"Repeated validation failure pattern in recent sessions (F1, F6) was observed twice (F3, F7).\", \"factIds\": [\"F1\", \"F6\", \"F3\"]}, {\"text\": \"The same validation-failure pattern appeared twice in recent sessions (F3, F7).\", \"factIds\": [\"F3\", \"F7\"]}, {\"text\": \"An overlong primary card would recreate the wall-of-text problem (F4).\", \"factIds\": [\"F4\"]}]} }",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "Repeated validation failure pattern in recent sessions (F1, F6) was observed twice (F3, F7).",
+              "factIds": [
+                "F1",
+                "F6",
+                "F3"
+              ]
+            },
+            {
+              "text": "The same validation-failure pattern appeared twice in recent sessions (F3, F7).",
+              "factIds": [
+                "F3",
+                "F7"
+              ]
+            },
+            {
+              "text": "An overlong primary card would recreate the wall-of-text problem (F4).",
+              "factIds": [
+                "F4"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-014",
+      "title": "Low-information case should remain uncertain or fall back",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 1852,
+      "factCount": 2,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [{\"text\": \"A delta summary was observed with no useful details.\", \"factIds\": [\"F1\"]}, {\"text\": \"An other detector signal was detected with no useful details.\", \"factIds\": [\"F2\"]}]} }",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "A delta summary was observed with no useful details.",
+              "factIds": [
+                "F1"
+              ]
+            },
+            {
+              "text": "An other detector signal was detected with no useful details.",
+              "factIds": [
+                "F2"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "NARR-EVAL-015",
+      "title": "Safe generic narrative can be accepted by validator but still worse than the goal",
+      "routeId": "chat-response-format-json-schema-openai",
+      "httpOk": true,
+      "statusCode": 200,
+      "timeout": false,
+      "elapsedMs": 3091,
+      "factCount": 7,
+      "parseValid": true,
+      "schemaValid": true,
+      "verifierPass": true,
+      "validationIssue": null,
+      "contentPreview": "{\"schemaVersion\": 2, \"whatHappened\": {\"sentences\": [ { \"text\": \"A repeated workflow problem was observed twice in recent sessions (F3, F5).\", \"factIds\": [\"F3\", \"F5\"] }, { \"text\": \"Two redacted observations were grouped as the same recurring workflow pattern (F6, F7).\", \"factIds\": [\"F6\", \"F7\"] }, { \"text\": \"A generic narrative fails to address the duplicate-section problem because it lacks recurrence context (F2, F4).\", \"factIds\": [\"F2\", \"F4\"] } ]} }",
+      "envelopePreview": null,
+      "parsed": {
+        "schemaVersion": 2,
+        "whatHappened": {
+          "sentences": [
+            {
+              "text": "A repeated workflow problem was observed twice in recent sessions (F3, F5).",
+              "factIds": [
+                "F3",
+                "F5"
+              ]
+            },
+            {
+              "text": "Two redacted observations were grouped as the same recurring workflow pattern (F6, F7).",
+              "factIds": [
+                "F6",
+                "F7"
+              ]
+            },
+            {
+              "text": "A generic narrative fails to address the duplicate-section problem because it lacks recurrence context (F2, F4).",
+              "factIds": [
+                "F2",
+                "F4"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

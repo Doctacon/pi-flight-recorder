@@ -1,0 +1,14 @@
+$ npm test
+
+> pi-flight-recorder@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.7 <repo>
+
+
+ Test Files  21 passed (21)
+      Tests  145 passed (145)
+   Start at  06:50:34
+   Duration  2.83s (transform 1.83s, setup 0ms, import 2.88s, tests 4.85s, environment 2ms)
+

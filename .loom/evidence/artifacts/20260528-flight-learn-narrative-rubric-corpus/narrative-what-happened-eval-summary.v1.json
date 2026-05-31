@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 1,
+  "id": "flight-learn-narrative-rubric-corpus-summary-v1",
+  "created": "2026-05-28",
+  "relatedTicket": "ticket:20260528-flight-learn-narrative-rubric-corpus",
+  "corpusArtifact": ".loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/narrative-what-happened-eval-corpus.v1.json",
+  "caseCount": 15,
+  "caseIds": [
+    "NARR-EVAL-001",
+    "NARR-EVAL-002",
+    "NARR-EVAL-003",
+    "NARR-EVAL-004",
+    "NARR-EVAL-005",
+    "NARR-EVAL-006",
+    "NARR-EVAL-007",
+    "NARR-EVAL-008",
+    "NARR-EVAL-009",
+    "NARR-EVAL-010",
+    "NARR-EVAL-011",
+    "NARR-EVAL-012",
+    "NARR-EVAL-013",
+    "NARR-EVAL-014",
+    "NARR-EVAL-015"
+  ],
+  "primaryExpectedRubricOutcomeCounts": {
+    "accepted-equivalent": 1,
+    "accepted-narrative-better": 5,
+    "accepted-narrative-worse": 1,
+    "fallback-expected": 8
+  },
+  "coverageCounts": {
+    "accepted-equivalent": 1,
+    "accepted-narrative-worse": 1,
+    "adversarial": 9,
+    "artifact-rule-ticket-source": 1,
+    "build-validation": 1,
+    "classifier-ranking": 1,
+    "display-only-boundary": 1,
+    "display-safety": 1,
+    "distinctness-rubric": 1,
+    "fallback-expected": 8,
+    "hallucination-risk": 1,
+    "human-feedback": 1,
+    "length-bound": 1,
+    "low-information": 1,
+    "low-information-narrative": 1,
+    "manual-delta": 1,
+    "missing-evidence": 1,
+    "mutation-instruction": 1,
+    "narrative-better": 5,
+    "no-better-than-deterministic": 1,
+    "no-invented-cause": 1,
+    "no-overpolish": 1,
+    "overlong": 1,
+    "ownership-boundary": 1,
+    "path-leak-guard": 1,
+    "positive": 6,
+    "privacy": 2,
+    "production-overreach": 1,
+    "raw-command": 1,
+    "raw-path": 1,
+    "recurrence": 1,
+    "redaction-placeholder": 1,
+    "repetitive-headline": 2,
+    "route-action-advice": 1,
+    "screenshot-shaped": 1,
+    "secret-looking": 1,
+    "session-path": 1,
+    "stale-edit": 1,
+    "unsupported-fact": 1,
+    "unsupported-fact-guard": 1,
+    "useful-narrative": 4,
+    "user-correction": 1,
+    "validation-recurrence": 1,
+    "wall-of-text": 1
+  },
+  "requiredCoverageSatisfied": {
+    "repetitiveHeadlineCases": true,
+    "usefulNarrativeCases": true,
+    "screenshotShapedCase": true,
+    "unsupportedFactCase": true,
+    "rawCommandCase": true,
+    "rawPathOrSessionPathCase": true,
+    "secretCase": true,
+    "redactionPlaceholderCase": true,
+    "routeActionCase": true,
+    "mutationCase": true,
+    "classifierRankingCase": true,
+    "overlongCase": true,
+    "lowInformationCase": true,
+    "acceptedEquivalentCase": true,
+    "acceptedNarrativeWorseCase": true
+  },
+  "acceptanceSupport": {
+    "ACC-001": {
+      "supported": true,
+      "notes": "Includes screenshot-shaped repeated workflow case plus multiple repetitive-headline/useful-narrative cases."
+    },
+    "ACC-002": {
+      "supported": true,
+      "notes": "Rubric separates narrative usefulness from deterministic equivalence and includes reviewer note slots."
+    },
+    "ACC-003": {
+      "supported": true,
+      "notes": "Adversarial synthetic probes cover unsupported facts, raw command/path/session details, secrets/placeholders, route/action, mutation/classifier, overlong, and low-information fallback."
+    },
+    "ACC-004": {
+      "supported": true,
+      "notes": "Artifacts are synthetic/redacted and include reusable schema, outcome enums, case IDs, and rating slots; privacy scan artifact records no forbidden raw private data."
+    }
+  },
+  "nextRecommendedReview": "Run an adversarial audit over the corpus/rubric, summary, and privacy scan before closing the ticket."
+}

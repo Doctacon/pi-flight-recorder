@@ -1,0 +1,30 @@
+$ node corpus summary
+{
+  "id": "flight-learn-narrative-what-happened-eval-corpus-v1",
+  "schemaVersion": 1,
+  "totalCases": 15,
+  "inventoryTotalCases": 15,
+  "caseIds": [
+    "NARR-EVAL-001",
+    "NARR-EVAL-002",
+    "NARR-EVAL-003",
+    "NARR-EVAL-004",
+    "NARR-EVAL-005",
+    "NARR-EVAL-006",
+    "NARR-EVAL-007",
+    "NARR-EVAL-008",
+    "NARR-EVAL-009",
+    "NARR-EVAL-010",
+    "NARR-EVAL-011",
+    "NARR-EVAL-012",
+    "NARR-EVAL-013",
+    "NARR-EVAL-014",
+    "NARR-EVAL-015"
+  ],
+  "primaryExpectedRubricOutcomeCounts": {
+    "accepted-equivalent": 1,
+    "accepted-narrative-better": 5,
+    "accepted-narrative-worse": 1,
+    "fallback-expected": 8
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-05-29T06:01:03.093Z",
+  "sourceArtifacts": [
+    "07-replay-summary.json",
+    "08-replay-results.json"
+  ],
+  "clarification": "In the original replay summary, fallbackCount/fallbackReasons are narrative non-acceptance counts, not product-level deterministic fallback counts. Product-level fallback is tracked separately via productFallbackReason in per-case results.",
+  "narrativeAcceptedCount": 0,
+  "narrativeNonAcceptedCount": 15,
+  "narrativeNonAcceptanceReasons": {
+    "timeout": 3,
+    "empty-output": 6,
+    "unsupported-facts": 2,
+    "schema-invalid": 1,
+    "unsafe-output": 3
+  },
+  "productFallbackCount": 10,
+  "productFallbackReasons": {
+    "timeout": 3,
+    "empty-output": 1,
+    "unsupported-facts": 2,
+    "schema-invalid": 1,
+    "unsafe-output": 3
+  },
+  "productUsedLocalModelWithoutAcceptedNarrativeCount": 5,
+  "productUsedLocalModelWithoutAcceptedNarrativeCaseIds": [
+    "NARR-EVAL-003",
+    "NARR-EVAL-005",
+    "NARR-EVAL-006",
+    "NARR-EVAL-009",
+    "NARR-EVAL-013"
+  ],
+  "recommendation": "Use narrativeAcceptedCount/narrativeNonAcceptedCount for the ticket gate. Do not treat productUsedLocalModelWithoutAcceptedNarrative as accepted whatHappened narrative or as product-ready comprehension."
+}

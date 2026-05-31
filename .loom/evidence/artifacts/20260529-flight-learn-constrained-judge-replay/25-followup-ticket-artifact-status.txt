@@ -1,0 +1,5 @@
+$ git status --short .loom/tickets/20260529-flight-learn-constrained-judge-replay.md .loom/evidence/20260529-flight-learn-constrained-judge-replay.md .loom/audit/20260529-flight-learn-constrained-judge-replay-review.md .loom/evidence/artifacts/20260529-flight-learn-constrained-judge-replay
+?? .loom/audit/20260529-flight-learn-constrained-judge-replay-review.md
+?? .loom/evidence/20260529-flight-learn-constrained-judge-replay.md
+?? .loom/evidence/artifacts/20260529-flight-learn-constrained-judge-replay/
+?? .loom/tickets/20260529-flight-learn-constrained-judge-replay.md

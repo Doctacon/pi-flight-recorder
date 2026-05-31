@@ -1,0 +1,26 @@
+$ grep -R "^ID:\|^Status:\|^Depends On:" selected Loom records
+.loom/plans/20260529-flight-learn-comprehension-path.md:ID: plan:20260529-flight-learn-comprehension-path
+.loom/plans/20260529-flight-learn-comprehension-path.md:Status: active
+.loom/plans/20260529-flight-learn-comprehension-path.md:Depends On: `ticket:20260529-flight-learn-constrained-json-adapter`
+.loom/plans/20260529-flight-learn-comprehension-path.md:Depends On: `ticket:20260529-flight-learn-constrained-judge-replay`
+.loom/plans/20260529-flight-learn-comprehension-path.md:Depends On: `ticket:20260529-flight-learn-constrained-judge-replay`
+.loom/plans/20260529-flight-learn-comprehension-path.md:Depends On: `ticket:20260529-flight-learn-local-draft-comprehension-gate`
+.loom/plans/20260529-flight-learn-comprehension-path.md:Depends On: `ticket:20260529-flight-learn-comprehension-validation`
+.loom/tickets/20260529-flight-learn-local-draft-comprehension-gate.md:ID: ticket:20260529-flight-learn-local-draft-comprehension-gate
+.loom/tickets/20260529-flight-learn-local-draft-comprehension-gate.md:Status: closed
+.loom/tickets/20260529-flight-learn-local-draft-comprehension-gate.md:Depends On: ticket:20260529-flight-learn-constrained-judge-replay
+.loom/tickets/20260529-flight-learn-comprehension-validation.md:ID: ticket:20260529-flight-learn-comprehension-validation
+.loom/tickets/20260529-flight-learn-comprehension-validation.md:Status: open
+.loom/tickets/20260529-flight-learn-comprehension-validation.md:Depends On: ticket:20260529-flight-learn-local-draft-comprehension-gate
+.loom/tickets/20260529-flight-learn-dogfood-corpus-outcomes.md:ID: ticket:20260529-flight-learn-dogfood-corpus-outcomes
+.loom/tickets/20260529-flight-learn-dogfood-corpus-outcomes.md:Status: blocked
+.loom/tickets/20260529-flight-learn-dogfood-corpus-outcomes.md:Depends On: ticket:20260529-flight-learn-comprehension-validation
+
+$ git status --short ticket/evidence/audit/artifact/plan paths
+?? .loom/audit/20260529-flight-learn-local-draft-comprehension-gate-followup-review.md
+?? .loom/audit/20260529-flight-learn-local-draft-comprehension-gate-review.md
+?? .loom/evidence/20260529-flight-learn-local-draft-comprehension-gate.md
+?? .loom/evidence/artifacts/20260529-flight-learn-local-draft-comprehension-gate/
+?? .loom/plans/20260529-flight-learn-comprehension-path.md
+?? .loom/tickets/20260529-flight-learn-comprehension-validation.md
+?? .loom/tickets/20260529-flight-learn-local-draft-comprehension-gate.md

@@ -180,8 +180,13 @@ function fallbackReasonLabel(reason: LocalDiagnosisPolishFallbackReason): string
 
 function localDiagnosisStatusLine(result: LocalDiagnosisPolishResult | undefined): string | null {
   if (!result) return null;
-  if (result.usedLocalModel) return "Local model phrasing; deterministic fallback available.";
+  if (result.displayState === "accepted-narrative") return "Local model narrative accepted by local judge; deterministic fallback available.";
+  if (result.displayState === "draft") return "Local LLM draft — facts below are source of truth; not judge-accepted.";
+  if (result.displayState === "validated") return "Local model phrasing; deterministic fallback available.";
   if (!result.fallbackReason || result.fallbackReason === "disabled") return null;
+  if (["malformed-json", "schema-invalid", "unsafe-output", "unsupported-facts", "empty-output"].includes(result.fallbackReason)) {
+    return `Local model draft rejected (${fallbackReasonLabel(result.fallbackReason)}); deterministic wording shown.`;
+  }
   return `Local model unavailable (${fallbackReasonLabel(result.fallbackReason)}); deterministic wording shown.`;
 }
 
@@ -407,7 +412,7 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
       if (index === 0) return this.accent(this.bold(line));
       if (line.startsWith("Active follow-up:") || line.startsWith("▶")) return this.accent(this.bold(line));
       if (this.focusedSectionHeading(line)) return this.bold(line);
-      if (line.startsWith("Keys:") || line.startsWith("Local model ") || line.includes("hidden by default") || line.includes("more follow-up")) return this.dim(line);
+      if (line.startsWith("Keys:") || line.startsWith("Actions:") || line.startsWith("Local model ") || line.startsWith("Local LLM ") || line.includes("hidden by default") || line.includes("more follow-up")) return this.dim(line);
       if (this.statusMessage && line.includes(this.statusMessage)) return this.warning(line);
       return line;
     });
@@ -475,6 +480,7 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
     const diagnosis = polishedResult?.view ?? buildFlightLearnDiagnosisView({ delta: displayDelta, signals: item.signals });
     const modelStatus = localDiagnosisStatusLine(polishedResult);
     const expectedText = diagnosis.expectedBehavior ?? "unknown — press e to add what should have happened";
+    const sourceFactLines = this.focusedSourceFactLines(polishedResult, width);
     const rawClueLines = diagnosis.rawClue ? ["", "Raw clue", ...wrapFocusedProse(diagnosis.rawClue, width)] : [];
     const lines: string[] = [
       clip(`Flight Learn — Issue ${this.selectedItemIndex + 1} of ${this.items.length}`, width),
@@ -492,6 +498,7 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
       "",
       "Expected",
       ...wrapFocusedProse(expectedText, width),
+      ...(sourceFactLines.length > 0 ? ["", "Source facts", ...sourceFactLines] : []),
       ...rawClueLines,
       "",
       "Why suggested",
@@ -503,12 +510,31 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
       "Choose a follow-up",
       ...this.focusedRouteLines(width),
       "",
-      clip("Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose · e edit · v evidence · d dismiss · s skip · q quit", width),
+      ...this.focusedKeyHintLines(width),
     ];
     if (this.statusMessage) lines.push(clip(`Status: ${this.statusMessage}`, width));
     if (this.mode === "edit") lines.push(...this.editLines(width, delta.id));
     if (this.mode === "rationale") lines.push(...this.rationaleLines(width));
     return lines.map((line) => clip(line, width));
+  }
+
+  private focusedKeyHintLines(width: number): string[] {
+    return [
+      ...wrapText("Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose", width),
+      ...wrapText("Actions: e edit · v evidence · d dismiss · s skip · q quit", width),
+    ].map((line) => clip(line, width));
+  }
+
+  private focusedSourceFactLines(result: LocalDiagnosisPolishResult | undefined, width: number): string[] {
+    if (result?.displayState !== "draft") return [];
+    const deterministic = result.deterministicView;
+    const facts = [
+      `Problem: ${deterministic.headline}`,
+      `What happened: ${deterministic.whatHappened}`,
+      `Why it matters: ${deterministic.whyItMatters}`,
+      ...(deterministic.expectedBehavior ? [`Expected: ${deterministic.expectedBehavior}`] : []),
+    ];
+    return facts.flatMap((fact) => wrapFocusedProse(fact, width));
   }
 
   private focusedSignalLines(item: FlightLearnDeltaInboxItem, width: number): string[] {
@@ -750,7 +776,7 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
   }
 
   private focusedSectionHeading(line: string): boolean {
-    return ["Problem", "What happened?", "Why it matters", "Expected", "Raw clue", "Why suggested", "Evidence", "Choose a follow-up"].includes(line);
+    return ["Problem", "What happened?", "Why it matters", "Expected", "Source facts", "Raw clue", "Why suggested", "Evidence", "Choose a follow-up"].includes(line);
   }
 
   private accent(value: string): string {

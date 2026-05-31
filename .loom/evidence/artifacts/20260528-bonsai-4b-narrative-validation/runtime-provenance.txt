@@ -1,0 +1,11 @@
+runtime: /opt/homebrew/bin/llama-server
+version: 9360 (6b4e4bd58)
+built with AppleClang 17.0.0.17000604 for Darwin arm64
+model: ~/.cache/pi-flight-recorder/bonsai/Bonsai-4B-Q1_0.gguf
+-rw-r--r--@ 1 crlough  staff   546M May 27 16:48 ~/.cache/pi-flight-recorder/bonsai/Bonsai-4B-Q1_0.gguf
+4524b3f997f0f06444e568d1f26e2efd69effa3218c7ad3047432fb171e42168  ~/.cache/pi-flight-recorder/bonsai/Bonsai-4B-Q1_0.gguf
+pid: 49092
+  PID  PPID    RSS      VSZ ELAPSED COMMAND
+49092     1 1173824 413105120   00:22 llama-server -m ~/.cache/pi-flight-recorder/bonsai/Bonsai-4B-Q1_0.gguf --host 127.0.0.1 --port 18118 -c 4096 --no-webui --jinja
+health:
+{"status":"ok"}

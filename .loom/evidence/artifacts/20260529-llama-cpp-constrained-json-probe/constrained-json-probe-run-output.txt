@@ -1,0 +1,11 @@
+starting llama-server on http://127.0.0.1:18120
+server healthy
+probing chat-response-format-json-schema-openai
+probing chat-response-format-json-schema-schema-only
+probing chat-top-level-json-schema
+probing chat-request-grammar
+probing completion-json-schema
+probing completion-grammar
+running narrative generator probe via chat-response-format-json-schema-openai
+enforced routes: chat-response-format-json-schema-openai, chat-top-level-json-schema, completion-json-schema, completion-grammar
+narrative verifier pass: 15/15

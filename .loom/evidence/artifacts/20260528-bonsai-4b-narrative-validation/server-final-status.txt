@@ -1,0 +1,5 @@
+before-stop:
+  PID  PPID    RSS      VSZ ELAPSED COMMAND
+49092     1 1163760 415232432   05:10 llama-server -m ~/.cache/pi-flight-recorder/bonsai/Bonsai-4B-Q1_0.gguf --host 127.0.0.1 --port 18118 -c 4096 --no-webui --jinja
+stopping pid 49092
+stopped

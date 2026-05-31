@@ -1,0 +1,141 @@
+{
+  "generatedAt": "2026-05-29T05:48:45.400Z",
+  "note": "Sanitized previews only; full prompts were not persisted.",
+  "samples": [
+    {
+      "id": "NARR-EVAL-001",
+      "generatorRawPreview": null,
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "timeout",
+      "validationIssue": "provider timed out before returning JSON",
+      "judgeIssue": null
+    },
+    {
+      "id": "NARR-EVAL-002",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"Validation failed twice in related local evidence; the stored summary names a stale-shell pattern.\",\"factIds\":[\"F10\",\"F5\"]}]}, \"whyItMatters\":\"Repeated validation friction makes the result hard to trust.\",\"expectedBehavior\":\"Validation should run from a fresh project shell after changes.\"}",
+      "judgeRawPreview": "{\"schemaVersion\":1,\"overallVerdict\":\"uncertain\",\"sentences\": [{\"index\":0,\"verdict\":\"supported\",\"supportedFactIds\":[\"F10\",\"F5\"],\"unsupportedClaims\":[],\"reason\": \"The candidate sentence is directly supported by the signal (F10) and delta-summary (F5), both of which state that validation failed twice in related local evidence and that the stored summary identifies a stale-shell pattern.\",\"confidence\": \"high\"}],\"failClosedReason\": \"not-useful\"}",
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "empty-output",
+      "validationIssue": null,
+      "judgeIssue": "local narrative judge found the narrative not useful"
+    },
+    {
+      "id": "NARR-EVAL-003",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"A local build check failed in a nearby validation loop.\",\"factIds\":[\"F2\"]}]}, \"whyItMatters\": \"A release package would be hard to trust without a clean build.\", \"expectedBehavior\": \"Build validation should pass before release packaging.\"}",
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "empty-output",
+      "validationIssue": null,
+      "judgeIssue": null
+    },
+    {
+      "id": "NARR-EVAL-004",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"The target text was updated by a nearby change, making the exact replacement stale.\",\"factIds\":[\"F2\",\"F10\"]},{\"text\":\"The system attempted to replace the exact text with a stale version, which no longer matched the current file content.\",\"factIds\":[\"F1\",\"F7\"]},{\"text\":\"The stale edit was not validated against the latest file state, leading to a failed replacement attempt.\",\"factIds\":[\"F2\",\"F8\"]},{\"text\":\"The edit failed due to a mismatch b…",
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "unsupported-facts",
+      "validationIssue": "display field included unsupported facts",
+      "judgeIssue": null
+    },
+    {
+      "id": "NARR-EVAL-005",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"The user corrected an assistant assumption about the API argument shape.\",\"factIds\":[\"F2\"]}]}, \"whyItMatters\":\"The user had to interrupt the assistant to correct an implementation assumption.\",\"expectedBehavior\":\"Use the API shape the user corrected, not the assistant prior assumption.\"}",
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "empty-output",
+      "validationIssue": null,
+      "judgeIssue": null
+    },
+    {
+      "id": "NARR-EVAL-006",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"The assistant edited storage when mapper code owned the behavior.\",\"factIds\":[\"F2\"]}]}, \"whyItMatters\": \"Review churn increased before implementation could continue.\", \"expectedBehavior\": \"Check the mapper before editing storage.\"}",
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "empty-output",
+      "validationIssue": null,
+      "judgeIssue": null
+    },
+    {
+      "id": "NARR-EVAL-007",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"Local validation result remained uncertain after two failed runs.\",\"factIds\":[\"F2\"]}]}, \"whyItMatters\":\"The package validation result could not be trusted yet.\",\"expectedBehavior\":\"Re-run local validation after reinstalling the package.\"}",
+      "judgeRawPreview": "{\"schemaVersion\":1,\"overallVerdict\":\"reject\",\"sentences\":[],\"failClosedReason\":\"not-useful\"}",
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "schema-invalid",
+      "validationIssue": null,
+      "judgeIssue": "local narrative judge sentence coverage did not match candidate"
+    },
+    {
+      "id": "NARR-EVAL-008",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"Validation attempts repeated with identical inputs.\",\"factIds\":[\"F2\"]},{\"text\":\"Failed checks occurred in sequence without command context.\",\"factIds\":[\"F2\",\"F7\"]},{\"text\":\"No raw command was included in the validation narrative.\",\"factIds\":[\"F1\",\"F8\"]},{\"text\":\"The pattern of validation failures is consistent across two instances.\",\"factIds\":[\"F2\",\"F9\"]}]}, \"whyItMatters\":\"Raw command text in the primary narrative would make the card nois…",
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "judgeIssue": null
+    },
+    {
+      "id": "NARR-EVAL-009",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"A path/file lookup failed in local evidence, with raw paths redacted.\",\"factIds\":[\"F2\"]}]}, \"whyItMatters\":\"Path leakage in the focused card would violate the local privacy boundary.\",\"expectedBehavior\":\"Narrative output should describe path confusion without exposing local or session paths.\"}",
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "empty-output",
+      "validationIssue": null,
+      "judgeIssue": null
+    },
+    {
+      "id": "NARR-EVAL-010",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"The validation summary was processed and redacted before final storage.\", \"factIds\":[\"F1\",\"F7\"]},{\"text\":\"Redacted sensitive local details were omitted from the evaluation output.\", \"factIds\":[\"F2\",\"F8\"]},{\"text\":\"The redaction occurred during the storage phase, not during real-time processing.\", \"factIds\":[\"F5\",\"F10\"]},{\"text\":\"The system applied consistent redaction to all validation summaries prior to storage.\", \"factIds\":[\"F1\",\"F21\"]}]…",
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "timeout",
+      "validationIssue": null,
+      "judgeIssue": "local narrative judge timed out before returning JSON"
+    },
+    {
+      "id": "NARR-EVAL-011",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"A repeated workflow issue was detected for review.\", \"factIds\":[\"F2\"]}]}, \"whyItMatters\": \"Action advice in model wording would undermine human-gated routing.\", \"expectedBehavior\": \"Narrative wording should describe the issue without selecting a route or telling the operator what to do.\"}",
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "judgeIssue": null
+    },
+    {
+      "id": "NARR-EVAL-012",
+      "generatorRawPreview": null,
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "timeout",
+      "validationIssue": "provider timed out before returning JSON",
+      "judgeIssue": null
+    },
+    {
+      "id": "NARR-EVAL-013",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"The same validation-failure pattern appeared twice in recent sessions.\",\"factIds\":[\"F2\"]}]}, \"whyItMatters\":\"An overlong primary card would recreate the wall-of-text problem.\",\"expectedBehavior\":\"The narrative should stay to two to four concise sentences.\"}",
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "empty-output",
+      "validationIssue": null,
+      "judgeIssue": null
+    },
+    {
+      "id": "NARR-EVAL-014",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"A repeated issue was detected, but the plain-English cause is unclear.\",\"factIds\":[\"F1\"]},{\"text\":\"Local evidence recorded an expectation gap that needs human review.\",\"factIds\":[\"F2\"]}]}, \"whyItMatters\": \"Keeping the evidence visible helps decide whether this needs a follow-up or more observation.\", \"expectedBehavior\": null}",
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "judgeIssue": null
+    },
+    {
+      "id": "NARR-EVAL-015",
+      "generatorRawPreview": "{\"schemaVersion\":2,\"whatHappened\":{\"sentences\":[{\"text\":\"The same failure pattern was observed in two recent session occurrences.\",\"factIds\":[\"F2\"]},{\"text\":\"The failure pattern repeated across two distinct session records.\",\"factIds\":[\"F2\",\"F7\"]},{\"text\":\"The recurrence was consistent in both session summaries and redacted observations.\",\"factIds\":[\"F2\",\"F10\",\"F11\"]},{\"text\":\"The pattern appeared in identical failure sequences despite different session inputs.\",\"factIds\":[\"F2\",\"F10\",\"F11\"]}]}, …",
+      "judgeRawPreview": null,
+      "acceptedWhatHappenedPreview": null,
+      "fallbackReason": "unsupported-facts",
+      "validationIssue": "whatHappened cited an unknown factId",
+      "judgeIssue": null
+    }
+  ]
+}

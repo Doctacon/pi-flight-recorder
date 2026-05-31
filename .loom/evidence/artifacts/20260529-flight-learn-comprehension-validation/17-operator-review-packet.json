@@ -1,0 +1,239 @@
+{
+  "generatedAt": "2026-05-29T14:18:05.922Z",
+  "status": "operator-review-pending",
+  "instructions": [
+    "Have the operator review each render artifact without consulting raw private sessions first.",
+    "For each card, fill the operatorNotes fields. Do not count worker-precheck notes as operator comprehension evidence.",
+    "Proceed to corpus/outcome seed only if at least 80% of cards are clear or mostly clear and no safety/privacy blocker is recorded."
+  ],
+  "threshold": {
+    "minimumClearOrMostlyClearPercent": 80,
+    "safetyPrivacyBlockersAllowed": 0
+  },
+  "entries": [
+    {
+      "cardId": "card-01-draft-repeated-workflow",
+      "title": "Draft: repeated workflow recurrence",
+      "state": "draft",
+      "coverage": [
+        "draft",
+        "repeated-workflow"
+      ],
+      "renderArtifacts": {
+        "width92": "card-01-draft-repeated-workflow-92.txt",
+        "width72": "card-01-draft-repeated-workflow-72.txt"
+      },
+      "operatorReviewStatus": "pending",
+      "operatorPrompts": {
+        "whatHappened": "What happened?",
+        "whyItMatters": "Why does it matter?",
+        "routeDecision": "Route or observe/no-artifact decision?",
+        "confidence": "Confidence: clear / mostly clear / unclear",
+        "blockers": "Any blocker, misleading wording, or missing evidence?"
+      },
+      "operatorNotes": {
+        "whatHappened": null,
+        "whyItMatters": null,
+        "routeDecision": null,
+        "confidence": null,
+        "blockersMisleadingWordingMissingEvidence": null
+      }
+    },
+    {
+      "cardId": "card-02-fallback-repeated-workflow",
+      "title": "Fallback: repeated workflow recurrence",
+      "state": "fallback",
+      "coverage": [
+        "fallback",
+        "repeated-workflow"
+      ],
+      "renderArtifacts": {
+        "width92": "card-02-fallback-repeated-workflow-92.txt",
+        "width72": "card-02-fallback-repeated-workflow-72.txt"
+      },
+      "operatorReviewStatus": "pending",
+      "operatorPrompts": {
+        "whatHappened": "What happened?",
+        "whyItMatters": "Why does it matter?",
+        "routeDecision": "Route or observe/no-artifact decision?",
+        "confidence": "Confidence: clear / mostly clear / unclear",
+        "blockers": "Any blocker, misleading wording, or missing evidence?"
+      },
+      "operatorNotes": {
+        "whatHappened": null,
+        "whyItMatters": null,
+        "routeDecision": null,
+        "confidence": null,
+        "blockersMisleadingWordingMissingEvidence": null
+      }
+    },
+    {
+      "cardId": "card-03-draft-validation-build",
+      "title": "Draft: validation/build trust issue",
+      "state": "draft",
+      "coverage": [
+        "draft",
+        "validation-build"
+      ],
+      "renderArtifacts": {
+        "width92": "card-03-draft-validation-build-92.txt",
+        "width72": "card-03-draft-validation-build-72.txt"
+      },
+      "operatorReviewStatus": "pending",
+      "operatorPrompts": {
+        "whatHappened": "What happened?",
+        "whyItMatters": "Why does it matter?",
+        "routeDecision": "Route or observe/no-artifact decision?",
+        "confidence": "Confidence: clear / mostly clear / unclear",
+        "blockers": "Any blocker, misleading wording, or missing evidence?"
+      },
+      "operatorNotes": {
+        "whatHappened": null,
+        "whyItMatters": null,
+        "routeDecision": null,
+        "confidence": null,
+        "blockersMisleadingWordingMissingEvidence": null
+      }
+    },
+    {
+      "cardId": "card-04-fallback-validation-build",
+      "title": "Fallback: validation/build trust issue",
+      "state": "fallback",
+      "coverage": [
+        "fallback",
+        "validation-build"
+      ],
+      "renderArtifacts": {
+        "width92": "card-04-fallback-validation-build-92.txt",
+        "width72": "card-04-fallback-validation-build-72.txt"
+      },
+      "operatorReviewStatus": "pending",
+      "operatorPrompts": {
+        "whatHappened": "What happened?",
+        "whyItMatters": "Why does it matter?",
+        "routeDecision": "Route or observe/no-artifact decision?",
+        "confidence": "Confidence: clear / mostly clear / unclear",
+        "blockers": "Any blocker, misleading wording, or missing evidence?"
+      },
+      "operatorNotes": {
+        "whatHappened": null,
+        "whyItMatters": null,
+        "routeDecision": null,
+        "confidence": null,
+        "blockersMisleadingWordingMissingEvidence": null
+      }
+    },
+    {
+      "cardId": "card-05-draft-stale-edit",
+      "title": "Draft: stale exact-text edit",
+      "state": "draft",
+      "coverage": [
+        "draft",
+        "stale-edit"
+      ],
+      "renderArtifacts": {
+        "width92": "card-05-draft-stale-edit-92.txt",
+        "width72": "card-05-draft-stale-edit-72.txt"
+      },
+      "operatorReviewStatus": "pending",
+      "operatorPrompts": {
+        "whatHappened": "What happened?",
+        "whyItMatters": "Why does it matter?",
+        "routeDecision": "Route or observe/no-artifact decision?",
+        "confidence": "Confidence: clear / mostly clear / unclear",
+        "blockers": "Any blocker, misleading wording, or missing evidence?"
+      },
+      "operatorNotes": {
+        "whatHappened": null,
+        "whyItMatters": null,
+        "routeDecision": null,
+        "confidence": null,
+        "blockersMisleadingWordingMissingEvidence": null
+      }
+    },
+    {
+      "cardId": "card-06-fallback-stale-edit",
+      "title": "Fallback: stale exact-text edit",
+      "state": "fallback",
+      "coverage": [
+        "fallback",
+        "stale-edit"
+      ],
+      "renderArtifacts": {
+        "width92": "card-06-fallback-stale-edit-92.txt",
+        "width72": "card-06-fallback-stale-edit-72.txt"
+      },
+      "operatorReviewStatus": "pending",
+      "operatorPrompts": {
+        "whatHappened": "What happened?",
+        "whyItMatters": "Why does it matter?",
+        "routeDecision": "Route or observe/no-artifact decision?",
+        "confidence": "Confidence: clear / mostly clear / unclear",
+        "blockers": "Any blocker, misleading wording, or missing evidence?"
+      },
+      "operatorNotes": {
+        "whatHappened": null,
+        "whyItMatters": null,
+        "routeDecision": null,
+        "confidence": null,
+        "blockersMisleadingWordingMissingEvidence": null
+      }
+    },
+    {
+      "cardId": "card-07-draft-low-information",
+      "title": "Draft: low-information candidate",
+      "state": "draft",
+      "coverage": [
+        "draft",
+        "low-information"
+      ],
+      "renderArtifacts": {
+        "width92": "card-07-draft-low-information-92.txt",
+        "width72": "card-07-draft-low-information-72.txt"
+      },
+      "operatorReviewStatus": "pending",
+      "operatorPrompts": {
+        "whatHappened": "What happened?",
+        "whyItMatters": "Why does it matter?",
+        "routeDecision": "Route or observe/no-artifact decision?",
+        "confidence": "Confidence: clear / mostly clear / unclear",
+        "blockers": "Any blocker, misleading wording, or missing evidence?"
+      },
+      "operatorNotes": {
+        "whatHappened": null,
+        "whyItMatters": null,
+        "routeDecision": null,
+        "confidence": null,
+        "blockersMisleadingWordingMissingEvidence": null
+      }
+    },
+    {
+      "cardId": "card-08-fallback-safety-adversarial",
+      "title": "Fallback: safety/adversarial model output rejected",
+      "state": "fallback",
+      "coverage": [
+        "fallback",
+        "safety-adversarial"
+      ],
+      "renderArtifacts": {
+        "width92": "card-08-fallback-safety-adversarial-92.txt",
+        "width72": "card-08-fallback-safety-adversarial-72.txt"
+      },
+      "operatorReviewStatus": "pending",
+      "operatorPrompts": {
+        "whatHappened": "What happened?",
+        "whyItMatters": "Why does it matter?",
+        "routeDecision": "Route or observe/no-artifact decision?",
+        "confidence": "Confidence: clear / mostly clear / unclear",
+        "blockers": "Any blocker, misleading wording, or missing evidence?"
+      },
+      "operatorNotes": {
+        "whatHappened": null,
+        "whyItMatters": null,
+        "routeDecision": null,
+        "confidence": null,
+        "blockersMisleadingWordingMissingEvidence": null
+      }
+    }
+  ]
+}

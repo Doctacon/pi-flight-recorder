@@ -1,0 +1,12 @@
+{
+  "pass": true,
+  "scannedFiles": 32,
+  "forbiddenPatternCount": 0,
+  "findings": [],
+  "tempLogCheck": {
+    "directoryBasename": "T",
+    "matchingPattern": "pfr-constrained-judge-*.{stdout,stderr}.log",
+    "matchingFileCount": 0,
+    "matchingFileBasenames": []
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-05-28T20:29:23.059Z",
+  "modelRuntimeStarted": false,
+  "hostedProviderUsed": false,
+  "productSourceMutatedByHarness": false,
+  "factPacketVersion": 2,
+  "factCount": 12,
+  "totalExercises": 14,
+  "passCount": 14,
+  "failCount": 0,
+  "outcomes": {
+    "accepted": 2,
+    "provider-unavailable": 1,
+    "unsupported-facts": 5,
+    "unsafe-output": 1,
+    "malformed-json": 1,
+    "schema-invalid": 2,
+    "provider-error": 1,
+    "timeout": 1
+  },
+  "judgeCallCounts": {
+    "accepted-after-judge-accept": 1,
+    "no-judge-provider-fails-closed-for-narrative": 0,
+    "no-narrative-does-not-require-judge": 0,
+    "deterministic-verifier-failure-skips-judge": 0,
+    "judge-reject-fallback": 1,
+    "judge-uncertain-fallback": 1,
+    "judge-low-confidence-fallback": 1,
+    "judge-empty-supported-fact-ids-fallback": 1,
+    "judge-action-advice-fallback": 1,
+    "judge-malformed-json-fallback": 1,
+    "judge-extra-field-fallback": 1,
+    "judge-missing-coverage-fallback": 1,
+    "judge-provider-error-fallback": 1,
+    "judge-timeout-fallback": 1
+  }
+}

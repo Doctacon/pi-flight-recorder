@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-05-28T19:54:34.624Z",
+  "modelRuntimeStarted": false,
+  "hostedProviderUsed": false,
+  "factPacketVersion": 2,
+  "factCount": 12,
+  "totalExercises": 18,
+  "passCount": 18,
+  "failCount": 0,
+  "outcomes": {
+    "accepted": 1,
+    "schema-invalid": 4,
+    "unsupported-facts": 1,
+    "unsafe-output": 8,
+    "empty-output": 1,
+    "malformed-json": 1,
+    "provider-error": 1,
+    "timeout": 1
+  }
+}

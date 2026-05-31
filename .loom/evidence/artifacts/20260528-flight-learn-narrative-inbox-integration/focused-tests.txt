@@ -1,0 +1,13 @@
+
+> pi-flight-recorder@0.1.0 test
+> vitest run src/flight-learn-inbox.test.ts src/pi-extension.test.ts src/flight-learn-local-diagnosis-model.test.ts src/flight-learn-llama-cpp-adapter.test.ts
+
+
+ RUN  v4.1.7 /Users/crlough/Code/personal/pi-flight-recorder
+
+
+ Test Files  4 passed (4)
+      Tests  75 passed (75)
+   Start at  16:08:19
+   Duration  2.36s (transform 531ms, setup 0ms, import 611ms, tests 2.41s, environment 0ms)
+

@@ -1,0 +1,31 @@
+$ node --import tsx .loom/evidence/artifacts/20260529-flight-learn-constrained-judge-replay/run-constrained-judge-replay.mjs
+{
+  "corpusId": "flight-learn-narrative-what-happened-eval-corpus-v1",
+  "replayedCases": 15,
+  "parseValidCount": 13,
+  "schemaValidCount": 13,
+  "verifierPassCount": 8,
+  "judgePassCount": 0,
+  "acceptedCount": 0,
+  "fallbackCount": 15,
+  "fallbackReasons": {
+    "timeout": 3,
+    "empty-output": 6,
+    "unsupported-facts": 2,
+    "schema-invalid": 1,
+    "unsafe-output": 3
+  },
+  "timeoutCount": 3,
+  "unsafeAcceptedCount": 0,
+  "latencyMs": {
+    "min": 2593,
+    "max": 9511,
+    "avg": 4444
+  },
+  "judgeLatencyMs": {
+    "min": 2003,
+    "max": 5003,
+    "avg": 3730
+  },
+  "recommendation": "Stop/replan before model-enabled inbox integration for this runtime: constrained generator output did not pass the existing verifier + judge gates."
+}

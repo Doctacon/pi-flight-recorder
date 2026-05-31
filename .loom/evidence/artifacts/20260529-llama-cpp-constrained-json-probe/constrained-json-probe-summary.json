@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "ticket": "ticket:20260529-llama-cpp-constrained-json-probe",
+  "runStartedAt": "2026-05-29T03:40:13.583Z",
+  "runCompletedAt": "2026-05-29T03:41:02.519Z",
+  "localOnly": true,
+  "runtime": {
+    "command": "/opt/homebrew/bin/llama-server",
+    "versionStatus": 0,
+    "versionStdoutPreview": "",
+    "versionStderrPreview": "version: 9360 (6b4e4bd58) built with AppleClang 17.0.0.17000604 for Darwin arm64"
+  },
+  "model": {
+    "path": "~",
+    "sha256": "4524b3f997f0f06444e568d1f26e2efd69effa3218c7ad3047432fb171e42168"
+  },
+  "baseUrl": "http://127.0.0.1:18120",
+  "routeProbe": {
+    "totalRoutes": 6,
+    "enforcedRoutes": [
+      "chat-response-format-json-schema-openai",
+      "chat-top-level-json-schema",
+      "completion-json-schema",
+      "completion-grammar"
+    ],
+    "acceptedButNotEnforcedRoutes": [
+      "chat-response-format-json-schema-schema-only",
+      "chat-request-grammar"
+    ],
+    "rejectedOrTimeoutRoutes": []
+  },
+  "narrativeProbe": {
+    "routeId": "chat-response-format-json-schema-openai",
+    "corpusId": "flight-learn-narrative-what-happened-eval-corpus-v1",
+    "totalCases": 15,
+    "parseValidCount": 15,
+    "schemaValidCount": 15,
+    "verifierPassCount": 15,
+    "malformedOrSchemaInvalidCount": 0,
+    "timeoutCount": 0,
+    "latencyMs": {
+      "min": 1852,
+      "max": 3354,
+      "avg": 2705
+    },
+    "validationIssues": {}
+  },
+  "recommendation": "Shape a successor adapter implementation ticket for the best proven constrained route, then separately isolate judge/latency; do not productize without audit."
+}

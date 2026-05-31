@@ -3,10 +3,11 @@ import { createServer, type IncomingHttpHeaders, type IncomingMessage, type Serv
 import type { AddressInfo, Socket } from "node:net";
 import { setTimeout as delay } from "node:timers/promises";
 import { afterEach, describe, expect, it } from "vitest";
-import { buildFlightLearnDiagnosisViewWithLocalPolish } from "./flight-learn-local-diagnosis-model.js";
+import { buildFlightLearnDiagnosisViewWithLocalPolish, type LocalNarrativeJudgeRequest } from "./flight-learn-local-diagnosis-model.js";
 import {
   createLlamaCppLocalDiagnosisPolishOptions,
   createLlamaCppLocalDiagnosisPolishProvider,
+  createLlamaCppLocalNarrativeJudgeProvider,
   llamaCppChatCompletionsEndpoint,
   validateLlamaCppServerBaseUrl,
   type LlamaCppLocalDiagnosisPolishConfig,
@@ -99,11 +100,77 @@ function polishedEnvelope(content = validPolishJson()): Record<string, unknown> 
 
 function validPolishJson(): string {
   return JSON.stringify({
+    schemaVersion: 2,
     headline: "Validation was rerun from an old shell after the package changed.",
-    whatHappened: "The same local validation check failed after a stale shell reran it.",
+    whatHappened: {
+      sentences: [
+        { text: "The validation command was rerun from an old shell after the package changed.", factIds: ["F2"] },
+      ],
+    },
     whyItMatters: "That makes the validation result hard to trust.",
     expectedBehavior: "Run validation from a fresh project shell.",
   });
+}
+
+function validNarrativePolishJson(): string {
+  return JSON.stringify({
+    schemaVersion: 2,
+    headline: "Validation was rerun from an old shell after the package changed.",
+    whatHappened: {
+      sentences: [
+        { text: "The repeated validation pattern came from an old shell after the package changed, which makes this a validation-trust issue.", factIds: ["F7", "F8"] },
+      ],
+    },
+    whyItMatters: "That makes the validation result hard to trust.",
+    expectedBehavior: "Run validation from a fresh project shell.",
+  });
+}
+
+function validJudgeJson(): string {
+  return JSON.stringify({
+    schemaVersion: 1,
+    overallVerdict: "accept",
+    sentences: [
+      {
+        index: 0,
+        verdict: "supported",
+        supportedFactIds: ["F7", "F8"],
+        unsupportedClaims: [],
+        reason: "Supported by cited redacted facts.",
+        confidence: "high",
+      },
+    ],
+  });
+}
+
+function judgeRequest(): LocalNarrativeJudgeRequest {
+  const fact = { id: "F2" as const, kind: "deterministic-what-happened" as const, text: "The validation command was rerun from an old shell after the package changed." };
+  return {
+    schemaVersion: 1,
+    prompt: "Judge request JSON: redacted facts only",
+    policy: {
+      field: "whatHappened",
+      displayOnly: true,
+      maxSentences: 4,
+      maxNarrativeChars: 520,
+      rejectOnUncertainty: true,
+      acceptedSentenceVerdicts: ["supported", "supported-cautious-connection"],
+    },
+    deterministic: {
+      headline: "Validation was rerun from an old shell.",
+      whatHappened: fact.text,
+      whyItMatters: "The result is hard to trust.",
+      expectedBehavior: "Run validation from a fresh shell.",
+      confidence: "medium",
+    },
+    facts: [fact],
+    candidate: {
+      field: "whatHappened",
+      text: fact.text,
+      sentences: [{ index: 0, text: fact.text, factIds: ["F2"], citedFacts: [fact] }],
+    },
+    signal: new AbortController().signal,
+  };
 }
 
 function writeJson(response: ServerResponse, value: unknown, init: { status?: number; headers?: Record<string, string> } = {}): void {
@@ -230,6 +297,80 @@ function restoreProxyEnv(snapshot: Partial<Record<ProxyEnvKey, string>>): void {
   }
 }
 
+function responseFormatJsonSchema(body: Record<string, unknown>): Record<string, unknown> {
+  const responseFormat = body["response_format"];
+  expect(responseFormat).toMatchObject({ type: "json_schema", json_schema: { strict: true } });
+  const jsonSchema = (responseFormat as { json_schema?: unknown }).json_schema;
+  expect(jsonSchema).toBeTypeOf("object");
+  if (typeof jsonSchema !== "object" || jsonSchema === null || Array.isArray(jsonSchema)) throw new Error("expected response_format.json_schema object");
+  expect(JSON.stringify(jsonSchema)).not.toContain("$ref");
+  expect(JSON.stringify(jsonSchema)).not.toContain("$defs");
+  const schema = (jsonSchema as { schema?: unknown }).schema;
+  expect(schema).toBeTypeOf("object");
+  if (typeof schema !== "object" || schema === null || Array.isArray(schema)) throw new Error("expected inline JSON schema object");
+  return schema as Record<string, unknown>;
+}
+
+function objectProperty(object: Record<string, unknown>, key: string): Record<string, unknown> {
+  const value = object[key];
+  expect(value).toBeTypeOf("object");
+  if (typeof value !== "object" || value === null || Array.isArray(value)) throw new Error(`expected object property ${key}`);
+  return value as Record<string, unknown>;
+}
+
+function propertiesOf(schema: Record<string, unknown>): Record<string, unknown> {
+  return objectProperty(schema, "properties");
+}
+
+function assertGeneratorSchema(body: Record<string, unknown>): void {
+  const responseFormat = body["response_format"] as { json_schema?: { name?: unknown } };
+  const schema = responseFormatJsonSchema(body);
+  expect(responseFormat.json_schema?.name).toBe("flight_learn_diagnosis_polish_v2");
+  expect(schema["additionalProperties"]).toBe(false);
+  expect(schema["required"]).toEqual(["schemaVersion", "whatHappened"]);
+  const properties = propertiesOf(schema);
+  expect(objectProperty(properties, "schemaVersion")["enum"]).toEqual([2]);
+  expect(properties).toHaveProperty("headline");
+  expect(properties).toHaveProperty("whyItMatters");
+  expect(properties).toHaveProperty("expectedBehavior");
+
+  const whatHappened = objectProperty(properties, "whatHappened");
+  expect(whatHappened["additionalProperties"]).toBe(false);
+  expect(whatHappened["required"]).toEqual(["sentences"]);
+  const sentences = objectProperty(propertiesOf(whatHappened), "sentences");
+  expect(sentences["minItems"]).toBe(1);
+  expect(sentences["maxItems"]).toBe(4);
+  const sentenceItem = objectProperty(sentences, "items");
+  expect(sentenceItem["additionalProperties"]).toBe(false);
+  expect(sentenceItem["required"]).toEqual(["text", "factIds"]);
+  const sentenceProperties = propertiesOf(sentenceItem);
+  expect(objectProperty(sentenceProperties, "text")["type"]).toBe("string");
+  const factIds = objectProperty(sentenceProperties, "factIds");
+  expect(factIds["minItems"]).toBe(1);
+  expect(factIds["maxItems"]).toBe(8);
+  expect(objectProperty(factIds, "items")["pattern"]).toBe("^F[0-9]+$");
+}
+
+function assertJudgeSchema(body: Record<string, unknown>): void {
+  const responseFormat = body["response_format"] as { json_schema?: { name?: unknown } };
+  const schema = responseFormatJsonSchema(body);
+  expect(responseFormat.json_schema?.name).toBe("flight_learn_narrative_judge_v1");
+  expect(schema["additionalProperties"]).toBe(false);
+  expect(schema["required"]).toEqual(["schemaVersion", "overallVerdict", "sentences"]);
+  const properties = propertiesOf(schema);
+  expect(objectProperty(properties, "schemaVersion")["enum"]).toEqual([1]);
+  expect(objectProperty(properties, "overallVerdict")["enum"]).toEqual(["accept", "reject", "uncertain"]);
+  expect(objectProperty(properties, "failClosedReason")["enum"]).toEqual(["unsupported-facts", "unsafe-output", "action-advice", "low-information", "not-useful", "schema-invalid", "judge-uncertain"]);
+  const sentences = objectProperty(properties, "sentences");
+  const sentenceItem = objectProperty(sentences, "items");
+  expect(sentenceItem["additionalProperties"]).toBe(false);
+  expect(sentenceItem["required"]).toEqual(["index", "verdict", "supportedFactIds", "unsupportedClaims", "reason", "confidence"]);
+  const sentenceProperties = propertiesOf(sentenceItem);
+  expect(objectProperty(sentenceProperties, "verdict")["enum"]).toEqual(["supported", "supported-cautious-connection", "partially-supported", "unsupported", "unsafe", "action-advice", "not-useful", "uncertain"]);
+  expect(objectProperty(sentenceProperties, "confidence")["enum"]).toEqual(["low", "medium", "high"]);
+  expect(objectProperty(objectProperty(sentenceProperties, "supportedFactIds"), "items")["pattern"]).toBe("^F[0-9]+$");
+}
+
 async function runAdapterChildProcessWithStartupProxyEnv(baseUrl: string, proxyBaseUrl: string): Promise<{ exitCode: number | null; stdout: string; stderr: string }> {
   const childCode = `
     import { createLlamaCppLocalDiagnosisPolishProvider } from "./src/flight-learn-llama-cpp-adapter.ts";
@@ -244,7 +385,7 @@ async function runAdapterChildProcessWithStartupProxyEnv(baseUrl: string, proxyB
 
     const response = await provider.completeLocalDiagnosisPolish({
       prompt: "Return JSON.",
-      factPacket: { version: 1 },
+      factPacket: { version: 2 },
       signal: new AbortController().signal,
     });
     console.log(JSON.stringify({ response }));
@@ -344,7 +485,7 @@ describe("llama.cpp local diagnosis polish adapter", () => {
     expect(body["top_p"]).toBe(0.9);
     expect(body["n"]).toBe(1);
     expect(body["model"]).toBe("bonsai-1.7b-q1_0");
-    expect(body["response_format"]).toEqual({ type: "json_object" });
+    assertGeneratorSchema(body);
     expect(body).not.toHaveProperty("headers");
     expect(body).not.toHaveProperty("apiKey");
     expect(body).not.toHaveProperty("authorization");
@@ -361,6 +502,82 @@ describe("llama.cpp local diagnosis polish adapter", () => {
     expect(content).toContain("/Users/<user>");
     expect(content).not.toContain("/Users/alice");
     expect(content).not.toContain("API_KEY");
+  });
+
+  it("configures an explicit loopback narrative judge provider for fact-cited narrative output", async () => {
+    const generator = await startLoopbackHttpServer((_request, response) => writeJson(response, polishedEnvelope(validNarrativePolishJson())));
+    const judge = await startLoopbackHttpServer((_request, response) => writeJson(response, polishedEnvelope(validJudgeJson())));
+
+    const result = await buildFlightLearnDiagnosisViewWithLocalPolish(
+      input(),
+      createLlamaCppLocalDiagnosisPolishOptions({
+        enabled: true,
+        kind: "llama-cpp-server",
+        baseUrl: generator.baseUrl,
+        model: "bonsai-4b-q1_0",
+        timeoutMs: 100,
+        maxOutputTokens: 128,
+        judge: {
+          enabled: true,
+          kind: "llama-cpp-server",
+          baseUrl: judge.baseUrl,
+          model: "bonsai-4b-q1_0",
+          timeoutMs: 100,
+          maxOutputTokens: 256,
+        },
+      } satisfies LlamaCppLocalDiagnosisPolishConfig),
+    );
+
+    expect(result.usedLocalModel).toBe(true);
+    expect(result.fallbackReason).toBeNull();
+    expect(result.view.whatHappened).toBe("The repeated validation pattern came from an old shell after the package changed, which makes this a validation-trust issue.");
+    expect(generator.requests).toHaveLength(1);
+    expect(judge.requests).toHaveLength(1);
+
+    const generatorBody = JSON.parse(generator.requests[0]!.body) as Record<string, unknown>;
+    expect(generatorBody["model"]).toBe("bonsai-4b-q1_0");
+    expect(generatorBody["max_tokens"]).toBe(128);
+
+    const judgeBody = JSON.parse(judge.requests[0]!.body) as Record<string, unknown>;
+    expect(judgeBody["model"]).toBe("bonsai-4b-q1_0");
+    expect(judgeBody["max_tokens"]).toBe(256);
+    assertGeneratorSchema(generatorBody);
+    assertJudgeSchema(judgeBody);
+    expect(judgeBody).not.toHaveProperty("headers");
+    expect(judgeBody).not.toHaveProperty("apiKey");
+
+    const messages = judgeBody["messages"];
+    expect(Array.isArray(messages)).toBe(true);
+    if (!Array.isArray(messages)) throw new Error("expected judge messages array");
+    const content = (messages[0] as { content?: unknown }).content;
+    expect(typeof content).toBe("string");
+    expect(content).toContain("veto-only");
+    expect(content).toContain("Judge request JSON");
+    expect(content).toContain("F2");
+    expect(content).toContain("/Users/<user>");
+    expect(content).not.toContain("/Users/alice");
+    expect(content).not.toContain("API_KEY");
+  });
+
+  it("rejects unsafe narrative judge adapter config before any request", async () => {
+    const target = await startLoopbackHttpServer((_request, response) => writeJson(response, polishedEnvelope(validJudgeJson())));
+    const unsafeConfigs: unknown[] = [
+      { enabled: true, kind: "openai", baseUrl: target.baseUrl },
+      { enabled: true, kind: "llama-cpp-server", baseUrl: target.baseUrl, headers: { authorization: "Bearer redacted" } },
+      { enabled: true, kind: "llama-cpp-server", baseUrl: target.baseUrl, apiKey: "redacted" },
+      { enabled: true, kind: "llama-cpp-server", baseUrl: target.baseUrl, proxy: "http://127.0.0.1:9999" },
+      { enabled: true, kind: "llama-cpp-server", baseUrl: "https://api.openai.com/v1" },
+      { enabled: true, kind: "llama-cpp-server", baseUrl: `${target.baseUrl}/v1` },
+      { enabled: true, kind: "llama-cpp-server", baseUrl: target.baseUrl, model: "/Users/alice/models/bonsai.gguf" },
+    ];
+
+    for (const config of unsafeConfigs) {
+      const provider = createLlamaCppLocalNarrativeJudgeProvider(config);
+      expect(provider, JSON.stringify(config)).not.toBeNull();
+      await expect(provider!.completeLocalNarrativeJudge(judgeRequest()), JSON.stringify(config)).rejects.toBeInstanceOf(Error);
+    }
+
+    expect(target.requests).toHaveLength(0);
   });
 
   it("bypasses proxy-like environment variables and posts directly to the configured loopback server", async () => {

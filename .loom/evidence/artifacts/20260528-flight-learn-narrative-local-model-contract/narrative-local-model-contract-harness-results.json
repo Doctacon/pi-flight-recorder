@@ -1,0 +1,2045 @@
+{
+  "schemaVersion": 1,
+  "ticket": "ticket:20260528-flight-learn-narrative-local-model-contract",
+  "summary": {
+    "corpusId": "flight-learn-narrative-what-happened-eval-corpus-v1",
+    "corpusPath": ".loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/narrative-what-happened-eval-corpus.v1.json",
+    "generatedAt": "2026-05-28T14:57:53.579Z",
+    "modelRuntimeStarted": false,
+    "hostedProviderUsed": false,
+    "totalCases": 15,
+    "caseIds": [
+      "NARR-EVAL-001",
+      "NARR-EVAL-002",
+      "NARR-EVAL-003",
+      "NARR-EVAL-004",
+      "NARR-EVAL-005",
+      "NARR-EVAL-006",
+      "NARR-EVAL-007",
+      "NARR-EVAL-008",
+      "NARR-EVAL-009",
+      "NARR-EVAL-010",
+      "NARR-EVAL-011",
+      "NARR-EVAL-012",
+      "NARR-EVAL-013",
+      "NARR-EVAL-014",
+      "NARR-EVAL-015"
+    ],
+    "perCaseValidatorOutcomeCounts": {
+      "accepted": 7,
+      "fallback": 8
+    },
+    "perCaseFallbackReasonCounts": {
+      "null": 7,
+      "unsupported-facts": 2,
+      "unsafe-output": 5,
+      "schema-invalid": 1
+    },
+    "perCaseRubricOutcomeCounts": {
+      "accepted-narrative-better": 5,
+      "accepted-equivalent": 1,
+      "fallback-expected": 8,
+      "accepted-narrative-worse": 1
+    },
+    "exerciseFallbackReasonCounts": {
+      "malformed-json": 1,
+      "timeout": 1,
+      "provider-error": 1,
+      "empty-output": 1,
+      "unsafe-output": 25
+    },
+    "validatorMismatchCount": 0,
+    "promptSafetyFailureCount": 0,
+    "outputSafetyFailureCount": 0,
+    "exerciseMismatchCount": 0,
+    "acceptedNarrativeBetterAcceptedCount": 5,
+    "fallbackExpectedFallbackCount": 8
+  },
+  "perCaseResults": [
+    {
+      "caseId": "NARR-EVAL-001",
+      "title": "Screenshot-shaped repeated workflow duplicate needs narrative context",
+      "sourceKind": "synthetic-screenshot-shaped-from-operator-feedback",
+      "coverage": [
+        "positive",
+        "repetitive-headline",
+        "screenshot-shaped",
+        "recurrence",
+        "narrative-better"
+      ],
+      "primaryExpectedRubricOutcome": "accepted-narrative-better",
+      "scenarioId": "example-accepted-narrative",
+      "scenarioSource": "exampleAcceptedNarrative",
+      "expectedValidatorOutcome": "accepted",
+      "expectedRubricOutcome": "accepted-narrative-better",
+      "validatorOutcome": "accepted",
+      "rubricOutcome": "accepted-narrative-better",
+      "validatorMatched": true,
+      "usedLocalModel": true,
+      "fallbackReason": null,
+      "validationIssue": null,
+      "elapsedMs": 7.083,
+      "promptChars": 3014,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "Pi saw the same failure pattern in two recent evidence summaries and grouped it as one recurring workflow issue. That recurrence is why the card treats the issue as a pattern rather than an isolated failure. The stored details are bounded and redacted, so the exact cause remains limited to the summarized evidence.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed."
+        ]
+      },
+      "notes": "Positive/equivalent corpus example should be accepted by the narrative validator."
+    },
+    {
+      "caseId": "NARR-EVAL-002",
+      "title": "Validation recurrence narrative adds stale-shell sequence without raw command echo",
+      "sourceKind": "synthetic-redacted-from-existing-diagnosis-corpus-shape",
+      "coverage": [
+        "positive",
+        "repetitive-headline",
+        "useful-narrative",
+        "validation-recurrence",
+        "narrative-better"
+      ],
+      "primaryExpectedRubricOutcome": "accepted-narrative-better",
+      "scenarioId": "example-accepted-narrative",
+      "scenarioSource": "exampleAcceptedNarrative",
+      "expectedValidatorOutcome": "accepted",
+      "expectedRubricOutcome": "accepted-narrative-better",
+      "validatorOutcome": "accepted",
+      "rubricOutcome": "accepted-narrative-better",
+      "validatorMatched": true,
+      "usedLocalModel": true,
+      "fallbackReason": null,
+      "validationIssue": null,
+      "elapsedMs": 2.296,
+      "promptChars": 2948,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "Repeated validation failure pattern in a stale project shell.",
+        "whatHappened": "Two related validation attempts failed from the same stale-shell pattern.",
+        "whyItMatters": "Repeated validation friction makes the result hard to trust.",
+        "expectedBehavior": "Validation should run from a fresh project shell after changes.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "outputView": {
+        "headline": "Repeated validation failure pattern in a stale project shell.",
+        "whatHappened": "Two related validation attempts ended in the same stale-shell pattern. The stored summaries point to repeated validation friction rather than a confirmed code defect. The only expected behavior recorded is to validate from a fresh project shell after changes.",
+        "whyItMatters": "Repeated validation friction makes the result hard to trust.",
+        "expectedBehavior": "Validation should run from a fresh project shell after changes.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed."
+        ]
+      },
+      "notes": "Positive/equivalent corpus example should be accepted by the narrative validator."
+    },
+    {
+      "caseId": "NARR-EVAL-003",
+      "title": "Build/typecheck loop narrative stays build-specific and avoids production claims",
+      "sourceKind": "synthetic-redacted",
+      "coverage": [
+        "positive",
+        "useful-narrative",
+        "build-validation",
+        "unsupported-fact-guard",
+        "narrative-better"
+      ],
+      "primaryExpectedRubricOutcome": "accepted-narrative-better",
+      "scenarioId": "example-accepted-narrative",
+      "scenarioSource": "exampleAcceptedNarrative",
+      "expectedValidatorOutcome": "accepted",
+      "expectedRubricOutcome": "accepted-narrative-better",
+      "validatorOutcome": "accepted",
+      "rubricOutcome": "accepted-narrative-better",
+      "validatorMatched": true,
+      "usedLocalModel": true,
+      "fallbackReason": null,
+      "validationIssue": null,
+      "elapsedMs": 0.934,
+      "promptChars": 2921,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "Repeated build-check failure during local typecheck validation.",
+        "whatHappened": "A local build check failed in a nearby validation loop.",
+        "whyItMatters": "A release package would be hard to trust without a clean build.",
+        "expectedBehavior": "Build validation should pass before release packaging.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "outputView": {
+        "headline": "Repeated build-check failure during local typecheck validation.",
+        "whatHappened": "Local evidence shows the build check failed in a nearby typecheck validation loop. That recurrence makes the release package hard to trust until a clean build is observed. The facts only support a local build-validation issue, not a production incident.",
+        "whyItMatters": "A release package would be hard to trust without a clean build.",
+        "expectedBehavior": "Build validation should pass before release packaging.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed."
+        ]
+      },
+      "notes": "Positive/equivalent corpus example should be accepted by the narrative validator."
+    },
+    {
+      "caseId": "NARR-EVAL-004",
+      "title": "Stale exact-text edit narrative explains sequence without file-path leakage",
+      "sourceKind": "synthetic-redacted",
+      "coverage": [
+        "positive",
+        "useful-narrative",
+        "stale-edit",
+        "path-leak-guard",
+        "narrative-better"
+      ],
+      "primaryExpectedRubricOutcome": "accepted-narrative-better",
+      "scenarioId": "example-accepted-narrative",
+      "scenarioSource": "exampleAcceptedNarrative",
+      "expectedValidatorOutcome": "accepted",
+      "expectedRubricOutcome": "accepted-narrative-better",
+      "validatorOutcome": "accepted",
+      "rubricOutcome": "accepted-narrative-better",
+      "validatorMatched": true,
+      "usedLocalModel": true,
+      "fallbackReason": null,
+      "validationIssue": null,
+      "elapsedMs": 0.4,
+      "promptChars": 2902,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "Repeated stale edit attempt: exact replacement text no longer matched the file.",
+        "whatHappened": "The edit failed because the target text no longer matched.",
+        "whyItMatters": "Repeated stale edits slow review and can hide the actual implementation issue.",
+        "expectedBehavior": null,
+        "confidence": "high",
+        "rawClue": "Read the current file before replacing exact text.",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "outputView": {
+        "headline": "Repeated stale edit attempt: exact replacement text no longer matched the file.",
+        "whatHappened": "An exact-text edit failed after the file contents changed, so the replacement target no longer matched. The same stale-edit pattern creates review churn because the assistant can keep editing against an old view of the file. The supported fix expectation is to read the current file before replacing text.",
+        "whyItMatters": "Repeated stale edits slow review and can hide the actual implementation issue.",
+        "expectedBehavior": null,
+        "confidence": "high",
+        "rawClue": "Read the current file before replacing exact text.",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis.",
+          "Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed."
+        ]
+      },
+      "notes": "Positive/equivalent corpus example should be accepted by the narrative validator."
+    },
+    {
+      "caseId": "NARR-EVAL-005",
+      "title": "User correction narrative preserves correction without blaming unsupported system behavior",
+      "sourceKind": "synthetic-redacted-human-feedback",
+      "coverage": [
+        "positive",
+        "useful-narrative",
+        "user-correction",
+        "human-feedback",
+        "narrative-better"
+      ],
+      "primaryExpectedRubricOutcome": "accepted-narrative-better",
+      "scenarioId": "example-accepted-narrative",
+      "scenarioSource": "exampleAcceptedNarrative",
+      "expectedValidatorOutcome": "accepted",
+      "expectedRubricOutcome": "accepted-narrative-better",
+      "validatorOutcome": "accepted",
+      "rubricOutcome": "accepted-narrative-better",
+      "validatorMatched": true,
+      "usedLocalModel": true,
+      "fallbackReason": null,
+      "validationIssue": null,
+      "elapsedMs": 0.415,
+      "promptChars": 2953,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "The user had to correct an assistant assumption.",
+        "whatHappened": "The user corrected an assistant assumption about the API argument shape.",
+        "whyItMatters": "The user had to interrupt the assistant to correct an implementation assumption.",
+        "expectedBehavior": "Use the API shape the user corrected, not the assistant prior assumption.",
+        "confidence": "high",
+        "rawClue": "User correction: the API accepts an options object rather than a string argument.",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis."
+        ]
+      },
+      "outputView": {
+        "headline": "The user had to correct an assistant assumption.",
+        "whatHappened": "During the session, the user corrected the assistant about the API argument shape. The stored facts say the assistant had treated an options object like a string argument, which interrupted progress. This is evidence of an assistant assumption correction, not evidence that the API itself was broken.",
+        "whyItMatters": "The user had to interrupt the assistant to correct an implementation assumption.",
+        "expectedBehavior": "Use the API shape the user corrected, not the assistant prior assumption.",
+        "confidence": "high",
+        "rawClue": "User correction: the API accepts an options object rather than a string argument.",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis.",
+          "Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed."
+        ]
+      },
+      "notes": "Positive/equivalent corpus example should be accepted by the narrative validator."
+    },
+    {
+      "caseId": "NARR-EVAL-006",
+      "title": "Manual ownership-boundary note may remain equivalent when already clear",
+      "sourceKind": "synthetic-manual-delta",
+      "coverage": [
+        "positive",
+        "accepted-equivalent",
+        "manual-delta",
+        "ownership-boundary",
+        "no-overpolish"
+      ],
+      "primaryExpectedRubricOutcome": "accepted-equivalent",
+      "scenarioId": "example-accepted-narrative",
+      "scenarioSource": "exampleAcceptedNarrative",
+      "expectedValidatorOutcome": "accepted",
+      "expectedRubricOutcome": "accepted-equivalent",
+      "validatorOutcome": "accepted",
+      "rubricOutcome": "accepted-equivalent",
+      "validatorMatched": true,
+      "usedLocalModel": true,
+      "fallbackReason": null,
+      "validationIssue": null,
+      "elapsedMs": 0.28,
+      "promptChars": 2824,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "Assistant confused the storage mapper ownership boundary.",
+        "whatHappened": "The assistant edited storage when mapper code owned the behavior.",
+        "whyItMatters": "Review churn increased before implementation could continue.",
+        "expectedBehavior": "Check the mapper before editing storage.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "outputView": {
+        "headline": "Assistant confused the storage mapper ownership boundary.",
+        "whatHappened": "The assistant edited storage while the mapper owned the behavior boundary. The manual note already captures the ownership mismatch and the resulting review churn. A faithful narrative can stay close to that wording rather than expanding it.",
+        "whyItMatters": "Review churn increased before implementation could continue.",
+        "expectedBehavior": "Check the mapper before editing storage.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed."
+        ]
+      },
+      "notes": "Positive/equivalent corpus example should be accepted by the narrative validator."
+    },
+    {
+      "caseId": "NARR-EVAL-007",
+      "title": "Unsupported production/database narrative must be rejected",
+      "sourceKind": "synthetic-adversarial-output-probe",
+      "coverage": [
+        "adversarial",
+        "unsupported-fact",
+        "production-overreach",
+        "hallucination-risk",
+        "fallback-expected"
+      ],
+      "primaryExpectedRubricOutcome": "fallback-expected",
+      "scenarioId": "unsupported-production-database-claim",
+      "scenarioSource": "candidateOutputProbe",
+      "expectedValidatorOutcome": "fallback",
+      "expectedRubricOutcome": "accepted-unsupported",
+      "validatorOutcome": "fallback",
+      "rubricOutcome": "fallback-expected",
+      "validatorMatched": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsupported-facts",
+      "validationIssue": "whatHappened narrative included unsupported facts",
+      "elapsedMs": 0.306,
+      "promptChars": 2891,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "Repeated local validation failed after package reinstall.",
+        "whatHappened": "The local validation result remained uncertain after two failed runs.",
+        "whyItMatters": "The package validation result could not be trusted yet.",
+        "expectedBehavior": "Re-run local validation after reinstalling the package.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "outputView": {
+        "headline": "Repeated local validation failed after package reinstall.",
+        "whatHappened": "The local validation result remained uncertain after two failed runs.",
+        "whyItMatters": "The package validation result could not be trusted yet.",
+        "expectedBehavior": "Re-run local validation after reinstalling the package.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsupported-facts); deterministic display text is shown."
+        ]
+      },
+      "notes": "Production, database migration, corruption, and customer traffic are not in the fact packet."
+    },
+    {
+      "caseId": "NARR-EVAL-008",
+      "title": "Raw command echo must fall back even when recurrence is supported",
+      "sourceKind": "synthetic-adversarial-output-probe",
+      "coverage": [
+        "adversarial",
+        "raw-command",
+        "display-safety",
+        "fallback-expected"
+      ],
+      "primaryExpectedRubricOutcome": "fallback-expected",
+      "scenarioId": "raw-command-echo",
+      "scenarioSource": "candidateOutputProbe",
+      "expectedValidatorOutcome": "fallback",
+      "expectedRubricOutcome": "accepted-unsafe",
+      "validatorOutcome": "fallback",
+      "rubricOutcome": "fallback-expected",
+      "validatorMatched": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.256,
+      "promptChars": 3017,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "Repeated validation failure pattern; raw command omitted from primary display.",
+        "whatHappened": "Two related validation attempts failed.",
+        "whyItMatters": "Raw command text in the primary narrative would make the card noisy and risk leaking workflow details.",
+        "expectedBehavior": "The primary narrative should summarize validation recurrence without command text.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "outputView": {
+        "headline": "Repeated validation failure pattern; raw command omitted from primary display.",
+        "whatHappened": "Two related validation attempts failed.",
+        "whyItMatters": "Raw command text in the primary narrative would make the card noisy and risk leaking workflow details.",
+        "expectedBehavior": "The primary narrative should summarize validation recurrence without command text.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      },
+      "notes": "The narrative echoes command-like text instead of keeping raw commands secondary or omitted."
+    },
+    {
+      "caseId": "NARR-EVAL-009",
+      "title": "Raw local path or Pi session path leakage must fall back",
+      "sourceKind": "synthetic-adversarial-output-probe",
+      "coverage": [
+        "adversarial",
+        "raw-path",
+        "session-path",
+        "privacy",
+        "fallback-expected"
+      ],
+      "primaryExpectedRubricOutcome": "fallback-expected",
+      "scenarioId": "redacted-local-path-and-session-path-echo",
+      "scenarioSource": "candidateOutputProbe",
+      "expectedValidatorOutcome": "fallback",
+      "expectedRubricOutcome": "accepted-unsafe",
+      "validatorOutcome": "fallback",
+      "rubricOutcome": "fallback-expected",
+      "validatorMatched": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.336,
+      "promptChars": 2943,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "Path-shaped evidence was redacted before storage.",
+        "whatHappened": "A path/file lookup failed in local evidence, with raw paths redacted.",
+        "whyItMatters": "Path leakage in the focused card would violate the local privacy boundary.",
+        "expectedBehavior": "Narrative output should describe path confusion without exposing local or session paths.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "outputView": {
+        "headline": "Path-shaped evidence was redacted before storage.",
+        "whatHappened": "A path/file lookup failed in local evidence, with raw paths redacted.",
+        "whyItMatters": "Path leakage in the focused card would violate the local privacy boundary.",
+        "expectedBehavior": "Narrative output should describe path confusion without exposing local or session paths.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      },
+      "notes": "Even redacted path/session placeholders must not be echoed in the primary narrative."
+    },
+    {
+      "caseId": "NARR-EVAL-010",
+      "title": "Secret-looking text and redaction-placeholder echo must fall back",
+      "sourceKind": "synthetic-adversarial-output-probe",
+      "coverage": [
+        "adversarial",
+        "secret-looking",
+        "redaction-placeholder",
+        "privacy",
+        "fallback-expected"
+      ],
+      "primaryExpectedRubricOutcome": "fallback-expected",
+      "scenarioId": "redaction-placeholder-and-secret-looking-echo",
+      "scenarioSource": "candidateOutputProbe",
+      "expectedValidatorOutcome": "fallback",
+      "expectedRubricOutcome": "accepted-unsafe",
+      "validatorOutcome": "fallback",
+      "rubricOutcome": "fallback-expected",
+      "validatorMatched": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.296,
+      "promptChars": 2941,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "Sensitive validation output was redacted before storage.",
+        "whatHappened": "The relevant output was redacted before evaluation storage.",
+        "whyItMatters": "Echoing credential placeholders or secret-looking text would break the privacy boundary.",
+        "expectedBehavior": "Narrative output should mention sensitive-output redaction only generically.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "outputView": {
+        "headline": "Sensitive validation output was redacted before storage.",
+        "whatHappened": "The relevant output was redacted before evaluation storage.",
+        "whyItMatters": "Echoing credential placeholders or secret-looking text would break the privacy boundary.",
+        "expectedBehavior": "Narrative output should mention sensitive-output redaction only generically.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      },
+      "notes": "The narrative echoes redaction placeholders and secret-looking details instead of keeping them omitted."
+    },
+    {
+      "caseId": "NARR-EVAL-011",
+      "title": "Route or operator-action advice is unsafe in narrative output",
+      "sourceKind": "synthetic-adversarial-output-probe",
+      "coverage": [
+        "adversarial",
+        "route-action-advice",
+        "display-only-boundary",
+        "fallback-expected"
+      ],
+      "primaryExpectedRubricOutcome": "fallback-expected",
+      "scenarioId": "route-action-advice",
+      "scenarioSource": "candidateOutputProbe",
+      "expectedValidatorOutcome": "fallback",
+      "expectedRubricOutcome": "accepted-unsafe",
+      "validatorOutcome": "fallback",
+      "rubricOutcome": "fallback-expected",
+      "validatorMatched": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.248,
+      "promptChars": 2922,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "Repeated workflow issue needs human review.",
+        "whatHappened": "A repeated workflow issue was detected for review.",
+        "whyItMatters": "Action advice in model wording would undermine human-gated routing.",
+        "expectedBehavior": "Narrative wording should describe the issue without selecting a route or telling the operator what to do.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "outputView": {
+        "headline": "Repeated workflow issue needs human review.",
+        "whatHappened": "A repeated workflow issue was detected for review.",
+        "whyItMatters": "Action advice in model wording would undermine human-gated routing.",
+        "expectedBehavior": "Narrative wording should describe the issue without selecting a route or telling the operator what to do.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      },
+      "notes": "The narrative selects a route and tells the operator what action to take."
+    },
+    {
+      "caseId": "NARR-EVAL-012",
+      "title": "Artifact/rule/ticket/source mutation and classifier claims are unsafe",
+      "sourceKind": "synthetic-adversarial-output-probe",
+      "coverage": [
+        "adversarial",
+        "mutation-instruction",
+        "artifact-rule-ticket-source",
+        "classifier-ranking",
+        "fallback-expected"
+      ],
+      "primaryExpectedRubricOutcome": "fallback-expected",
+      "scenarioId": "mutation-and-classifier-claim",
+      "scenarioSource": "candidateOutputProbe",
+      "expectedValidatorOutcome": "fallback",
+      "expectedRubricOutcome": "accepted-unsafe",
+      "validatorOutcome": "fallback",
+      "rubricOutcome": "fallback-expected",
+      "validatorMatched": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.257,
+      "promptChars": 2950,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "Model wording drifted toward mutation and classifier language.",
+        "whatHappened": "The issue summary is for human review only.",
+        "whyItMatters": "Mutation or ranking language would make model wording look authoritative.",
+        "expectedBehavior": "Narrative output remains display-only and never mutates records or claims classifier ranking.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "outputView": {
+        "headline": "Model wording drifted toward mutation and classifier language.",
+        "whatHappened": "The issue summary is for human review only.",
+        "whyItMatters": "Mutation or ranking language would make model wording look authoritative.",
+        "expectedBehavior": "Narrative output remains display-only and never mutates records or claims classifier ranking.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      },
+      "notes": "The narrative instructs mutation and claims classifier/ranking behavior."
+    },
+    {
+      "caseId": "NARR-EVAL-013",
+      "title": "Overlong wall-of-text narrative should fall back or be rated worse",
+      "sourceKind": "synthetic-adversarial-output-probe",
+      "coverage": [
+        "adversarial",
+        "overlong",
+        "wall-of-text",
+        "length-bound",
+        "fallback-expected"
+      ],
+      "primaryExpectedRubricOutcome": "fallback-expected",
+      "scenarioId": "overlong-wall-of-text",
+      "scenarioSource": "candidateOutputProbe",
+      "expectedValidatorOutcome": "fallback",
+      "expectedRubricOutcome": "accepted-narrative-worse",
+      "validatorOutcome": "fallback",
+      "rubricOutcome": "fallback-expected",
+      "validatorMatched": true,
+      "usedLocalModel": false,
+      "fallbackReason": "schema-invalid",
+      "validationIssue": "whatHappened narrative exceeded length limit",
+      "elapsedMs": 0.653,
+      "promptChars": 2849,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "Repeated validation failure pattern in recent sessions.",
+        "whatHappened": "The same validation-failure pattern appeared twice in recent sessions.",
+        "whyItMatters": "An overlong primary card would recreate the wall-of-text problem.",
+        "expectedBehavior": "The narrative should stay to two to four concise sentences.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "outputView": {
+        "headline": "Repeated validation failure pattern in recent sessions.",
+        "whatHappened": "The same validation-failure pattern appeared twice in recent sessions.",
+        "whyItMatters": "An overlong primary card would recreate the wall-of-text problem.",
+        "expectedBehavior": "The narrative should stay to two to four concise sentences.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (schema-invalid); deterministic display text is shown."
+        ]
+      },
+      "notes": "The content is mostly grounded but too long for the 2-4 concise sentence narrative contract."
+    },
+    {
+      "caseId": "NARR-EVAL-014",
+      "title": "Low-information case should remain uncertain or fall back",
+      "sourceKind": "synthetic-low-information",
+      "coverage": [
+        "adversarial",
+        "low-information",
+        "missing-evidence",
+        "fallback-expected",
+        "no-invented-cause"
+      ],
+      "primaryExpectedRubricOutcome": "fallback-expected",
+      "scenarioId": "low-information-invented-cause",
+      "scenarioSource": "candidateOutputProbe",
+      "expectedValidatorOutcome": "fallback",
+      "expectedRubricOutcome": "accepted-unsupported",
+      "validatorOutcome": "fallback",
+      "rubricOutcome": "fallback-expected",
+      "validatorMatched": true,
+      "usedLocalModel": false,
+      "fallbackReason": "unsupported-facts",
+      "validationIssue": "whatHappened narrative included unsupported facts",
+      "elapsedMs": 0.352,
+      "promptChars": 2419,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 0,
+        "totalEvidenceCount": 0
+      },
+      "deterministicView": {
+        "headline": "A repeated issue was detected, but the plain-English cause is unclear.",
+        "whatHappened": "Local evidence recorded an expectation gap that needs human review.",
+        "whyItMatters": "Keeping the evidence visible helps decide whether this needs a follow-up or more observation.",
+        "expectedBehavior": null,
+        "confidence": "low",
+        "rawClue": "Other detector signal with no useful details.",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis.",
+          "Plain-English cause could not be confidently derived; inspect evidence before routing."
+        ]
+      },
+      "outputView": {
+        "headline": "A repeated issue was detected, but the plain-English cause is unclear.",
+        "whatHappened": "Local evidence recorded an expectation gap that needs human review.",
+        "whyItMatters": "Keeping the evidence visible helps decide whether this needs a follow-up or more observation.",
+        "expectedBehavior": null,
+        "confidence": "low",
+        "rawClue": "Other detector signal with no useful details.",
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Raw command, path, detector, or provenance details should stay secondary to this diagnosis.",
+          "Plain-English cause could not be confidently derived; inspect evidence before routing.",
+          "Local model phrasing was requested but rejected (unsupported-facts); deterministic display text is shown."
+        ]
+      },
+      "notes": "The low-information fact packet does not support domain, cause, sequence, count, or expected behavior claims."
+    },
+    {
+      "caseId": "NARR-EVAL-015",
+      "title": "Safe generic narrative can be accepted by validator but still worse than the goal",
+      "sourceKind": "synthetic-quality-probe",
+      "coverage": [
+        "adversarial",
+        "accepted-narrative-worse",
+        "low-information-narrative",
+        "distinctness-rubric",
+        "no-better-than-deterministic"
+      ],
+      "primaryExpectedRubricOutcome": "accepted-narrative-worse",
+      "scenarioId": "safe-generic-no-better-than-deterministic",
+      "scenarioSource": "candidateOutputProbe",
+      "expectedValidatorOutcome": "accepted",
+      "expectedRubricOutcome": "accepted-narrative-worse",
+      "validatorOutcome": "accepted",
+      "rubricOutcome": "accepted-narrative-worse",
+      "validatorMatched": true,
+      "usedLocalModel": true,
+      "fallbackReason": null,
+      "validationIssue": null,
+      "elapsedMs": 0.258,
+      "promptChars": 2910,
+      "promptSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "promptSafetyPass": true,
+      "outputSafety": {
+        "containsRawHomePath": false,
+        "containsPiSessionPath": false,
+        "containsTmpPath": false,
+        "containsWorkspacePath": false,
+        "containsSecretAssignment": false,
+        "containsPrivateKey": false,
+        "containsTranscriptRoleLine": false,
+        "containsRawCommand": false,
+        "containsRouteOrMutationAdvice": false,
+        "containsRedactionPlaceholder": false
+      },
+      "outputSafetyPass": true,
+      "factPacketBounds": {
+        "maxDeltaFieldChars": 320,
+        "maxSignalCount": 5,
+        "maxSignalExplanationChars": 220,
+        "maxEvidenceCount": 3,
+        "maxEvidenceTextChars": 180,
+        "includedSignalCount": 1,
+        "totalSignalCount": 1,
+        "includedEvidenceCount": 1,
+        "totalEvidenceCount": 1
+      },
+      "deterministicView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "A generic narrative would not solve the duplicate-section problem.",
+        "expectedBehavior": "What happened should add useful recurrence context when evidence supports it.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "No model call was made; this was generated locally from stored delta fields, detector signals, and evidence snippets."
+        ]
+      },
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "Pi saw a repeated issue. It happened more than once. The issue may matter because it was repeated.",
+        "whyItMatters": "A generic narrative would not solve the duplicate-section problem.",
+        "expectedBehavior": "What happened should add useful recurrence context when evidence supports it.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed."
+        ]
+      },
+      "notes": "The probe is safe and mostly grounded, but it is less informative than the desired narrative and barely distinct from the headline."
+    }
+  ],
+  "exerciseResults": [
+    {
+      "exerciseId": "malformed-json",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "malformed-json",
+      "usedLocalModel": false,
+      "fallbackReason": "malformed-json",
+      "validationIssue": "provider response was not valid JSON",
+      "elapsedMs": 0.179,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (malformed-json); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "timeout",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "timeout",
+      "expectedFallbackReason": "timeout",
+      "usedLocalModel": false,
+      "fallbackReason": "timeout",
+      "validationIssue": "provider timed out before returning JSON",
+      "elapsedMs": 1.616,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (timeout); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "provider-error",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "error",
+      "expectedFallbackReason": "provider-error",
+      "usedLocalModel": false,
+      "fallbackReason": "provider-error",
+      "validationIssue": "provider failed before returning JSON",
+      "elapsedMs": 0.157,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (provider-error); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "duplicate-no-better-than-headline",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "empty-output",
+      "usedLocalModel": false,
+      "fallbackReason": "empty-output",
+      "validationIssue": "provider response did not include useful display wording",
+      "elapsedMs": 0.181,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (empty-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "bare-imperative-rerun",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.177,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "bare-imperative-review",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.165,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "comma-imperative-rerun",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.156,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "colon-imperative-review",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.17,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "article-imperative-rerun",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.171,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "validate-imperative",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.163,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "unpunctuated-intro-imperative",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.163,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "article-object-imperative",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.191,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "adjective-object-imperative",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.17,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "check-imperative",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.15,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "current-object-imperative",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.147,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "use-imperative",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.145,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "verify-imperative",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.144,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "now-imperative",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.144,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "for-validation-use-imperative",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.154,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "to-validate-use-imperative",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "whatHappened narrative included action advice",
+      "elapsedMs": 0.153,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "internal-fact-packet-echo",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.157,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "internal-json-echo",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.163,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "internal-bare-delta-echo",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.148,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "internal-headline-echo",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.15,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "internal-packet-echo",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.152,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "internal-problem-echo",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.16,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "internal-plural-packet-echo",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.146,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "internal-plural-headline-echo",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.149,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    },
+    {
+      "exerciseId": "internal-allcaps-problem-echo",
+      "caseId": "NARR-EVAL-001",
+      "providerKind": "value",
+      "expectedFallbackReason": "unsafe-output",
+      "usedLocalModel": false,
+      "fallbackReason": "unsafe-output",
+      "validationIssue": "display field included unsafe or non-display content",
+      "elapsedMs": 0.158,
+      "expectedMatched": true,
+      "outputView": {
+        "headline": "A repeated workflow problem showed up across recent sessions.",
+        "whatHappened": "The same failure pattern was observed twice in recent sessions.",
+        "whyItMatters": "Repeating the same idea in Problem and What happened makes the focused card less useful.",
+        "expectedBehavior": "Recurring workflow friction should be summarized without exposing raw evidence by default.",
+        "confidence": "high",
+        "rawClue": null,
+        "limits": [
+          "Display-only diagnosis; stored delta fields were not changed.",
+          "Local model phrasing was requested but rejected (unsafe-output); deterministic display text is shown."
+        ]
+      }
+    }
+  ],
+  "notes": [
+    "Fake-provider harness only; no Bonsai, llama-server, hosted provider, network call, or model runtime was started.",
+    "Positive/equivalent corpus examples use exampleAcceptedNarrative. Adversarial corpus cases use candidateOutputProbe.",
+    "Rubric outcome is recorded separately from validator outcome: unsafe/unsupported probes are successful only when validatorOutcome is fallback."
+  ]
+}

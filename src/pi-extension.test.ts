@@ -655,8 +655,8 @@ describe("Pi extension wrapper", () => {
     const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
     extension({ registerCommand: (name, command) => commands.set(name, command) });
     const chatServer = await startLocalChatServer(JSON.stringify({
+      schemaVersion: 2,
       headline: "A validation check failed repeatedly in this project.",
-      whatHappened: "Pi saw the same validation check failed twice in recent sessions.",
       whyItMatters: "Repeated validation friction makes the result hard to trust.",
       expectedBehavior: "Validation should run from a fresh shell.",
     }));
@@ -709,7 +709,7 @@ describe("Pi extension wrapper", () => {
       const output = rendered[0]?.join("\n") ?? "";
       expect(output).toContain("Local model phrasing; deterministic fallback available.");
       expect(output).toContain("A validation check failed repeatedly in this project.");
-      expect(output).toContain("Pi saw the same validation check failed twice in recent sessions.");
+      expect(output).toContain("Pi saw the same validation-failure pattern twice in recent sessions.");
       expect(chatServer.requests).toHaveLength(1);
       expect(chatServer.requests[0]).toContain("Fact packet JSON");
       expect(chatServer.requests[0]).toContain("/Users/<user>");
@@ -738,13 +738,208 @@ describe("Pi extension wrapper", () => {
     }
   });
 
+  it("uses explicitly configured local narrative judge for accepted what-happened wording without persisting it", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-learn-local-judge-data-"));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    const generatorServer = await startLocalChatServer(JSON.stringify({
+      schemaVersion: 2,
+      whatHappened: {
+        sentences: [
+          { text: "The accepted local narrative ties the repeated validation check to an old shell after the package changed.", factIds: ["F7", "F10"] },
+        ],
+      },
+    }));
+    const judgeServer = await startLocalChatServer(JSON.stringify({
+      schemaVersion: 1,
+      overallVerdict: "accept",
+      sentences: [
+        {
+          index: 0,
+          verdict: "supported",
+          supportedFactIds: ["F7", "F10"],
+          unsupportedClaims: [],
+          reason: "Supported by cited redacted facts.",
+          confidence: "high",
+        },
+      ],
+    }));
+    let deltaId = "";
+    try {
+      const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+      try {
+        const delta = store.createExpectationDelta({
+          source: "detector",
+          summary: "Repeated failure pattern: bash cd /Users/alice/project && npm test",
+          expectation: "Validation should run from a fresh shell.",
+          reality: "The validation check was rerun from an old shell after the package changed.",
+          impact: "That makes the validation result hard to trust.",
+          severity: "medium",
+          cwd: "/Users/alice/project",
+          evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/Users/alice/project", entryId: null, timestamp: null, snippet: "npm test failed twice", note: "manual" }],
+        });
+        deltaId = delta.id;
+        store.recordDeltaDetectorSignal({ deltaId, type: "failed-validation", explanation: "Validation failed twice from the same stale shell pattern.", confidence: 0.74, evidenceRefs: delta.evidenceRefs });
+      } finally {
+        store.close();
+      }
+
+      const rendered: string[][] = [];
+      const ctx = {
+        cwd: "/repo",
+        ui: {
+          notify: () => undefined,
+          custom: async (factory: any) => {
+            let result: unknown;
+            const component = factory({ requestRender: () => undefined }, { fg: (_color: string, value: string) => value, bold: (value: string) => value }, {}, (value: unknown) => {
+              result = value;
+            });
+            rendered.push(component.render(112));
+            component.handleInput?.("2");
+            component.handleInput?.("\r");
+            return result;
+          },
+          editor: (message: string) => {
+            if (message.includes("Why this follow-up?")) return "A validation check follow-up should preserve the local evidence.";
+            throw new Error("only follow-up reason editor should run after custom route selection");
+          },
+        },
+        sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
+      };
+
+      await commands.get("flight-learn")?.handler(`--data-dir ${dataDir} --local-model-polish --local-model-url ${generatorServer.baseUrl} --local-narrative-judge-url ${judgeServer.baseUrl} --local-narrative-judge-max-output-tokens 256`, ctx);
+
+      const output = rendered[0]?.join("\n") ?? "";
+      expect(output).toContain("Local model narrative accepted by local judge; deterministic fallback available.");
+      expect(output).toContain("A validation command failed repeatedly in this project.");
+      expect(output).toContain("The accepted local narrative ties the repeated validation check to an old shell");
+      expect(generatorServer.requests).toHaveLength(1);
+      expect(judgeServer.requests).toHaveLength(1);
+      expect(judgeServer.requests[0]).toContain("veto-only");
+      expect(judgeServer.requests[0]).toContain("Judge request JSON");
+      expect(judgeServer.requests[0]).not.toContain("/Users/alice");
+
+      const check = new FlightRecorderStore(defaultDatabasePath(dataDir));
+      try {
+        const routed = check.getExpectationDelta(deltaId);
+        const candidate = check.listArtifactCandidates({ deltaId })[0];
+        expect(routed?.status).toBe("routed");
+        expect(routed?.summary).toContain("Repeated failure pattern: bash cd");
+        expect(routed?.summary).not.toContain("accepted local narrative");
+        expect(candidate?.artifactType).toBe("test-check");
+        expect(candidate?.status).toBe("accepted");
+        expect(candidate?.applied).toBe(false);
+        expect(candidate?.proposedDraft).not.toContain("accepted local narrative");
+        expect(check.count("rule_candidates")).toBe(0);
+        expect(check.count("flight_rules")).toBe(0);
+      } finally {
+        check.close();
+      }
+    } finally {
+      await generatorServer.close();
+      await judgeServer.close();
+    }
+  });
+
+  it("shows explicitly enabled local LLM draft comprehension without judge acceptance or persistence", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-learn-local-draft-data-"));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    const generatorServer = await startLocalChatServer(JSON.stringify({
+      schemaVersion: 2,
+      whatHappened: {
+        sentences: [
+          { text: "The validation check was rerun from an old shell after the package changed.", factIds: ["F7", "F10"] },
+          { text: "The old shell recurrence made the validation result hard to trust.", factIds: ["F3", "F8", "F10"] },
+        ],
+      },
+    }));
+    let deltaId = "";
+    try {
+      const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+      try {
+        const delta = store.createExpectationDelta({
+          source: "detector",
+          summary: "Repeated failure pattern: bash cd /Users/alice/project && npm test",
+          expectation: "Validation should run from a fresh shell.",
+          reality: "The validation check was rerun from an old shell after the package changed.",
+          impact: "That makes the validation result hard to trust.",
+          severity: "medium",
+          cwd: "/Users/alice/project",
+          evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/Users/alice/project", entryId: null, timestamp: null, snippet: "npm test failed twice", note: "manual" }],
+        });
+        deltaId = delta.id;
+        store.recordDeltaDetectorSignal({ deltaId, type: "failed-validation", explanation: "Validation failed twice from the same stale shell pattern.", confidence: 0.74, evidenceRefs: delta.evidenceRefs });
+      } finally {
+        store.close();
+      }
+
+      const rendered: string[][] = [];
+      const ctx = {
+        cwd: "/repo",
+        ui: {
+          notify: () => undefined,
+          custom: async (factory: any) => {
+            let result: unknown;
+            const component = factory({ requestRender: () => undefined }, { fg: (_color: string, value: string) => value, bold: (value: string) => value }, {}, (value: unknown) => {
+              result = value;
+            });
+            rendered.push(component.render(112));
+            component.handleInput?.("2");
+            component.handleInput?.("\r");
+            return result;
+          },
+          editor: (message: string) => {
+            if (message.includes("Why this follow-up?")) return "A validation check follow-up should preserve deterministic facts.";
+            throw new Error("only follow-up reason editor should run after custom route selection");
+          },
+        },
+        sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
+      };
+
+      await commands.get("flight-learn")?.handler(`--data-dir ${dataDir} --local-model-polish --local-model-url ${generatorServer.baseUrl}`, ctx);
+
+      const output = rendered[0]?.join("\n") ?? "";
+      expect(output).toContain("Local LLM draft — facts below are source of truth; not judge-accepted.");
+      expect(output).toContain("The validation check was rerun from an old shell after the package changed.");
+      expect(output).toContain("Source facts");
+      expect(output).toContain("Problem: A validation command failed repeatedly in this project.");
+      expect(output).not.toContain("accepted by local judge");
+      expect(generatorServer.requests).toHaveLength(1);
+
+      const check = new FlightRecorderStore(defaultDatabasePath(dataDir));
+      try {
+        const routed = check.getExpectationDelta(deltaId);
+        const candidate = check.listArtifactCandidates({ deltaId })[0];
+        expect(routed?.status).toBe("routed");
+        expect(routed?.summary).toContain("Repeated failure pattern: bash cd");
+        expect(routed?.summary).not.toContain("old shell recurrence");
+        expect(candidate?.artifactType).toBe("test-check");
+        expect(candidate?.status).toBe("accepted");
+        expect(candidate?.applied).toBe(false);
+        expect(candidate?.proposedDraft).not.toContain("old shell recurrence");
+        expect(check.count("rule_candidates")).toBe(0);
+        expect(check.count("flight_rules")).toBe(0);
+      } finally {
+        check.close();
+      }
+    } finally {
+      await generatorServer.close();
+    }
+  });
+
   it("documents explicit local-model call behavior when custom inbox throws before primitive fallback", async () => {
     const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-learn-local-polish-custom-throw-data-"));
     const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
     extension({ registerCommand: (name, command) => commands.set(name, command) });
     const chatServer = await startLocalChatServer(JSON.stringify({
+      schemaVersion: 2,
       headline: "A validation check failed repeatedly in this project.",
-      whatHappened: "Pi saw the same validation check failed twice in recent sessions.",
+      whatHappened: {
+        sentences: [
+          { text: "Pi saw the same validation check failed twice in recent sessions.", factIds: ["F7", "F10"] },
+        ],
+      },
       whyItMatters: "Repeated validation friction makes the result hard to trust.",
       expectedBehavior: "Validation should run from a fresh shell.",
     }));

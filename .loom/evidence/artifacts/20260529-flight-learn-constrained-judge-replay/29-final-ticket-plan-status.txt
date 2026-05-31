@@ -1,0 +1,30 @@
+$ grep -R "^ID:\|^Status:\|^Depends On:" selected Loom records
+.loom/plans/20260529-flight-learn-comprehension-path.md:ID: plan:20260529-flight-learn-comprehension-path
+.loom/plans/20260529-flight-learn-comprehension-path.md:Status: blocked
+.loom/plans/20260529-flight-learn-comprehension-path.md:Depends On: `ticket:20260529-flight-learn-constrained-json-adapter`
+.loom/plans/20260529-flight-learn-comprehension-path.md:Depends On: `ticket:20260529-flight-learn-constrained-judge-replay`
+.loom/plans/20260529-flight-learn-comprehension-path.md:Depends On: `ticket:20260529-flight-learn-model-comprehension-integration`
+.loom/plans/20260529-flight-learn-comprehension-path.md:Depends On: `ticket:20260529-flight-learn-comprehension-validation`
+.loom/tickets/20260529-flight-learn-constrained-json-adapter.md:ID: ticket:20260529-flight-learn-constrained-json-adapter
+.loom/tickets/20260529-flight-learn-constrained-json-adapter.md:Status: closed
+.loom/tickets/20260529-flight-learn-constrained-judge-replay.md:ID: ticket:20260529-flight-learn-constrained-judge-replay
+.loom/tickets/20260529-flight-learn-constrained-judge-replay.md:Status: closed
+.loom/tickets/20260529-flight-learn-constrained-judge-replay.md:Depends On: ticket:20260529-flight-learn-constrained-json-adapter
+.loom/tickets/20260529-flight-learn-model-comprehension-integration.md:ID: ticket:20260529-flight-learn-model-comprehension-integration
+.loom/tickets/20260529-flight-learn-model-comprehension-integration.md:Status: blocked
+.loom/tickets/20260529-flight-learn-model-comprehension-integration.md:Depends On: ticket:20260529-flight-learn-constrained-judge-replay
+.loom/tickets/20260529-flight-learn-comprehension-validation.md:ID: ticket:20260529-flight-learn-comprehension-validation
+.loom/tickets/20260529-flight-learn-comprehension-validation.md:Status: blocked
+.loom/tickets/20260529-flight-learn-comprehension-validation.md:Depends On: ticket:20260529-flight-learn-model-comprehension-integration
+.loom/tickets/20260529-flight-learn-dogfood-corpus-outcomes.md:ID: ticket:20260529-flight-learn-dogfood-corpus-outcomes
+.loom/tickets/20260529-flight-learn-dogfood-corpus-outcomes.md:Status: blocked
+.loom/tickets/20260529-flight-learn-dogfood-corpus-outcomes.md:Depends On: ticket:20260529-flight-learn-comprehension-validation
+
+$ git status --short ticket/evidence/audit/artifact/plan paths
+?? .loom/audit/20260529-flight-learn-constrained-judge-replay-followup-review.md
+?? .loom/audit/20260529-flight-learn-constrained-judge-replay-review.md
+?? .loom/evidence/20260529-flight-learn-constrained-judge-replay.md
+?? .loom/evidence/artifacts/20260529-flight-learn-constrained-judge-replay/
+?? .loom/plans/20260529-flight-learn-comprehension-path.md
+?? .loom/tickets/20260529-flight-learn-constrained-judge-replay.md
+?? .loom/tickets/20260529-flight-learn-model-comprehension-integration.md

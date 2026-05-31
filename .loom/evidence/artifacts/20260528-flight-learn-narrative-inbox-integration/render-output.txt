@@ -1,0 +1,44 @@
+# Focused-card accepted narrative render (width 88)
+Flight Learn — Issue 1 of 1
+1 pending · 1 evidence ref · ↑/↓ changes issue
+Local model phrasing; deterministic fallback available.
+
+Problem
+ Validation kept running from a stale shell.
+
+What happened?
+ The accepted local narrative ties together repeated validation failures from
+ redacted facts. It explains that the same check was rerun after the package changed,
+ so the card is about validation trust rather than a separate code failure.
+
+Why it matters
+ A fuller narrative helps the reviewer understand why this deserves attention without
+ changing the review choices.
+
+Expected
+ Validation should run from a fresh project shell after package changes.
+
+Raw clue
+ Repeated validation failure pattern from a stale shell.
+
+Why suggested
+ failed-validation (0.74): Validation failed twice from the same stale shell pattern.
+
+Evidence
+ 1 ref hidden by default — press v to view concise refs.
+
+Choose a follow-up
+▶ [1] Test/check
+ Route to a missing or weak validation check.
+ [2] Loom ticket
+ Route to bounded implementation or cleanup work.
+ [3] Observe
+ Keep evidence and watch recurrence without creating an artifact.
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose · e edit · v evidence · d...
+
+# Line length check
+{
+  "maxLineLength": 88,
+  "lineCount": 37
+}

@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-05-29T00:24:35.700Z",
+  "samples": [
+    {
+      "id": "NARR-EVAL-001",
+      "elapsedMs": 2121,
+      "raw": "{\"sentences\":[{\"text\":\"The same failure pattern was observed in two recent sessions.\", \"factIds\":[\"F2\"]}, {\"text\":\"The pattern repeated without variation in the workflow execution.\", \"factIds\":[\"F2\", \"F7\"]}, {\"text\":\"The recurrence was consistent across both Problem and What happened fields.\", \"factIds\":[\"F2\", \"F8\"]}, {\"text\":\"This indicates a systemic issue in the workflow automation logic.\", \"factIds\":[\"F2\", \"F10\"]}], \"whyItMatters\":\"Repeating the same idea in Problem and What happened makes the focused card less useful.\", \"expectedBehavior\":\"Recurring workflow friction should be summarized without exposing raw evidence by default.\"}"
+    },
+    {
+      "id": "NARR-EVAL-002",
+      "elapsedMs": 3614,
+      "raw": "{\"sentences\":[{\"text\":\"Validation attempts failed twice in a single stale-shell pattern.\",\"factIds\":[\"F2\",\"F7\"]},{\"text\":\"The stale-shell pattern was associated with two failed validation attempts in local evidence.\",\"factIds\":[\"F10\",\"F11\"]},{\"text\":\"The pattern's recurrence suggests a systemic issue with local validation state.\",\"factIds\":[\"F2\",\"F8\"]},{\"text\":\"Fresh project shells should be used to avoid repeated validation friction.\",\"factIds\":[\"F4\"]}]}\n\n{\"whyItMatters\":\"Repeated validation friction undermines trust in the validation results due to inconsistent state across local shells.\",\"expectedBehavior\":\"Validation should run from a fresh project shell after changes to ensure consistent and reliable outcomes.\"}"
+    },
+    {
+      "id": "NARR-EVAL-003",
+      "elapsedMs": 2384,
+      "raw": "{\"sentences\":[{\"text\":\"A local build check failed in a nearby validation loop.\", \"factIds\":[\"F2\"]}], \"whyItMatters\":\"A release package would be hard to trust without a clean build.\", \"expectedBehavior\":\"Build validation should pass before release packaging.\"}"
+    }
+  ]
+}

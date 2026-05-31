@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "id": "flight-learn-narrative-rubric-corpus-privacy-scan-v1",
+  "created": "2026-05-28",
+  "relatedTicket": "ticket:20260528-flight-learn-narrative-rubric-corpus",
+  "scannedArtifacts": [
+    ".loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/narrative-what-happened-eval-corpus.v1.json",
+    ".loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/narrative-what-happened-eval-summary.v1.json",
+    ".loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/ralph-worker-output.md"
+  ],
+  "caseIds": [
+    "NARR-EVAL-001",
+    "NARR-EVAL-002",
+    "NARR-EVAL-003",
+    "NARR-EVAL-004",
+    "NARR-EVAL-005",
+    "NARR-EVAL-006",
+    "NARR-EVAL-007",
+    "NARR-EVAL-008",
+    "NARR-EVAL-009",
+    "NARR-EVAL-010",
+    "NARR-EVAL-011",
+    "NARR-EVAL-012",
+    "NARR-EVAL-013",
+    "NARR-EVAL-014",
+    "NARR-EVAL-015"
+  ],
+  "expectedCaseCount": 15,
+  "actualCaseCount": 15,
+  "forbiddenPatterns": [
+    "raw-home-path",
+    "raw-pi-session-path",
+    "private-key-block",
+    "concrete-credential-assignment",
+    "bearer-token-with-value",
+    "raw-transcript-role-lines",
+    "raw-stack-trace-line",
+    "unredacted-prompt-marker"
+  ],
+  "forbiddenPatternCount": 0,
+  "matches": [],
+  "allowedSyntheticSentinels": [
+    {
+      "target": ".loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/narrative-what-happened-eval-corpus.v1.json",
+      "patternId": "redacted-user-home-path",
+      "count": 2
+    },
+    {
+      "target": ".loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/narrative-what-happened-eval-corpus.v1.json",
+      "patternId": "redacted-project-placeholder",
+      "count": 19
+    },
+    {
+      "target": ".loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/narrative-what-happened-eval-corpus.v1.json",
+      "patternId": "redacted-pi-session-file",
+      "count": 17
+    },
+    {
+      "target": ".loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/narrative-what-happened-eval-corpus.v1.json",
+      "patternId": "redacted-credential-placeholder",
+      "count": 20
+    },
+    {
+      "target": ".loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/narrative-what-happened-eval-corpus.v1.json",
+      "patternId": "synthetic-command-probe",
+      "count": 2
+    }
+  ],
+  "result": "pass",
+  "notes": [
+    "The scan targets persisted corpus, summary, and worker-output artifacts; it does not certify future generated model outputs.",
+    "Allowed sentinel counts reflect redacted synthetic adversarial probes required by the ticket, not raw private data.",
+    "Re-run if corpus artifacts, evidence summaries, or worker output are changed.",
+    "Recomputed after NARR-EVAL-005 wording clarification from internal `stored delta` to `stored facts`."
+  ],
+  "updated": "2026-05-28"
+}

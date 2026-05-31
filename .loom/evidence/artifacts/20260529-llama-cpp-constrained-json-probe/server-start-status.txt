@@ -1,0 +1,4 @@
+started
+baseUrl=http://127.0.0.1:18120
+pid=29336
+health={"status":"ok"}

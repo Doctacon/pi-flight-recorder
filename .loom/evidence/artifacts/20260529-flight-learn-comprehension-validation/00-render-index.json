@@ -1,0 +1,124 @@
+{
+  "generatedAt": "2026-05-29T14:18:05.915Z",
+  "note": "Synthetic/redacted render pack. No raw private sessions, prompts, paths, or transcripts were used.",
+  "acceptedNarrativeIncluded": false,
+  "acceptedNarrativeReason": "No accepted real/runtime narrative evidence is available; accepted-narrative integration remains blocked.",
+  "widths": [
+    92,
+    72
+  ],
+  "cases": [
+    {
+      "cardId": "card-01-draft-repeated-workflow",
+      "title": "Draft: repeated workflow recurrence",
+      "state": "draft",
+      "coverage": [
+        "draft",
+        "repeated-workflow"
+      ],
+      "suggestedReviewFocus": "Can the draft explain the repeated workflow without becoming route advice?",
+      "renderArtifacts": {
+        "width92": "card-01-draft-repeated-workflow-92.txt",
+        "width72": "card-01-draft-repeated-workflow-72.txt"
+      }
+    },
+    {
+      "cardId": "card-02-fallback-repeated-workflow",
+      "title": "Fallback: repeated workflow recurrence",
+      "state": "fallback",
+      "coverage": [
+        "fallback",
+        "repeated-workflow"
+      ],
+      "suggestedReviewFocus": "Can fallback still support route/observe/dismiss/skip?",
+      "renderArtifacts": {
+        "width92": "card-02-fallback-repeated-workflow-92.txt",
+        "width72": "card-02-fallback-repeated-workflow-72.txt"
+      }
+    },
+    {
+      "cardId": "card-03-draft-validation-build",
+      "title": "Draft: validation/build trust issue",
+      "state": "draft",
+      "coverage": [
+        "draft",
+        "validation-build"
+      ],
+      "suggestedReviewFocus": "Can the card communicate validation trust clearly enough?",
+      "renderArtifacts": {
+        "width92": "card-03-draft-validation-build-92.txt",
+        "width72": "card-03-draft-validation-build-72.txt"
+      }
+    },
+    {
+      "cardId": "card-04-fallback-validation-build",
+      "title": "Fallback: validation/build trust issue",
+      "state": "fallback",
+      "coverage": [
+        "fallback",
+        "validation-build"
+      ],
+      "suggestedReviewFocus": "Can deterministic fallback explain enough about the build check?",
+      "renderArtifacts": {
+        "width92": "card-04-fallback-validation-build-92.txt",
+        "width72": "card-04-fallback-validation-build-72.txt"
+      }
+    },
+    {
+      "cardId": "card-05-draft-stale-edit",
+      "title": "Draft: stale exact-text edit",
+      "state": "draft",
+      "coverage": [
+        "draft",
+        "stale-edit"
+      ],
+      "suggestedReviewFocus": "Can the draft explain stale edit sequence without raw path noise?",
+      "renderArtifacts": {
+        "width92": "card-05-draft-stale-edit-92.txt",
+        "width72": "card-05-draft-stale-edit-72.txt"
+      }
+    },
+    {
+      "cardId": "card-06-fallback-stale-edit",
+      "title": "Fallback: stale exact-text edit",
+      "state": "fallback",
+      "coverage": [
+        "fallback",
+        "stale-edit"
+      ],
+      "suggestedReviewFocus": "Can fallback still expose the stale-edit diagnosis and actions?",
+      "renderArtifacts": {
+        "width92": "card-06-fallback-stale-edit-92.txt",
+        "width72": "card-06-fallback-stale-edit-72.txt"
+      }
+    },
+    {
+      "cardId": "card-07-draft-low-information",
+      "title": "Draft: low-information candidate",
+      "state": "draft",
+      "coverage": [
+        "draft",
+        "low-information"
+      ],
+      "suggestedReviewFocus": "Does the draft make sparse evidence honest rather than overconfident?",
+      "renderArtifacts": {
+        "width92": "card-07-draft-low-information-92.txt",
+        "width72": "card-07-draft-low-information-72.txt"
+      }
+    },
+    {
+      "cardId": "card-08-fallback-safety-adversarial",
+      "title": "Fallback: safety/adversarial model output rejected",
+      "state": "fallback",
+      "coverage": [
+        "fallback",
+        "safety-adversarial"
+      ],
+      "suggestedReviewFocus": "Does fallback disclose rejection and remain usable without unsafe model text?",
+      "renderArtifacts": {
+        "width92": "card-08-fallback-safety-adversarial-92.txt",
+        "width72": "card-08-fallback-safety-adversarial-72.txt"
+      }
+    }
+  ]
+}

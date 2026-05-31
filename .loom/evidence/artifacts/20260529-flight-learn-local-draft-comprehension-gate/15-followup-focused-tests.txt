@@ -1,0 +1,14 @@
+$ npm test -- src/flight-learn-local-diagnosis-model.test.ts src/flight-learn-inbox.test.ts src/pi-extension.test.ts
+
+> pi-flight-recorder@0.1.0 test
+> vitest run src/flight-learn-local-diagnosis-model.test.ts src/flight-learn-inbox.test.ts src/pi-extension.test.ts
+
+
+ RUN  v4.1.7 <repo>
+
+
+ Test Files  3 passed (3)
+      Tests  69 passed (69)
+   Start at  06:50:28
+   Duration  2.53s (transform 511ms, setup 0ms, import 590ms, tests 2.24s, environment 0ms)
+

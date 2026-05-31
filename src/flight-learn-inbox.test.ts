@@ -116,10 +116,45 @@ function localPolishResult(overrides: Partial<LocalDiagnosisPolishResult> = {}):
       limits: [],
     },
     usedLocalModel: true,
+    displayState: "validated",
+    narrativeStatus: "none",
     fallbackReason: null,
     validationIssue: null,
     ...overrides,
   };
+}
+
+function narrativeLocalPolishResult(): LocalDiagnosisPolishResult {
+  return localPolishResult({
+    displayState: "accepted-narrative",
+    narrativeStatus: "accepted",
+    view: {
+      headline: "Validation kept running from a stale shell.",
+      whatHappened: "The accepted local narrative ties together repeated validation failures from redacted facts. It explains that the same check was rerun after the package changed, so the card is about validation trust rather than a separate code failure.",
+      whyItMatters: "A fuller narrative helps the reviewer understand why this deserves attention without changing the review choices.",
+      expectedBehavior: "Validation should run from a fresh project shell after package changes.",
+      rawClue: "deterministic raw clue remains secondary",
+      confidence: "medium",
+      limits: ["Optional local model narrative was accepted by the local judge for display-only wording; stored delta fields, routing, and artifacts were not changed."],
+    },
+  });
+}
+
+function draftLocalPolishResult(): LocalDiagnosisPolishResult {
+  return localPolishResult({
+    displayState: "draft",
+    narrativeStatus: "draft",
+    validationIssue: "local narrative judge rejected the narrative",
+    view: {
+      headline: "A draft says validation kept running from a stale shell.",
+      whatHappened: "The draft ties repeated validation failures to an old shell after the package changed. It is useful reading help, but it has not been accepted by the local judge.",
+      whyItMatters: "The draft may help the reviewer understand the card while deterministic facts remain authoritative.",
+      expectedBehavior: "Validation should run from a fresh project shell after package changes.",
+      rawClue: "deterministic raw clue remains secondary",
+      confidence: "medium",
+      limits: ["Local LLM draft was shown as non-authoritative reading help; deterministic facts, storage, routing, and artifacts remain the source of truth."],
+    },
+  });
 }
 
 function rawCommandInput(): FlightLearnDeltaInboxInput {
@@ -287,6 +322,73 @@ describe("Flight Learn custom inbox component", () => {
     expect(input.items[0]!.delta.summary).toContain("Repeated failure pattern");
   });
 
+  it("renders accepted narrative what-happened text as distinct from the concise problem", () => {
+    const input = fixtureInput();
+    input.items[0]!.localDiagnosisPolish = narrativeLocalPolishResult();
+    const results: FlightLearnDeltaInboxResult[] = [];
+    const component = createFlightLearnDeltaInboxComponent({ input, done: (result) => results.push(result), layout: "focused-card" });
+
+    const lines = component.render(88).map(stripAnsi);
+    const output = lines.join("\n");
+    const problemBlock = sectionBetween(lines, "Problem", "What happened?").join("\n");
+    const whatHappenedBlock = sectionBetween(lines, "What happened?", "Why it matters").join("\n");
+
+    expect(output).toContain("Local model narrative accepted by local judge; deterministic fallback available.");
+    expect(problemBlock).toContain("Validation kept running from a stale shell.");
+    expect(problemBlock).not.toContain("accepted local narrative ties together");
+    expect(whatHappenedBlock).toContain("The accepted local narrative ties together repeated validation failures");
+    expect(whatHappenedBlock).toContain("the card is about validation trust rather than a separate code failure.");
+    expect(whatHappenedBlock).not.toContain("Deterministic what happened.");
+    expect(output).toContain("Choose a follow-up");
+    for (const line of lines) expect(line.length).toBeLessThanOrEqual(88);
+    for (const line of whatHappenedBlock.split("\n")) expect(line.length).toBeLessThanOrEqual(86);
+
+    component.handleInput?.("2");
+    component.handleInput?.("\r");
+
+    expect(results).toEqual([
+      expect.objectContaining({ kind: "route-selected", deltaId: "delta-one", artifactType: "test-check" }),
+    ]);
+    expect(input.items[0]!.delta.reality).toBe("The assistant edited repository storage and missed mapper sanitization twice.");
+  });
+
+  it("renders local LLM draft reading help as non-authoritative with deterministic source facts", () => {
+    const input = fixtureInput();
+    input.items[0]!.localDiagnosisPolish = draftLocalPolishResult();
+    const results: FlightLearnDeltaInboxResult[] = [];
+    const component = createFlightLearnDeltaInboxComponent({ input, done: (result) => results.push(result), layout: "focused-card" });
+
+    const lines = component.render(92).map(stripAnsi);
+    const output = lines.join("\n");
+    const sourceFactsBlock = sectionBetween(lines, "Source facts", "Raw clue").join("\n");
+
+    expect(output).toContain("Local LLM draft — facts below are source of truth; not judge-accepted.");
+    expect(output).toContain("A draft says validation kept running from a stale shell.");
+    expect(output).toContain("The draft ties repeated validation failures to an old shell after the package");
+    expect(output).toContain("changed. It is useful reading help");
+    expect(output).toContain("Source facts");
+    expect(sourceFactsBlock).toContain("Problem: Deterministic problem.");
+    expect(sourceFactsBlock).toContain("What happened: Deterministic what happened.");
+    expect(output).toContain("Choose a follow-up");
+    expect(output).toContain("d dismiss");
+    expect(output).toContain("s skip");
+    expect(output).not.toContain("local narrative judge rejected the narrative");
+    for (const line of lines) expect(line.length).toBeLessThanOrEqual(92);
+
+    const narrowOutput = component.render(72).map(stripAnsi).join("\n");
+    expect(narrowOutput).toContain("d dismiss");
+    expect(narrowOutput).toContain("s skip");
+
+    component.handleInput?.("2");
+    component.handleInput?.("\r");
+
+    expect(results).toEqual([
+      expect.objectContaining({ kind: "route-selected", deltaId: "delta-one", artifactType: "test-check" }),
+    ]);
+    expect(input.items[0]!.delta.summary).toContain("Repeated failure pattern");
+    expect(input.items[0]!.delta.reality).not.toContain("draft ties");
+  });
+
   it("falls back to deterministic focused-card text when local model polish is unavailable", () => {
     const input = rawCommandInput();
     input.items[0]!.localDiagnosisPolish = localPolishResult({
@@ -300,6 +402,8 @@ describe("Flight Learn custom inbox component", () => {
         limits: ["Local model phrasing was requested but rejected (timeout); deterministic display text is shown."],
       },
       usedLocalModel: false,
+      displayState: "deterministic",
+      narrativeStatus: "none",
       fallbackReason: "timeout",
       validationIssue: "provider timed out before returning JSON",
     });
@@ -309,6 +413,8 @@ describe("Flight Learn custom inbox component", () => {
 
     expect(output).toContain("Local model unavailable (timed out); deterministic wording shown.");
     expect(output).toContain("A validation command failed repeatedly in this project.");
+    expect(output).toContain("d dismiss");
+    expect(output).toContain("s skip");
     expect(output).not.toContain("provider timed out before returning JSON");
   });
 

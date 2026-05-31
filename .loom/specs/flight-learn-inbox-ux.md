@@ -4,7 +4,7 @@ ID: spec:flight-learn-inbox-ux
 Type: Spec
 Status: active
 Created: 2026-05-25
-Updated: 2026-05-27
+Updated: 2026-05-29
 
 ## Summary
 
@@ -76,7 +76,7 @@ The UI should preserve all existing safety boundaries: candidate generation can 
 - Do not require users to edit YAML/Markdown-like blobs for ordinary delta review.
 - Do not remove CLI/subcommand fallback paths for non-interactive or broken-UI recovery.
 - Do not use hosted services, hosted model calls, or classifier labels as part of the default UI improvement.
-- Do not require a model for `/flight-learn`; optional local model polish must fail closed to deterministic text.
+- Do not require a model for `/flight-learn` safety/recovery. Deterministic fallback must remain available and non-dead-ending, but it is not required to be as rich as the explicitly enabled local-model comprehension path.
 
 ## Requirements
 
@@ -109,6 +109,18 @@ The UI should preserve all existing safety boundaries: candidate generation can 
 - REQ-027: Optional local-model output MUST be structured, validated, length-bounded, and treated as display-only phrasing. Invalid, hallucinated, over-specific, secret-looking, or schema-invalid output MUST be rejected in favor of deterministic text.
 - REQ-028: Optional local-model polish MUST NOT affect artifact routing, route ranking, classifier behavior, delta status, stored `ExpectationDelta` fields, artifact candidates, source files, Loom records, rules, skills, or prompts. It may only change the displayed diagnosis wording for the current review screen.
 - REQ-029: When local-model polish is used, the UI SHOULD disclose it unobtrusively, for example with a small secondary line such as `Local model phrasing; deterministic fallback available`, without making the wording look authoritative.
+- REQ-030: `Problem` and `What happened?` SHOULD carry different jobs. `Problem` should be a concise diagnosis headline; `What happened?` should explain the sequence or pattern that led to the diagnosis. The UI SHOULD avoid rendering the same idea in both sections when evidence supports a richer explanation.
+- REQ-031: Optional local-model polish MAY use a small local model, such as Bonsai 4B Q1_0 GGUF when explicitly configured, to generate a longer `What happened?` narrative. That narrative SHOULD be 2-4 concise sentences or an equivalent short paragraph, grounded in the bounded fact packet, and more informative than the deterministic headline.
+- REQ-032: A local-model `What happened?` narrative MUST remain display-only and safety-bounded. It MUST NOT include raw commands, raw local paths, session file paths, secrets, stack traces, full transcript text, route advice, artifact/rule/ticket/source mutation instructions, classifier/ranking claims, or unsupported concrete facts. Invalid or unsafe narratives MUST fall back to deterministic wording.
+- REQ-033: `/flight-learn` comprehension validation MAY treat explicitly enabled local-model narrative as the intended usable path. Deterministic fallback remains the safety and recovery path, not a feature-parity requirement.
+- REQ-034: Deterministic fallback MUST remain non-dead-ending: it must preserve route/observe/dismiss/skip options, show an honest fallback/limitation state when model wording is unavailable or rejected, and keep redacted evidence inspectable enough that the operator is not trapped.
+- REQ-035: The model-enabled comprehension path SHOULD be judged by whether the operator can answer, from the focused card without decoding raw evidence first: what happened, why it matters, and which artifact route or observe/no-artifact outcome is appropriate.
+- REQ-036: Corpus/outcome collection for classifier readiness SHOULD begin only after comprehension validation shows cards are understandable enough for confident human routing. Collecting labels from misunderstood cards is worse than delaying collection.
+- REQ-037: The UI MAY show an explicitly labeled local LLM draft explanation when the operator has already opted into the local model path via existing local-model flags/config, even if that draft has not been promoted to a judge-accepted narrative. This draft is for human reading help only.
+- REQ-038: A local LLM draft explanation MUST pass hard display gates before rendering: parseable/schema-compatible output, bounded length, known fact references where references are provided, no raw local paths or session paths, no secrets, no stack traces, no prompt/transcript text, no route/action advice, no artifact/rule/ticket/source mutation instructions, no classifier/ranking claims, and no hosted/non-loopback calls.
+- REQ-039: A local LLM draft explanation MUST be visually and semantically distinct from an accepted narrative. The card should label it with language such as `Local LLM draft — facts below are source of truth`, and should not imply verifier/judge acceptance.
+- REQ-040: A local LLM draft explanation MUST NOT persist as stored delta truth, update artifact candidates, rank routes, create rules/docs/source/Loom records, feed classifier labels, or change any routing/storage side effect. It may only help the operator read the current card.
+- REQ-041: The stricter accepted-narrative path remains available as an upgrade when verifier/judge acceptance succeeds, but it MUST NOT block draft comprehension when the operator has explicitly opted into local model reading help and hard draft display gates pass.
 
 ## Scenarios
 
@@ -203,6 +215,45 @@ THEN the card uses deterministic diagnosis text
 AND the UI or debug output records an honest local-model fallback reason without interrupting review
 AND no route/storage/artifact side effects occur.
 
+### SCN-010: Local 4B narrative makes What happened distinct
+
+Exercises: REQ-024, REQ-026, REQ-027, REQ-028, REQ-029, REQ-030, REQ-031, REQ-032
+
+GIVEN a pending detector-created delta whose deterministic `Problem` and `What happened?` are nearly repetitive
+AND the operator explicitly enables an approved local Bonsai 4B Q1_0 GGUF runtime
+WHEN `/flight-learn` renders the focused card
+THEN `Problem` remains a concise diagnosis headline
+AND `What happened?` may be a bounded narrative that explains the recurrence or sequence behind the issue
+AND the narrative is visibly more informative than repeating the headline
+AND invalid, unsafe, unsupported, slow, or unavailable model output falls back to deterministic text
+AND no routing, storage, artifact candidate, rule, source, docs, Loom, skill, prompt, or classifier side effect occurs.
+
+### SCN-011: Model-enabled card is the comprehension bar
+
+Exercises: REQ-033, REQ-034, REQ-035, REQ-036
+
+GIVEN deterministic fallback remains available and safe
+AND the operator explicitly enables an approved local narrative model path
+WHEN `/flight-learn` renders representative focused cards
+THEN the model-enabled card is evaluated as the intended comprehension experience
+AND the operator can explain what happened, why it matters, and what route or observe/no-artifact decision fits
+AND fallback cards disclose their limitation and still allow route/observe/dismiss/skip/evidence inspection
+AND corpus/outcome collection does not start from cards the operator cannot confidently interpret.
+
+### SCN-012: Local LLM draft helps comprehension without acceptance claims
+
+Exercises: REQ-037, REQ-038, REQ-039, REQ-040, REQ-041
+
+GIVEN the constrained accepted-narrative judge path has not produced accepted narratives for the current local runtime
+AND the operator explicitly enables the existing local-model path
+AND the local model returns a schema-compatible draft that passes hard display gates
+WHEN `/flight-learn` renders the focused card
+THEN the card may show the draft as local LLM reading help
+AND the card labels the draft as non-authoritative and not judge-accepted
+AND deterministic facts/evidence remain visible as source of truth
+AND route/observe/dismiss/skip actions remain human-controlled
+AND no stored delta, artifact candidate, route ranking, rule, source, docs, Loom, skill, prompt, or classifier state changes because the draft was displayed.
+
 ## Evidence Plan
 
 - REQ-001 through REQ-007 / SCN-001 through SCN-003: fake-Pi command/component tests prove `/flight-learn` opens the custom inbox for pending deltas, selection/edit/route/dismiss/skip flows store the same safe records as the old flow, and no durable artifact mutation occurs.
@@ -213,6 +264,9 @@ AND no route/storage/artifact side effects occur.
 - REQ-015 through REQ-018 / SCN-006: render artifacts and tests should compare the focused-card layout against a representative multi-delta fixture and show that pending queue, primary diagnosis, secondary evidence/signals, and active route selection have separate visual hierarchy.
 - REQ-019 through REQ-023 / SCN-007: deterministic view-model tests should cover detector-created deltas with raw commands, cluster IDs, user corrections, stale edit attempts, missing evidence, and human-authored fields. Render artifacts should show that primary diagnosis text is plain-English, raw details are secondary, and prose wraps at a readable measure while staying width-safe.
 - REQ-024 through REQ-029 / SCN-008 and SCN-009: tests should use fake local-model providers/runtimes to prove bounded redacted prompt construction, JSON schema validation, timeout/error fallback, unsafe-output rejection, display-only integration, and no storage/routing side effects. Before release claims about real local-model behavior, capture a disposable real local runtime smoke with an explicitly installed/authorized local model or record the validation as blocked.
+- REQ-030 through REQ-032 / SCN-010: narrative-specific tests and artifacts should prove `Problem` and `What happened?` are not duplicate sections when local narrative polish is accepted, the local-model narrative is grounded in bounded facts, and unsafe/unsupported/slow/unavailable narrative output falls back without side effects. Real Bonsai 4B evidence should include both structured corpus metrics and at least one redacted focused-card render or Pi TUI capture showing the longer narrative in context.
+- REQ-033 through REQ-036 / SCN-011: comprehension validation should include rendered model-enabled and fallback cards plus operator-facing review notes that answer whether the card can be understood and routed without first decoding raw evidence. Evidence should distinguish schema/verifier success from comprehension success and should block corpus/outcome collection if the operator cannot confidently explain the card.
+- REQ-037 through REQ-041 / SCN-012: local draft comprehension evidence should include tests and render artifacts for a draft explanation that passes hard display gates but is not judge-accepted, plus rejected draft cases for raw path/session/secret/prompt/route/mutation/overlong/unknown-fact content. Evidence must prove draft display has no storage/routing/artifact/source/Loom/classifier side effects.
 - Visual UX claim: before strong release claims, capture at least one real interactive Pi TUI screenshot or ANSI log showing the custom inbox with representative data.
 
 ## Open Questions
@@ -222,6 +276,7 @@ AND no route/storage/artifact side effects occur.
 - Should route recommendations be ranked? Recommendation: route cards can group likely/default-safe choices, but avoid classifier-like ranking language until routed/outcome corpus exists.
 - Should the split-pane layout be polished further or replaced? Recommendation: replace it for the primary review path. The current screenshots show that the split-pane shape itself creates the cognitive-load problem; further border/copy tweaks are likely incremental.
 - Which local model runtime should optional diagnosis polish use? Recommendation: research local/open-source options first and choose a small explicit runtime adapter with deterministic fallback, no automatic model downloads, and no hosted/network dependency.
+- How permissive should the support validator be for narrative `What happened?` text? Recommendation: keep raw path/secret/action/route checks strict, but evaluate a field-specific narrative rubric instead of treating every new explanatory token as an unsupported-fact failure.
 
 ## Quality Bar
 
@@ -234,7 +289,7 @@ Problem
   A validation command failed repeatedly from the wrong project or shell context.
 
 What happened?
-  Pi saw the same validation-failure pattern twice in recent sessions.
+  Pi saw the same validation-failure pattern twice in recent sessions. The failed checks happened close enough together that the card is treating them as one recurring workflow issue rather than an isolated command failure. The details are still hidden behind evidence so the operator can inspect the raw command only if needed.
 
 Why it matters
   Repeated setup/cwd friction makes it harder to trust whether the latest code actually passed.
@@ -347,7 +402,7 @@ Non-examples:
 - For primary prose, prefer a readable measure over using the whole terminal width. Use Pi TUI wrapping utilities or an equivalent width-safe local wrapper so plain-English paragraphs do not become one-line/truncated command walls.
 - Prefer built-in Pi TUI components such as `SelectList`, `Markdown`, `Container`, `Text`, and `DynamicBorder` before building custom primitives from scratch.
 - Preserve local-first privacy, redaction, and human gates from `spec:delta-artifact-learning-loop`.
-- Optional model polish must be local/open-source, explicit, bounded, timeout-protected, and safe to disable without changing normal `/flight-learn` behavior.
+- Optional model polish must be local/open-source, explicit, bounded, timeout-protected, and safe to disable without corrupting or blocking `/flight-learn`. It may define the richer intended comprehension path once explicitly enabled, while deterministic fallback remains safe and non-dead-ending.
 - Preserve the two-command visible surface from `spec:visible-command-surface`.
 - Do not make visual quality claims without visual evidence.
 
@@ -358,5 +413,7 @@ Non-examples:
 - `ticket:20260525-streamlined-learning-inbox-command` - created the current functional but primitive one-command flow.
 - `ticket:20260525-collapse-visible-command-surface` - collapsed visible commands; this UX work builds on that surface.
 - `evidence:20260527-flight-learn-plain-english-feedback` - operator screenshot/feedback showing that focused-card layout improved but primary diagnosis text remains too code-heavy and one-line/truncated.
+- `research:20260529-llama-cpp-constrained-json` - records constrained-output route tradeoffs for local narrative generation.
+- `evidence:20260529-llama-cpp-constrained-json-probe` - proves the installed local Bonsai 4B/llama.cpp path can enforce the narrative JSON shape at generator time.
 - `/Users/crlough/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/docs/tui.md` - Pi TUI capabilities and component constraints.
 - `/Users/crlough/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/docs/extensions.md` - extension UI APIs, command handlers, and custom UI integration.

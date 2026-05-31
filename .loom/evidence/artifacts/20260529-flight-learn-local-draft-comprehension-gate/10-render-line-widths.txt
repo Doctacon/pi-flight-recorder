@@ -1,0 +1,4 @@
+06-render-draft-card-92.txt: max=84, width=92, pass=true
+07-render-fallback-card-92.txt: max=81, width=92, pass=true
+08-render-draft-card-72.txt: max=70, width=72, pass=true
+09-render-fallback-card-72.txt: max=72, width=72, pass=true

@@ -1,0 +1,37 @@
+# Real Bonsai 4B validation focused-card fallback render
+Flight Learn — Issue 1 of 1
+1 pending · 1 evidence ref · ↑/↓ changes issue
+Local model unavailable (invalid JSON); deterministic wording shown.
+
+Problem
+ A repeated workflow problem showed up across recent sessions.
+
+What happened?
+ The same failure pattern was observed twice in recent sessions.
+
+Why it matters
+ Repeating the same idea in Problem and What happened makes the focused card less
+ useful.
+
+Expected
+ Recurring workflow friction should be summarized without exposing raw evidence by
+ default.
+
+Why suggested
+ No detector signal recorded. Route only if the issue is still clear from the summary
+ and evidence.
+
+Evidence
+ 1 ref hidden by default — press v to view concise refs.
+
+Choose a follow-up
+▶ [1] Observe
+ Keep evidence and watch recurrence without creating an artifact.
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose · e edit · v evidence · d...
+
+# Line length check
+{
+  "maxLineLength": 88,
+  "lineCount": 30
+}

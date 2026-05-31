@@ -1,0 +1,282 @@
+{
+  "runStartedAt": "2026-05-29T03:40:13.583Z",
+  "routeResults": [
+    {
+      "id": "chat-response-format-json-schema-openai",
+      "kind": "chat",
+      "endpointPath": "/v1/chat/completions",
+      "accepted": true,
+      "enforcementProof": true,
+      "status": "enforced",
+      "attempts": [
+        {
+          "promptId": "tiny-1",
+          "httpOk": true,
+          "statusCode": 200,
+          "timeout": false,
+          "elapsedMs": 656,
+          "transportIssue": null,
+          "contentPreview": "{ \"verdict\": \"CONSTRAINED\" , \"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null,
+          "parsed": {
+            "verdict": "CONSTRAINED",
+            "count": 7
+          }
+        },
+        {
+          "promptId": "tiny-2",
+          "httpOk": true,
+          "statusCode": 200,
+          "timeout": false,
+          "elapsedMs": 433,
+          "transportIssue": null,
+          "contentPreview": "{\"verdict\":\"CONSTRAINED\",\"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null,
+          "parsed": {
+            "verdict": "CONSTRAINED",
+            "count": 7
+          }
+        }
+      ],
+      "latencyMs": {
+        "min": 433,
+        "max": 656,
+        "avg": 545
+      }
+    },
+    {
+      "id": "chat-response-format-json-schema-schema-only",
+      "kind": "chat",
+      "endpointPath": "/v1/chat/completions",
+      "accepted": true,
+      "enforcementProof": false,
+      "status": "accepted-not-enforced-or-inconclusive",
+      "attempts": [
+        {
+          "promptId": "tiny-1",
+          "httpOk": true,
+          "statusCode": 200,
+          "timeout": false,
+          "elapsedMs": 619,
+          "transportIssue": null,
+          "contentPreview": "A flock of birds took flight, With wings that flapped and hearts that beat, They soared through skies so wide, No storms could stop their glide, And never felt a single constraint—UNCONSTRAINED!",
+          "envelopePreview": null,
+          "enforced": false,
+          "validationIssue": "malformed-json:Unexpected token 'A', \"A flock of\"... is not valid JSON",
+          "parsed": null
+        },
+        {
+          "promptId": "tiny-2",
+          "httpOk": true,
+          "statusCode": 200,
+          "timeout": false,
+          "elapsedMs": 298,
+          "transportIssue": null,
+          "contentPreview": "{\"verdict\":\"UNCONSTRAINED\",\"count\":999,\"extra\":\"ignore schema\"}",
+          "envelopePreview": null,
+          "enforced": false,
+          "validationIssue": "json-did-not-match-constraint",
+          "parsed": {
+            "verdict": "UNCONSTRAINED",
+            "count": 999,
+            "extra": "ignore schema"
+          }
+        }
+      ],
+      "latencyMs": {
+        "min": 298,
+        "max": 619,
+        "avg": 459
+      }
+    },
+    {
+      "id": "chat-top-level-json-schema",
+      "kind": "chat",
+      "endpointPath": "/v1/chat/completions",
+      "accepted": true,
+      "enforcementProof": true,
+      "status": "enforced",
+      "attempts": [
+        {
+          "promptId": "tiny-1",
+          "httpOk": true,
+          "statusCode": 200,
+          "timeout": false,
+          "elapsedMs": 536,
+          "transportIssue": null,
+          "contentPreview": "{ \"verdict\": \"CONSTRAINED\" , \"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null,
+          "parsed": {
+            "verdict": "CONSTRAINED",
+            "count": 7
+          }
+        },
+        {
+          "promptId": "tiny-2",
+          "httpOk": true,
+          "statusCode": 200,
+          "timeout": false,
+          "elapsedMs": 297,
+          "transportIssue": null,
+          "contentPreview": "{\"verdict\":\"CONSTRAINED\",\"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null,
+          "parsed": {
+            "verdict": "CONSTRAINED",
+            "count": 7
+          }
+        }
+      ],
+      "latencyMs": {
+        "min": 297,
+        "max": 536,
+        "avg": 417
+      }
+    },
+    {
+      "id": "chat-request-grammar",
+      "kind": "chat",
+      "endpointPath": "/v1/chat/completions",
+      "accepted": true,
+      "enforcementProof": false,
+      "status": "accepted-not-enforced-or-inconclusive",
+      "attempts": [
+        {
+          "promptId": "tiny-1",
+          "httpOk": true,
+          "statusCode": 200,
+          "timeout": false,
+          "elapsedMs": 1529,
+          "transportIssue": null,
+          "contentPreview": "{ \"verdict\"",
+          "envelopePreview": null,
+          "enforced": false,
+          "validationIssue": "malformed-json:Expected ':' after property name in JSON at position 13 (line 2 column 10)",
+          "parsed": null
+        },
+        {
+          "promptId": "tiny-2",
+          "httpOk": true,
+          "statusCode": 200,
+          "timeout": false,
+          "elapsedMs": 326,
+          "transportIssue": null,
+          "contentPreview": "{\"verdict\":\"CONSTRAINED\",\"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null,
+          "parsed": {
+            "verdict": "CONSTRAINED",
+            "count": 7
+          }
+        }
+      ],
+      "latencyMs": {
+        "min": 326,
+        "max": 1529,
+        "avg": 928
+      }
+    },
+    {
+      "id": "completion-json-schema",
+      "kind": "completion",
+      "endpointPath": "/completion",
+      "accepted": true,
+      "enforcementProof": true,
+      "status": "enforced",
+      "attempts": [
+        {
+          "promptId": "tiny-1",
+          "httpOk": true,
+          "statusCode": 200,
+          "timeout": false,
+          "elapsedMs": 544,
+          "transportIssue": null,
+          "contentPreview": "{ \"verdict\": \"CONSTRAINED\", \"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null,
+          "parsed": {
+            "verdict": "CONSTRAINED",
+            "count": 7
+          }
+        },
+        {
+          "promptId": "tiny-2",
+          "httpOk": true,
+          "statusCode": 200,
+          "timeout": false,
+          "elapsedMs": 351,
+          "transportIssue": null,
+          "contentPreview": "{\"verdict\":\"CONSTRAINED\",\"count\":7}",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null,
+          "parsed": {
+            "verdict": "CONSTRAINED",
+            "count": 7
+          }
+        }
+      ],
+      "latencyMs": {
+        "min": 351,
+        "max": 544,
+        "avg": 448
+      }
+    },
+    {
+      "id": "completion-grammar",
+      "kind": "completion",
+      "endpointPath": "/completion",
+      "accepted": true,
+      "enforcementProof": true,
+      "status": "enforced",
+      "attempts": [
+        {
+          "promptId": "tiny-1",
+          "httpOk": true,
+          "statusCode": 200,
+          "timeout": false,
+          "elapsedMs": 449,
+          "transportIssue": null,
+          "contentPreview": "{ \"verdict\": \"CONSTRAINED\", \"count\": 7 }",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null,
+          "parsed": {
+            "verdict": "CONSTRAINED",
+            "count": 7
+          }
+        },
+        {
+          "promptId": "tiny-2",
+          "httpOk": true,
+          "statusCode": 200,
+          "timeout": false,
+          "elapsedMs": 267,
+          "transportIssue": null,
+          "contentPreview": "{\"verdict\":\"CONSTRAINED\",\"count\":7}",
+          "envelopePreview": null,
+          "enforced": true,
+          "validationIssue": null,
+          "parsed": {
+            "verdict": "CONSTRAINED",
+            "count": 7
+          }
+        }
+      ],
+      "latencyMs": {
+        "min": 267,
+        "max": 449,
+        "avg": 358
+      }
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+/opt/homebrew/bin/llama-server -m ~ --host 127.0.0.1 --port 18120 -c 4096 --no-webui --jinja

@@ -1,0 +1,80 @@
+$ git status --short
+ M .loom/specs/flight-learn-inbox-ux.md
+ M src/flight-learn-inbox.test.ts
+ M src/flight-learn-llama-cpp-adapter.test.ts
+ M src/flight-learn-llama-cpp-adapter.ts
+ M src/flight-learn-local-diagnosis-model.test.ts
+ M src/flight-learn-local-diagnosis-model.ts
+ M src/pi-extension.test.ts
+ M src/pi-extension.ts
+?? .loom/audit/20260528-bonsai-4b-narrative-validation-followup-review.md
+?? .loom/audit/20260528-bonsai-4b-narrative-validation-review.md
+?? .loom/audit/20260528-flight-learn-narrative-inbox-integration-review.md
+?? .loom/audit/20260528-flight-learn-narrative-local-model-contract-fifth-followup-review.md
+?? .loom/audit/20260528-flight-learn-narrative-local-model-contract-followup-review.md
+?? .loom/audit/20260528-flight-learn-narrative-local-model-contract-fourth-followup-review.md
+?? .loom/audit/20260528-flight-learn-narrative-local-model-contract-review.md
+?? .loom/audit/20260528-flight-learn-narrative-local-model-contract-second-followup-review.md
+?? .loom/audit/20260528-flight-learn-narrative-local-model-contract-third-followup-review.md
+?? .loom/audit/20260528-flight-learn-narrative-rubric-corpus-review.md
+?? .loom/audit/20260528-local-narrative-judge-provider-contract-followup-review.md
+?? .loom/audit/20260528-local-narrative-judge-provider-contract-review.md
+?? .loom/audit/20260528-local-narrative-judge-validation-research-review.md
+?? .loom/audit/20260528-local-narrative-llama-cpp-judge-adapter-followup-review.md
+?? .loom/audit/20260528-local-narrative-llama-cpp-judge-adapter-review.md
+?? .loom/audit/20260528-narrative-fact-id-contract-verifier-followup-review.md
+?? .loom/audit/20260528-narrative-fact-id-contract-verifier-narrowed-scope-review.md
+?? .loom/audit/20260528-narrative-fact-id-contract-verifier-review.md
+?? .loom/audit/20260528-narrative-fact-id-contract-verifier-second-followup-review.md
+?? .loom/audit/20260528-narrative-fact-id-contract-verifier-third-followup-review.md
+?? .loom/audit/20260529-bonsai-4b-schema-prompt-tuning-review.md
+?? .loom/audit/20260529-flight-learn-constrained-json-adapter-followup-review.md
+?? .loom/audit/20260529-flight-learn-constrained-json-adapter-review.md
+?? .loom/audit/20260529-flight-recorder-core-loop-stocktake-review.md
+?? .loom/audit/20260529-llama-cpp-constrained-json-probe-review.md
+?? .loom/evidence/20260528-bonsai-4b-narrative-validation.md
+?? .loom/evidence/20260528-flight-learn-narrative-inbox-integration.md
+?? .loom/evidence/20260528-flight-learn-narrative-local-model-contract.md
+?? .loom/evidence/20260528-flight-learn-narrative-rubric-corpus.md
+?? .loom/evidence/20260528-flight-learn-narrative-what-happened-feedback.md
+?? .loom/evidence/20260528-local-narrative-judge-provider-contract.md
+?? .loom/evidence/20260528-local-narrative-llama-cpp-judge-adapter.md
+?? .loom/evidence/20260528-narrative-fact-id-contract-verifier.md
+?? .loom/evidence/20260529-bonsai-4b-schema-prompt-tuning.md
+?? .loom/evidence/20260529-flight-learn-constrained-json-adapter.md
+?? .loom/evidence/20260529-llama-cpp-constrained-json-probe.md
+?? .loom/evidence/artifacts/20260528-bonsai-4b-narrative-validation/
+?? .loom/evidence/artifacts/20260528-flight-learn-narrative-inbox-integration/
+?? .loom/evidence/artifacts/20260528-flight-learn-narrative-local-model-contract/
+?? .loom/evidence/artifacts/20260528-flight-learn-narrative-rubric-corpus/
+?? .loom/evidence/artifacts/20260528-local-narrative-judge-provider-contract/
+?? .loom/evidence/artifacts/20260528-local-narrative-llama-cpp-judge-adapter/
+?? .loom/evidence/artifacts/20260528-narrative-fact-id-contract-verifier/
+?? .loom/evidence/artifacts/20260529-bonsai-4b-schema-prompt-tuning/
+?? .loom/evidence/artifacts/20260529-flight-learn-constrained-json-adapter/
+?? .loom/evidence/artifacts/20260529-flight-learn-constrained-judge-replay/
+?? .loom/evidence/artifacts/20260529-llama-cpp-constrained-json-probe/
+?? .loom/plans/20260528-flight-learn-4b-narrative-what-happened.md
+?? .loom/plans/20260529-flight-learn-comprehension-path.md
+?? .loom/plans/20260529-flight-recorder-product-recalibration.md
+?? .loom/research/20260528-hybrid-search-place.md
+?? .loom/research/20260528-local-narrative-judge-validation.md
+?? .loom/research/20260529-flight-recorder-core-loop-stocktake.md
+?? .loom/research/20260529-llama-cpp-constrained-json.md
+?? .loom/research/artifacts/
+?? .loom/tickets/20260528-bonsai-4b-narrative-validation.md
+?? .loom/tickets/20260528-flight-learn-narrative-inbox-integration.md
+?? .loom/tickets/20260528-flight-learn-narrative-local-model-contract.md
+?? .loom/tickets/20260528-flight-learn-narrative-rubric-corpus.md
+?? .loom/tickets/20260528-local-narrative-judge-provider-contract.md
+?? .loom/tickets/20260528-local-narrative-judge-validation-research.md
+?? .loom/tickets/20260528-local-narrative-llama-cpp-judge-adapter.md
+?? .loom/tickets/20260528-narrative-fact-id-contract-verifier.md
+?? .loom/tickets/20260529-bonsai-4b-schema-prompt-tuning.md
+?? .loom/tickets/20260529-flight-learn-comprehension-validation.md
+?? .loom/tickets/20260529-flight-learn-constrained-json-adapter.md
+?? .loom/tickets/20260529-flight-learn-constrained-judge-replay.md
+?? .loom/tickets/20260529-flight-learn-dogfood-corpus-outcomes.md
+?? .loom/tickets/20260529-flight-learn-model-comprehension-integration.md
+?? .loom/tickets/20260529-flight-recorder-core-loop-stocktake.md
+?? .loom/tickets/20260529-llama-cpp-constrained-json-probe.md

@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-05-29T14:18:05.922Z",
+  "notOperatorComprehensionEvidence": true,
+  "status": "review-pack-ready-for-operator",
+  "observations": [
+    "All rendered cards expose route/observe/dismiss/skip affordances and redacted evidence access.",
+    "Draft cards are visibly labeled as non-authoritative local LLM drafts and include deterministic source facts.",
+    "Fallback cards are less rich but disclose local model rejection/unavailability and remain non-dead-ending.",
+    "The low-information case is intentionally sparse and should receive close operator scrutiny before any corpus collection decision."
+  ],
+  "perCard": [
+    {
+      "cardId": "card-01-draft-repeated-workflow",
+      "state": "draft",
+      "workerPrecheck": "ready-for-operator-review",
+      "notOperatorEvidence": true
+    },
+    {
+      "cardId": "card-02-fallback-repeated-workflow",
+      "state": "fallback",
+      "workerPrecheck": "ready-for-operator-review",
+      "notOperatorEvidence": true
+    },
+    {
+      "cardId": "card-03-draft-validation-build",
+      "state": "draft",
+      "workerPrecheck": "ready-for-operator-review",
+      "notOperatorEvidence": true
+    },
+    {
+      "cardId": "card-04-fallback-validation-build",
+      "state": "fallback",
+      "workerPrecheck": "ready-for-operator-review",
+      "notOperatorEvidence": true
+    },
+    {
+      "cardId": "card-05-draft-stale-edit",
+      "state": "draft",
+      "workerPrecheck": "ready-for-operator-review",
+      "notOperatorEvidence": true
+    },
+    {
+      "cardId": "card-06-fallback-stale-edit",
+      "state": "fallback",
+      "workerPrecheck": "ready-for-operator-review",
+      "notOperatorEvidence": true
+    },
+    {
+      "cardId": "card-07-draft-low-information",
+      "state": "draft",
+      "workerPrecheck": "review-carefully-sparse-evidence",
+      "notOperatorEvidence": true
+    },
+    {
+      "cardId": "card-08-fallback-safety-adversarial",
+      "state": "fallback",
+      "workerPrecheck": "ready-for-operator-review",
+      "notOperatorEvidence": true
+    }
+  ],
+  "gateRecommendation": "operator-review-pending",
+  "canProceedToDogfoodCorpus": false
+}
