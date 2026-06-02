@@ -1,0 +1,36 @@
+Flight Learn — Issue 1 of 1
+1 pending · 1 evidence ref · ↑/↓ changes issue
+Local model draft rejected (unsafe wording); deterministic wording
+shown.
+
+Problem
+ Unknown expected behavior should not be invented
+
+What happened?
+ The review lacked enough information about intended behavior.
+
+Why it matters
+ Inventing expected behavior would mislead routing.
+
+Expected
+ Pi does not know the intended behavior yet — press e to add it.
+
+Why this was flagged
+ Pi grouped this as a recurring local issue from 1 redacted evidence
+ ref. Expand evidence to inspect concise refs before routing.
+
+Evidence
+ 1 ref hidden by default — press v to inspect concise refs.
+
+Choose a follow-up
+▶ [1] Code legibility
+ Use when confusing source shape caused repeated mistakes
+ [2] Test/check
+ Use when a missing or weak validation check would have caught this
+ [3] Flight Rule
+ Use when Pi needs reusable guidance, still requiring approval later
+ [4] Observe
+ Keep evidence and watch recurrence without creating an artifact
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose
+Actions: e edit · v evidence · d dismiss · s skip · q quit

@@ -122,6 +122,10 @@ function citedWhatHappened(sentences: string | string[], factIds = ["F1"]): { se
   };
 }
 
+function citedDisplayText(text: string, factIds: string[]): { text: string; factIds: string[] } {
+  return { text, factIds };
+}
+
 describe("local diagnosis model contract harness", () => {
   it("keeps deterministic diagnosis as the default and unavailable-provider fallback", async () => {
     const input = { delta: delta(), signals: [signal()] };
@@ -201,6 +205,48 @@ describe("local diagnosis model contract harness", () => {
     expect(JSON.stringify(judgeRequest)).not.toContain("session.jsonl");
     expect(judgeRequest.prompt).toContain("veto-only");
     expect(judgeRequest.prompt).not.toContain("/Users/alice");
+  });
+
+  it("accepts all-field card-copy response as display-only wording", async () => {
+    const input = { delta: delta(), signals: [signal()] };
+    const before = JSON.stringify(input.delta);
+    const capturedRequests: LocalDiagnosisPolishRequest[] = [];
+    const capturedJudgeRequests: LocalNarrativeJudgeRequest[] = [];
+    const provider: LocalDiagnosisPolishProvider = {
+      completeLocalDiagnosisPolish: async (request) => {
+        capturedRequests.push(request);
+        return localResponse({
+          headline: "Validation was rerun from an old shell after the package changed.",
+          whatHappened: citedWhatHappened("The same local validation check failed after a stale shell reran it.", ["F2", "F7", "F10"]),
+          whyItMatters: "That makes the validation result hard to trust.",
+          expectedBehavior: "Run validation from a fresh project shell.",
+          whyThisWasFlagged: citedDisplayText("Pi saw 2 related validation failures from the same stale shell pattern.", ["F9", "F10"]),
+          evidenceSummary: citedDisplayText("Validation failed from a stale pane.", ["F21"]),
+        });
+      },
+    };
+
+    const result = await buildFlightLearnDiagnosisViewWithLocalPolish(input, { enabled: true, provider, judgeProvider: acceptingJudgeProvider(capturedJudgeRequests), timeoutMs: 100 });
+
+    expect(result.usedLocalModel).toBe(true);
+    expect(result.displayState).toBe("accepted-narrative");
+    expect(result.fallbackReason).toBeNull();
+    expect(result.view.headline).toBe("Validation was rerun from an old shell after the package changed.");
+    expect(result.view.whatHappened).toBe("The same local validation check failed after a stale shell reran it.");
+    expect(result.view.whyItMatters).toBe("That makes the validation result hard to trust.");
+    expect(result.view.expectedBehavior).toBe("Run validation from a fresh project shell.");
+    expect(result.view.whyThisWasFlagged).toBe("Pi saw 2 related validation failures from the same stale shell pattern.");
+    expect(result.view.evidenceSummary).toBe("Validation failed from a stale pane.");
+    expect(result.deterministicView.whyThisWasFlagged).toBeUndefined();
+    expect(result.deterministicView.evidenceSummary).toBeUndefined();
+    expect(JSON.stringify(input.delta)).toBe(before);
+    expect(capturedRequests).toHaveLength(1);
+    expect(capturedRequests[0]?.prompt).toContain("whyThisWasFlagged");
+    expect(capturedRequests[0]?.prompt).toContain("evidenceSummary");
+    expect(capturedRequests[0]?.prompt).toContain("factIds");
+    expect(capturedRequests[0]?.prompt).toContain("must summarize existing evidence facts only");
+    expect(capturedRequests[0]?.prompt).not.toContain("/Users/alice");
+    expect(capturedJudgeRequests).toHaveLength(1);
   });
 
   it("accepts a fact-cited narrative whatHappened only after the local judge accepts it", async () => {
@@ -964,6 +1010,104 @@ describe("local diagnosis model contract harness", () => {
     );
     expect(noExpectation.usedLocalModel).toBe(false);
     expect(noExpectation.fallbackReason).toBe("unsupported-facts");
+  });
+
+  it("rejects invented expected behavior when no expected-behavior facts exist", async () => {
+    const inputWithoutExpectation = { delta: delta({ expectation: null }), signals: [signal()] };
+
+    const invented = await polishWithResponse(
+      localResponse({
+        headline: "Validation was rerun from an old shell after the package changed.",
+        expectedBehavior: "Run validation from a fresh project shell.",
+      }),
+      inputWithoutExpectation,
+    );
+    expect(invented.usedLocalModel).toBe(false);
+    expect(invented.displayState).toBe("deterministic");
+    expect(invented.fallbackReason).toBe("unsupported-facts");
+    expect(invented.view.expectedBehavior).toBe(invented.deterministicView.expectedBehavior);
+
+    const omitted = await polishWithResponse(
+      localResponse({
+        headline: "Validation was rerun from an old shell after the package changed.",
+        expectedBehavior: null,
+      }),
+      inputWithoutExpectation,
+    );
+    expect(omitted.usedLocalModel).toBe(true);
+    expect(omitted.fallbackReason).toBeNull();
+    expect(omitted.view.expectedBehavior).toBeNull();
+  });
+
+  it("rejects cross-field and inverted expected behavior when an expectation exists", async () => {
+    const crossFieldReality = await polishWithResponse(localResponse({
+      expectedBehavior: "The validation command was rerun from an old shell after the package changed.",
+    }));
+    expect(crossFieldReality.usedLocalModel).toBe(false);
+    expect(crossFieldReality.fallbackReason).toBe("unsupported-facts");
+
+    const inventedContainer = await polishWithResponse(localResponse({
+      expectedBehavior: "Run validation from a clean container.",
+    }));
+    expect(inventedContainer.usedLocalModel).toBe(false);
+    expect(inventedContainer.fallbackReason).toBe("unsupported-facts");
+
+    const inverted = await polishWithResponse(localResponse({
+      expectedBehavior: "Do not run validation from a fresh project shell after reinstalling the package.",
+    }));
+    expect(inverted.usedLocalModel).toBe(false);
+    expect(inverted.fallbackReason).toBe("unsupported-facts");
+
+    const supportedRewrite = await polishWithResponse(localResponse({
+      expectedBehavior: "Run validation from a fresh project shell.",
+    }));
+    expect(supportedRewrite.usedLocalModel).toBe(true);
+    expect(supportedRewrite.fallbackReason).toBeNull();
+    expect(supportedRewrite.view.expectedBehavior).toBe("Run validation from a fresh project shell.");
+  });
+
+  it("rejects invalid evidenceSummary and whyThisWasFlagged support claims", async () => {
+    const generatedEvidence = await polishWithResponse(localResponse({
+      evidenceSummary: citedDisplayText("The model generated a new evidence ref proving the stale shell pattern.", ["F21"]),
+    }));
+    expect(generatedEvidence.usedLocalModel).toBe(false);
+    expect(generatedEvidence.fallbackReason).toBe("unsafe-output");
+
+    const internalEvidence = await polishWithResponse(localResponse({
+      evidenceSummary: citedDisplayText("Reflection cluster cluster_a287ed7cf54be13e confidence 0.74 shows 2 refs.", ["F21"]),
+    }));
+    expect(internalEvidence.usedLocalModel).toBe(false);
+    expect(internalEvidence.fallbackReason).toBe("unsafe-output");
+
+    const nonEvidenceFact = await polishWithResponse(localResponse({
+      evidenceSummary: citedDisplayText("Validation failed from a stale pane.", ["F10"]),
+    }));
+    expect(nonEvidenceFact.usedLocalModel).toBe(false);
+    expect(nonEvidenceFact.fallbackReason).toBe("unsupported-facts");
+
+    const evidenceSummaryWithExpectationOnlyText = await polishWithResponse(localResponse({
+      evidenceSummary: citedDisplayText("Fresh package reinstall was the intended behavior.", ["F21"]),
+    }));
+    expect(evidenceSummaryWithExpectationOnlyText.usedLocalModel).toBe(false);
+    expect(evidenceSummaryWithExpectationOnlyText.fallbackReason).toBe("unsupported-facts");
+
+    const whyFlaggedWithExpectationOnlyText = await polishWithResponse(localResponse({
+      whyThisWasFlagged: citedDisplayText("Fresh package reinstall was the intended behavior.", ["F9"]),
+    }));
+    expect(whyFlaggedWithExpectationOnlyText.usedLocalModel).toBe(false);
+    expect(whyFlaggedWithExpectationOnlyText.fallbackReason).toBe("unsupported-facts");
+
+    const unknownFact = await polishWithResponse(localResponse({
+      whyThisWasFlagged: citedDisplayText("Pi saw 2 related validation failures from the same stale shell pattern.", ["F999"]),
+    }));
+    expect(unknownFact.usedLocalModel).toBe(false);
+    expect(unknownFact.fallbackReason).toBe("unsupported-facts");
+
+    const rawString = await polishWithResponse(localResponse({
+      whyThisWasFlagged: "Pi saw 2 related validation failures from the same stale shell pattern.",
+    }));
+    expect(rawString.usedLocalModel).toBe(false);
+    expect(rawString.fallbackReason).toBe("schema-invalid");
   });
 
   it("rejects modal action phrasing before unsupported-fact checks when action tokens are supported", async () => {

@@ -102,6 +102,8 @@ function localPolishResult(overrides: Partial<LocalDiagnosisPolishResult> = {}):
       whatHappened: "The local model summarized the repeated failure from redacted facts.",
       whyItMatters: "The polished text is easier to scan, but it stays display-only.",
       expectedBehavior: "Use deterministic text if the model is unavailable.",
+      whyThisWasFlagged: "The local model explains why redacted recurrence facts made this issue worth reviewing.",
+      evidenceSummary: "Existing evidence shows repeated review churn around the same source seam.",
       rawClue: "deterministic raw clue remains secondary",
       confidence: "medium",
       limits: ["Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed."],
@@ -133,6 +135,8 @@ function narrativeLocalPolishResult(): LocalDiagnosisPolishResult {
       whatHappened: "The accepted local narrative ties together repeated validation failures from redacted facts. It explains that the same check was rerun after the package changed, so the card is about validation trust rather than a separate code failure.",
       whyItMatters: "A fuller narrative helps the reviewer understand why this deserves attention without changing the review choices.",
       expectedBehavior: "Validation should run from a fresh project shell after package changes.",
+      whyThisWasFlagged: "The accepted local copy says redacted recurrence evidence made this validation issue worth review.",
+      evidenceSummary: "Existing evidence shows the same validation check recurring after package changes.",
       rawClue: "deterministic raw clue remains secondary",
       confidence: "medium",
       limits: ["Optional local model narrative was accepted by the local judge for display-only wording; stored delta fields, routing, and artifacts were not changed."],
@@ -150,6 +154,8 @@ function draftLocalPolishResult(): LocalDiagnosisPolishResult {
       whatHappened: "The draft ties repeated validation failures to an old shell after the package changed. It is useful reading help, but it has not been accepted by the local judge.",
       whyItMatters: "The draft may help the reviewer understand the card while deterministic facts remain authoritative.",
       expectedBehavior: "Validation should run from a fresh project shell after package changes.",
+      whyThisWasFlagged: "The draft says redacted recurrence evidence made this validation issue worth review.",
+      evidenceSummary: "Existing evidence shows the validation check recurring after package changes.",
       rawClue: "deterministic raw clue remains secondary",
       confidence: "medium",
       limits: ["Local LLM draft was shown as non-authoritative reading help; deterministic facts, storage, routing, and artifacts remain the source of truth."],
@@ -241,11 +247,12 @@ describe("Flight Learn custom inbox component", () => {
     expect(output).toContain("Why it matters");
     expect(output).toContain("Expected");
     expect(output).toContain("The assistant should identify the storage/mapper seam before editing.");
-    expect(output).toContain("Raw clue");
-    expect(output).toContain("exact-text edit mismatches");
-    expect(output).toContain("Why suggested");
+    expect(output).toContain("Why this was flagged");
+    expect(output).toContain("Pi grouped this as a recurring local issue from 3 redacted evidence refs.");
+    expect(output).not.toContain("Raw clue");
+    expect(output).not.toContain("Why suggested");
     expect(output).toContain("Evidence");
-    expect(output).toContain("3 refs hidden by default — press v to view concise refs.");
+    expect(output).toContain("3 refs hidden by default — press v to inspect concise refs.");
     expect(output).toContain("Choose a follow-up");
     expect(output).toContain("▶ [2] Test/check");
     expect(output).toContain("Route to a missing or weak validation check");
@@ -261,7 +268,7 @@ describe("Flight Learn custom inbox component", () => {
     expect(expanded).toContain("No, actually the mapper owns this behavior");
   });
 
-  it("renders raw detector text as a plain-English focused-card diagnosis with secondary raw clue", () => {
+  it("renders raw detector text as a plain-English focused-card diagnosis with internals hidden by default", () => {
     const results: FlightLearnDeltaInboxResult[] = [];
     const component = createFlightLearnDeltaInboxComponent({
       input: rawCommandInput(),
@@ -271,27 +278,37 @@ describe("Flight Learn custom inbox component", () => {
 
     const lines = component.render(132).map(stripAnsi);
     const output = lines.join("\n");
-    const primaryBlock = sectionBetween(lines, "Problem", "Raw clue").join("\n");
+    const primaryBlock = sectionBetween(lines, "Problem", "Choose a follow-up").join("\n");
     const primaryContent = primaryBlock
       .split("\n")
-      .filter((line) => line.trim() && !["Problem", "What happened?", "Why it matters", "Expected"].includes(line));
+      .filter((line) => line.trim() && !["Problem", "What happened?", "Why it matters", "Expected", "Why this was flagged", "Evidence"].includes(line));
 
     expect(output).toContain("Problem");
     expect(output).toContain("A validation command failed repeatedly in this project.");
     expect(output).toContain("Pi saw the same validation-failure pattern twice in recent sessions.");
     expect(output).toContain("Repeated validation friction makes it harder to trust whether the latest code");
     expect(output).toContain("actually passed.");
-    expect(output).toContain("Raw clue");
-    expect(output).toContain("npm test");
-    expect(output).toContain("Why suggested");
-    expect(output).toContain("Reflection cluster cluster_73111b7e16551a58");
-    expect(output).not.toContain("Issue\nbash cd");
-    expect(primaryBlock).not.toContain("bash cd");
-    expect(primaryBlock).not.toContain("cluster_73111b7e16551a58");
-    expect(primaryBlock).not.toContain("/Users/alice");
+    expect(output).toContain("Pi does not know the intended behavior yet — press e to add it.");
+    expect(output).toContain("Why this was flagged");
+    expect(output).toContain("Pi grouped this as a recurring local issue from 1 redacted evidence ref.");
+    expect(output).toContain("Evidence");
+    expect(output).toContain("1 ref hidden by default — press v to inspect concise refs.");
+    expect(output).not.toContain("Raw clue");
+    expect(output).not.toContain("Why suggested");
+    expect(output).not.toContain("npm test");
+    expect(output).not.toContain("Reflection cluster cluster_73111b7e16551a58");
+    expect(output).not.toContain("bash cd");
+    expect(output).not.toContain("/Users/alice");
     for (const line of primaryContent) expect(line.length).toBeLessThanOrEqual(86);
     for (const line of lines) expect(line.length).toBeLessThanOrEqual(132);
     expect(results).toEqual([]);
+
+    component.handleInput?.("v");
+    const expanded = component.render(132).map(stripAnsi).join("\n");
+    expect(expanded).toContain("Expanded provenance:");
+    expect(expanded).toContain("reflection-cluster (0.55): Reflection cluster cluster_73111b7e16551a58");
+    expect(expanded).toContain("occurrence/occ-1: bash cd /Users/<user>/Code/personal/pi-flight-recorder");
+    expect(expanded).not.toContain("/Users/alice");
   });
 
   it("renders optional local-model-polished diagnosis as display-only wording with disclosure", () => {
@@ -307,6 +324,11 @@ describe("Flight Learn custom inbox component", () => {
     expect(output).toContain("The local model summarized the repeated failure from redacted facts.");
     expect(output).toContain("The polished text is easier to scan, but it stays display-only.");
     expect(output).toContain("Use deterministic text if the model is unavailable.");
+    expect(output).toContain("Why this was flagged");
+    expect(output).toContain("The local model explains why redacted recurrence facts made this issue worth");
+    expect(output).toContain("Existing evidence shows repeated review churn around the same source seam.");
+    expect(output).not.toContain("Raw clue");
+    expect(output).not.toContain("Why suggested");
 
     component.handleInput?.("2");
     component.handleInput?.("\r");
@@ -360,7 +382,7 @@ describe("Flight Learn custom inbox component", () => {
 
     const lines = component.render(92).map(stripAnsi);
     const output = lines.join("\n");
-    const sourceFactsBlock = sectionBetween(lines, "Source facts", "Raw clue").join("\n");
+    const sourceFactsBlock = sectionBetween(lines, "Source facts", "Why this was flagged").join("\n");
 
     expect(output).toContain("Local LLM draft — facts below are source of truth; not judge-accepted.");
     expect(output).toContain("A draft says validation kept running from a stale shell.");
@@ -369,9 +391,14 @@ describe("Flight Learn custom inbox component", () => {
     expect(output).toContain("Source facts");
     expect(sourceFactsBlock).toContain("Problem: Deterministic problem.");
     expect(sourceFactsBlock).toContain("What happened: Deterministic what happened.");
+    expect(output).toContain("Why this was flagged");
+    expect(output).toContain("The draft says redacted recurrence evidence made this validation issue worth review.");
+    expect(output).toContain("Existing evidence shows the validation check recurring after package changes.");
     expect(output).toContain("Choose a follow-up");
     expect(output).toContain("d dismiss");
     expect(output).toContain("s skip");
+    expect(output).not.toContain("Raw clue");
+    expect(output).not.toContain("Why suggested");
     expect(output).not.toContain("local narrative judge rejected the narrative");
     for (const line of lines) expect(line.length).toBeLessThanOrEqual(92);
 
@@ -413,8 +440,15 @@ describe("Flight Learn custom inbox component", () => {
 
     expect(output).toContain("Local model unavailable (timed out); deterministic wording shown.");
     expect(output).toContain("A validation command failed repeatedly in this project.");
+    expect(output).toContain("Pi does not know the intended behavior yet — press e to add it.");
+    expect(output).toContain("Why this was flagged");
+    expect(output).toContain("Pi grouped this as a recurring local issue from 1 redacted evidence ref.");
     expect(output).toContain("d dismiss");
     expect(output).toContain("s skip");
+    expect(output).not.toContain("Raw clue");
+    expect(output).not.toContain("Why suggested");
+    expect(output).not.toContain("npm test");
+    expect(output).not.toContain("cluster_73111b7e16551a58");
     expect(output).not.toContain("provider timed out before returning JSON");
   });
 

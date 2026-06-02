@@ -16,9 +16,16 @@ export type LocalDiagnosisPolishFallbackReason =
 export type LocalDiagnosisPolishDisplayState = "deterministic" | "validated" | "accepted-narrative" | "draft";
 export type LocalDiagnosisNarrativeStatus = "none" | "accepted" | "draft" | "rejected";
 
+export interface LocalDiagnosisCardCopyFields {
+  whyThisWasFlagged?: string;
+  evidenceSummary?: string;
+}
+
+export type LocalDiagnosisPolishedView = FlightLearnDiagnosisView & LocalDiagnosisCardCopyFields;
+
 export interface LocalDiagnosisPolishResult {
-  view: FlightLearnDiagnosisView;
-  deterministicView: FlightLearnDiagnosisView;
+  view: LocalDiagnosisPolishedView;
+  deterministicView: LocalDiagnosisPolishedView;
   usedLocalModel: boolean;
   displayState: LocalDiagnosisPolishDisplayState;
   narrativeStatus: LocalDiagnosisNarrativeStatus;
@@ -217,6 +224,8 @@ export interface LocalDiagnosisPolishDisplayFields {
   whatHappened?: string;
   whyItMatters?: string;
   expectedBehavior?: string;
+  whyThisWasFlagged?: string;
+  evidenceSummary?: string;
 }
 
 const DEFAULT_TIMEOUT_MS = 750;
@@ -240,15 +249,24 @@ const RESPONSE_FIELD_LIMITS = {
   whatHappened: 520,
   whyItMatters: 300,
   expectedBehavior: 320,
+  whyThisWasFlagged: 360,
+  evidenceSummary: 360,
 } as const;
 const WHAT_HAPPENED_MAX_SENTENCES = 4;
 const MAX_FACT_IDS_PER_NARRATIVE_SENTENCE = 8;
+const MAX_FACT_IDS_PER_DISPLAY_FIELD = 8;
 
 type ResponseFieldName = keyof typeof RESPONSE_FIELD_LIMITS;
+type FactCitedDisplayFieldName = "whyThisWasFlagged" | "evidenceSummary";
 type LocalDiagnosisTopLevelResponseField = ResponseFieldName | "schemaVersion";
 
-const RESPONSE_FIELDS = new Set<ResponseFieldName>(["headline", "whatHappened", "whyItMatters", "expectedBehavior"]);
-const TOP_LEVEL_RESPONSE_FIELDS = new Set<LocalDiagnosisTopLevelResponseField>(["schemaVersion", "headline", "whatHappened", "whyItMatters", "expectedBehavior"]);
+const RESPONSE_FIELDS: ResponseFieldName[] = ["headline", "whatHappened", "whyItMatters", "expectedBehavior", "whyThisWasFlagged", "evidenceSummary"];
+const TOP_LEVEL_RESPONSE_FIELDS = new Set<LocalDiagnosisTopLevelResponseField>(["schemaVersion", "headline", "whatHappened", "whyItMatters", "expectedBehavior", "whyThisWasFlagged", "evidenceSummary"]);
+const FACT_CITED_DISPLAY_FIELDS = new Set<FactCitedDisplayFieldName>(["whyThisWasFlagged", "evidenceSummary"]);
+const FACT_CITED_DISPLAY_RESPONSE_FIELDS = new Set(["text", "factIds"]);
+const WHY_FLAGGED_SUPPORT_KINDS = new Set<LocalDiagnosisSupportFactKind>(["delta-summary", "delta-reality", "occurrence-count", "signal", "evidence-summary", "deterministic-headline", "deterministic-what-happened"]);
+const EXPECTED_BEHAVIOR_SUPPORT_KINDS = new Set<LocalDiagnosisSupportFactKind>(["expected-behavior", "delta-expectation"]);
+const EXPECTED_BEHAVIOR_NEGATION_PATTERN = /\b(?:no|not|never|avoid|without|instead\s+of|cannot|can't|do\s+not|don't|shouldn't|won't)\b/i;
 const WHAT_HAPPENED_RESPONSE_FIELDS = new Set(["sentences"]);
 const WHAT_HAPPENED_SENTENCE_FIELDS = new Set(["text", "factIds"]);
 const JUDGE_TOP_LEVEL_RESPONSE_FIELDS = new Set(["schemaVersion", "overallVerdict", "failClosedReason", "sentences"]);
@@ -308,6 +326,9 @@ const DISPLAY_ONLY_FORBIDDEN_PATTERNS: RegExp[] = [
   /\b(?:follow-up|followup)\b/i,
   /\b(?:source files?|docs?|prompts?|skills?)\s+(?:should|must|need|needs|will)\s+(?:be\s+)?(?:changed|updated|created|written|mutated)\b/i,
   /\b(?:fact\s+packet|bounded\s+fact\s+packet|(?:bounded|redacted)\s+packets?|packets?\b|allowed\s+keys?|json\s+(?:object|schema|response)|response\s+schema|deltas?\b|signals?\b|bounds?\b|analysis\s+fields?|headlines?\b|display\s+fields?|schema\s+fields?|field\s+names?|problem\s+(?:field|key|section)|whatHappened\s+(?:field|key))\b/i,
+  /\b(?:detector|reflection\s+cluster|cluster_[a-z0-9_-]+|confidence(?:\s+score)?|record\s+ids?|source\s+ids?|session\s+ids?|entry\s+ids?|fact\s+ids?|sourceType|sourceFile|sessionFile|cwd)\b/i,
+  /\b(?:generated|created|added|fabricated|invented|synthesized)\s+(?:new\s+|extra\s+)?(?:evidence|refs?|snippets?)\b/i,
+  /\b(?:new|extra|fabricated|invented|synthetic)\s+(?:evidence|refs?|snippets?)\b/i,
   /\b(?:Problem|Problems|PROBLEM|PROBLEMS)\b/,
 ];
 
@@ -336,7 +357,7 @@ const STOP_WORDS = new Set([
 ]);
 
 const COMMON_DIAGNOSIS_TOKENS = new Set([
-  "assistant", "behavior", "clear", "current", "follow", "friction", "hard", "issue", "local", "made", "makes", "matter", "matters", "needed", "needs", "observed", "problem", "progress", "recent", "recorded", "repeated", "repeatedly", "result", "results", "review", "session", "sessions", "state", "text", "trust", "unclear", "unknown", "workflow",
+  "assistant", "available", "behavior", "clear", "current", "describes", "evidence", "flagged", "follow", "friction", "hard", "issue", "local", "made", "makes", "matter", "matters", "needed", "needs", "observed", "points", "problem", "progress", "recent", "recorded", "redacted", "repeated", "repeatedly", "result", "results", "review", "session", "sessions", "state", "stored", "summarizes", "summary", "text", "trust", "unclear", "unknown", "workflow",
 ]);
 
 const SYNONYM_GROUPS: string[][] = [
@@ -655,13 +676,14 @@ export function buildLocalDiagnosisPrompt(factPacket: LocalDiagnosisFactPacket):
   return [
     "You are an optional local-only phrasing helper for a Pi Flight Learn diagnosis card.",
     "Use only the bounded redacted fact packet and its facts[] entries. Do not add facts, routes, actions, artifacts, file paths, secrets, stack traces, commands, or transcript text.",
-    "Return only a JSON object with schemaVersion: 2. Allowed keys: schemaVersion, headline, whatHappened, whyItMatters, expectedBehavior. Omit any display key you cannot improve. No other top-level keys are allowed.",
-    "Field jobs: headline/Problem stays concise, conservative, and headline-shaped; whatHappened is the narrative field; whyItMatters explains impact; expectedBehavior is included only when supported.",
+    "Return only a JSON object with schemaVersion: 2. Allowed keys: schemaVersion, headline, whatHappened, whyItMatters, expectedBehavior, whyThisWasFlagged, evidenceSummary. Omit any display key you cannot improve. No other top-level keys are allowed.",
+    "Field jobs: headline/Problem stays concise, conservative, and headline-shaped; whatHappened is the narrative field; whyItMatters explains impact; expectedBehavior is included only when supported by expected-behavior or delta-expectation facts, not inferred from reality, impact, signals, or evidence; whyThisWasFlagged explains why local evidence flagged this issue; evidenceSummary summarizes existing evidence facts only.",
     "For whatHappened, do not return a string. Return {\"sentences\":[{\"text\":\"...\",\"factIds\":[\"F1\"]}]}. Each sentence needs 1 or more factIds, and every factId must exactly match an id in facts[].",
+    "For whyThisWasFlagged and evidenceSummary, return {\"text\":\"...\",\"factIds\":[\"F1\"]}. evidenceSummary must summarize existing evidence facts only; do not create, imply, invent, or replace evidence refs.",
     "Write 2-4 concise whatHappened sentence objects that explain the observed sequence, recurrence, pattern, or uncertainty and are distinct from the headline. The factIds are deterministic support handles, not proof of entailment; unsupported meaning will be handled by a later local judge path.",
-    "Do not include confidence, scores, metadata, notes, rationale, route, action, status, severity, or any other non-display field.",
+    "Do not include confidence, scores, metadata, notes, rationale, route, action, status, severity, record IDs, detector names, cluster IDs, or any other non-display field.",
     "Do not echo or summarize the fact packet structure. Do not mention internal field names such as JSON, allowed keys, delta, signals, bounds, analysis, or headline fields. You may refer generically to stored evidence when it helps.",
-    `Length limits: headline <= ${RESPONSE_FIELD_LIMITS.headline} chars; combined whatHappened text <= ${RESPONSE_FIELD_LIMITS.whatHappened} and <= ${WHAT_HAPPENED_MAX_SENTENCES} sentence objects; whyItMatters <= ${RESPONSE_FIELD_LIMITS.whyItMatters}; expectedBehavior <= ${RESPONSE_FIELD_LIMITS.expectedBehavior}.`,
+    `Length limits: headline <= ${RESPONSE_FIELD_LIMITS.headline} chars; combined whatHappened text <= ${RESPONSE_FIELD_LIMITS.whatHappened} and <= ${WHAT_HAPPENED_MAX_SENTENCES} sentence objects; whyItMatters <= ${RESPONSE_FIELD_LIMITS.whyItMatters}; expectedBehavior <= ${RESPONSE_FIELD_LIMITS.expectedBehavior}; whyThisWasFlagged <= ${RESPONSE_FIELD_LIMITS.whyThisWasFlagged}; evidenceSummary <= ${RESPONSE_FIELD_LIMITS.evidenceSummary}.`,
     "The JSON is display-only wording for the current card and must not instruct routing, ranking, storage, artifact creation, source edits, Loom records, rules, skills, or prompt changes.",
     "Fact packet JSON:",
     factPacketJson,
@@ -785,8 +807,8 @@ async function validateNarrativeCandidateWithLocalJudge(
 }
 
 function fallbackResult(
-  deterministicView: FlightLearnDiagnosisView,
-  baseView: FlightLearnDiagnosisView,
+  deterministicView: LocalDiagnosisPolishedView,
+  baseView: LocalDiagnosisPolishedView,
   reason: LocalDiagnosisPolishFallbackReason,
   issue: string | null,
   narrativeStatus: LocalDiagnosisNarrativeStatus = "none",
@@ -803,8 +825,8 @@ function fallbackResult(
 }
 
 function draftResult(
-  deterministicView: FlightLearnDiagnosisView,
-  view: FlightLearnDiagnosisView,
+  deterministicView: LocalDiagnosisPolishedView,
+  view: LocalDiagnosisPolishedView,
   issue: string | null,
 ): LocalDiagnosisPolishResult {
   return {
@@ -819,7 +841,7 @@ function draftResult(
 }
 
 function acceptedNarrativeResult(
-  deterministicView: FlightLearnDiagnosisView,
+  deterministicView: LocalDiagnosisPolishedView,
   fields: LocalDiagnosisPolishDisplayFields,
 ): LocalDiagnosisPolishResult {
   return {
@@ -834,7 +856,7 @@ function acceptedNarrativeResult(
 }
 
 function validatedPolishResult(
-  deterministicView: FlightLearnDiagnosisView,
+  deterministicView: LocalDiagnosisPolishedView,
   fields: LocalDiagnosisPolishDisplayFields,
 ): LocalDiagnosisPolishResult {
   return {
@@ -848,7 +870,7 @@ function validatedPolishResult(
   };
 }
 
-function withFallbackLimit(view: FlightLearnDiagnosisView, reason: LocalDiagnosisPolishFallbackReason): FlightLearnDiagnosisView {
+function withFallbackLimit(view: LocalDiagnosisPolishedView, reason: LocalDiagnosisPolishFallbackReason): LocalDiagnosisPolishedView {
   const limits = view.limits.filter((limit) => !limit.startsWith("No model call was made"));
   return {
     ...view,
@@ -859,14 +881,18 @@ function withFallbackLimit(view: FlightLearnDiagnosisView, reason: LocalDiagnosi
   };
 }
 
-function applyDisplayFields(view: FlightLearnDiagnosisView, fields: LocalDiagnosisPolishDisplayFields, limit: string): FlightLearnDiagnosisView {
+function applyDisplayFields(view: LocalDiagnosisPolishedView, fields: LocalDiagnosisPolishDisplayFields, limit: string): LocalDiagnosisPolishedView {
   const limits = view.limits.filter((existingLimit) => !existingLimit.startsWith("No model call was made"));
+  const whyThisWasFlagged = fields.whyThisWasFlagged ?? view.whyThisWasFlagged;
+  const evidenceSummary = fields.evidenceSummary ?? view.evidenceSummary;
   return {
     ...view,
     headline: fields.headline ?? view.headline,
     whatHappened: fields.whatHappened ?? view.whatHappened,
     whyItMatters: fields.whyItMatters ?? view.whyItMatters,
     expectedBehavior: fields.expectedBehavior ?? view.expectedBehavior,
+    ...(whyThisWasFlagged !== undefined ? { whyThisWasFlagged } : {}),
+    ...(evidenceSummary !== undefined ? { evidenceSummary } : {}),
     limits: [
       ...limits,
       limit,
@@ -874,7 +900,7 @@ function applyDisplayFields(view: FlightLearnDiagnosisView, fields: LocalDiagnos
   };
 }
 
-function applyValidatedPolishedFields(view: FlightLearnDiagnosisView, fields: LocalDiagnosisPolishDisplayFields): FlightLearnDiagnosisView {
+function applyValidatedPolishedFields(view: LocalDiagnosisPolishedView, fields: LocalDiagnosisPolishDisplayFields): LocalDiagnosisPolishedView {
   return applyDisplayFields(
     view,
     fields,
@@ -882,7 +908,7 @@ function applyValidatedPolishedFields(view: FlightLearnDiagnosisView, fields: Lo
   );
 }
 
-function applyAcceptedNarrativeFields(view: FlightLearnDiagnosisView, fields: LocalDiagnosisPolishDisplayFields): FlightLearnDiagnosisView {
+function applyAcceptedNarrativeFields(view: LocalDiagnosisPolishedView, fields: LocalDiagnosisPolishDisplayFields): LocalDiagnosisPolishedView {
   return applyDisplayFields(
     view,
     fields,
@@ -890,7 +916,7 @@ function applyAcceptedNarrativeFields(view: FlightLearnDiagnosisView, fields: Lo
   );
 }
 
-function applyDraftPolishedFields(view: FlightLearnDiagnosisView, fields: LocalDiagnosisPolishDisplayFields): FlightLearnDiagnosisView {
+function applyDraftPolishedFields(view: LocalDiagnosisPolishedView, fields: LocalDiagnosisPolishDisplayFields): LocalDiagnosisPolishedView {
   return applyDisplayFields(
     view,
     fields,
@@ -1133,16 +1159,82 @@ function validateResponseField(
   support: Set<string>,
 ): FieldValidationResult {
   if (key === "whatHappened") return validateWhatHappenedNarrative(value, context);
+  if (FACT_CITED_DISPLAY_FIELDS.has(key as FactCitedDisplayFieldName)) {
+    return validateFactCitedDisplayField(key as FactCitedDisplayFieldName, value, context);
+  }
   if (value === null && key === "expectedBehavior") return { ok: true, value: null };
   if (typeof value !== "string") return { ok: false, reason: "schema-invalid", issue: "display fields must be strings" };
   const normalized = value.replace(/\s+/g, " ").trim();
   if (UNKNOWN_VALUES.has(normalized.toLowerCase())) return { ok: true, value: null };
   if (normalized.length > RESPONSE_FIELD_LIMITS[key]) return { ok: false, reason: "schema-invalid", issue: "display field exceeded length limit" };
   if (containsUnsafeOutput(normalized)) return { ok: false, reason: "unsafe-output", issue: "display field included unsafe or non-display content" };
-  if (key === "expectedBehavior" && !context.factPacket.delta.expectation && !context.deterministicView.expectedBehavior) {
-    return { ok: false, reason: "unsupported-facts", issue: "expected behavior was not supported by the fact packet" };
-  }
+  if (key === "expectedBehavior") return validateExpectedBehaviorField(normalized, context);
   if (hasUnsupportedFacts(normalized, support)) return { ok: false, reason: "unsupported-facts", issue: "display field included unsupported facts" };
+  return { ok: true, value: normalized };
+}
+
+function validateExpectedBehaviorField(
+  normalized: string,
+  context: LocalDiagnosisPolishValidationContext,
+): FieldValidationResult {
+  const expectedFacts = context.factPacket.facts.filter((fact) => EXPECTED_BEHAVIOR_SUPPORT_KINDS.has(fact.kind));
+  if (expectedFacts.length === 0) {
+    return { ok: false, reason: "unsupported-facts", issue: "expected behavior was not supported by expected-behavior facts" };
+  }
+  if (hasExpectedBehaviorNegationMismatch(normalized, expectedFacts)) {
+    return { ok: false, reason: "unsupported-facts", issue: "expected behavior contradicted expected-behavior facts" };
+  }
+  if (hasUnsupportedFacts(normalized, buildSupportSetFromFacts(expectedFacts))) {
+    return { ok: false, reason: "unsupported-facts", issue: "expected behavior included unsupported facts" };
+  }
+  return { ok: true, value: normalized };
+}
+
+function hasExpectedBehaviorNegationMismatch(value: string, expectedFacts: LocalDiagnosisSupportFact[]): boolean {
+  const outputHasNegation = EXPECTED_BEHAVIOR_NEGATION_PATTERN.test(value);
+  const factsHaveNegation = expectedFacts.some((fact) => EXPECTED_BEHAVIOR_NEGATION_PATTERN.test(fact.text));
+  return outputHasNegation !== factsHaveNegation;
+}
+
+function validateFactCitedDisplayField(
+  key: FactCitedDisplayFieldName,
+  value: unknown,
+  context: LocalDiagnosisPolishValidationContext,
+): FieldValidationResult {
+  if (!isPlainObject(value)) return { ok: false, reason: "schema-invalid", issue: `${key} must be a fact-cited display object` };
+  const extraKey = Object.keys(value).find((fieldKey) => !FACT_CITED_DISPLAY_RESPONSE_FIELDS.has(fieldKey));
+  if (extraKey) return { ok: false, reason: "schema-invalid", issue: `${key} included unsupported fields` };
+
+  const text = value["text"];
+  if (typeof text !== "string") return { ok: false, reason: "schema-invalid", issue: `${key} text must be a string` };
+  const normalized = text.replace(/\s+/g, " ").trim();
+
+  const factIds = value["factIds"];
+  if (!Array.isArray(factIds) || factIds.length === 0) return { ok: false, reason: "schema-invalid", issue: `${key} must cite one or more factIds` };
+  if (factIds.length > MAX_FACT_IDS_PER_DISPLAY_FIELD) return { ok: false, reason: "schema-invalid", issue: `${key} cited too many factIds` };
+
+  const factsById = new Map(context.factPacket.facts.map((fact) => [fact.id, fact]));
+  const seenFactIds = new Set<string>();
+  const citedFacts: LocalDiagnosisSupportFact[] = [];
+  for (const factId of factIds) {
+    if (typeof factId !== "string") return { ok: false, reason: "schema-invalid", issue: `${key} factIds must be strings` };
+    if (seenFactIds.has(factId)) return { ok: false, reason: "schema-invalid", issue: `${key} repeated a factId` };
+    seenFactIds.add(factId);
+    const fact = factsById.get(factId as LocalDiagnosisSupportFactId);
+    if (!fact) return { ok: false, reason: "unsupported-facts", issue: `${key} cited an unknown factId` };
+    citedFacts.push(fact);
+  }
+
+  if (!normalized || UNKNOWN_VALUES.has(normalized.toLowerCase())) return { ok: true, value: null };
+  if (normalized.length > RESPONSE_FIELD_LIMITS[key]) return { ok: false, reason: "schema-invalid", issue: `${key} exceeded length limit` };
+  if (containsUnsafeOutput(normalized)) return { ok: false, reason: "unsafe-output", issue: `${key} included unsafe or non-display content` };
+  if (key === "evidenceSummary" && citedFacts.some((fact) => fact.kind !== "evidence-summary")) {
+    return { ok: false, reason: "unsupported-facts", issue: "evidenceSummary must cite evidence-summary facts" };
+  }
+  if (key === "whyThisWasFlagged" && !citedFacts.some((fact) => WHY_FLAGGED_SUPPORT_KINDS.has(fact.kind))) {
+    return { ok: false, reason: "unsupported-facts", issue: "whyThisWasFlagged did not cite flagging support facts" };
+  }
+  if (hasUnsupportedFacts(normalized, buildSupportSetFromFacts(citedFacts))) return { ok: false, reason: "unsupported-facts", issue: `${key} included unsupported facts` };
   return { ok: true, value: normalized };
 }
 
@@ -1291,8 +1383,20 @@ function factStrings(packet: LocalDiagnosisFactPacket): string[] {
 }
 
 function buildSupportSet(packet: LocalDiagnosisFactPacket): Set<string> {
+  const support = buildSupportSetFromTexts(factStrings(packet));
+  const count = packet.delta.occurrenceCount;
+  if (count !== null) support.add(String(count));
+  return support;
+}
+
+function buildSupportSetFromFacts(facts: LocalDiagnosisSupportFact[]): Set<string> {
+  return buildSupportSetFromTexts(facts.map((fact) => fact.text));
+}
+
+function buildSupportSetFromTexts(texts: Array<string | null | undefined>): Set<string> {
   const support = new Set<string>(COMMON_DIAGNOSIS_TOKENS);
-  for (const text of factStrings(packet)) {
+  for (const text of texts) {
+    if (!text) continue;
     for (const token of contentTokens(text)) support.add(token);
     for (const numberToken of numberTokens(text)) support.add(numberToken);
   }
@@ -1301,8 +1405,6 @@ function buildSupportSet(packet: LocalDiagnosisFactPacket): Set<string> {
       for (const token of group) support.add(token);
     }
   }
-  const count = packet.delta.occurrenceCount;
-  if (count !== null) support.add(String(count));
   return support;
 }
 

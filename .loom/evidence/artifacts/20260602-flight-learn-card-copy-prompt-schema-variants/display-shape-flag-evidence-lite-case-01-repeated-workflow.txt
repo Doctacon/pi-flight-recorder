@@ -1,0 +1,12 @@
+Variant: flag-evidence-lite
+Case: case-01-repeated-workflow
+Product-gate-equivalent pass: true
+Fallback category: none
+Display field shape (model text omitted; no raw model output persisted):
+- headline: omitted
+- whatHappened: omitted
+- whyItMatters: omitted
+- expectedBehavior: omitted
+- whyThisWasFlagged: omitted
+- evidenceSummary: present, product-validated
+Evidence remains deterministic and inspectable; this artifact records shape only.

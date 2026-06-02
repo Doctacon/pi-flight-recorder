@@ -1,0 +1,3 @@
+?? .loom/evidence/20260602-flight-learn-card-copy-failure-diagnostics.md
+?? .loom/evidence/artifacts/20260602-flight-learn-card-copy-failure-diagnostics/
+?? .loom/tickets/20260602-flight-learn-card-copy-failure-diagnostics.md

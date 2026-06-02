@@ -1,0 +1,61 @@
+{
+  "pass": true,
+  "files": [
+    {
+      "file": "render-draft-72.txt",
+      "width": 72,
+      "lineCount": 48,
+      "maxLineLength": 71,
+      "overLimit": []
+    },
+    {
+      "file": "render-draft-92.txt",
+      "width": 92,
+      "lineCount": 45,
+      "maxLineLength": 85,
+      "overLimit": []
+    },
+    {
+      "file": "render-expanded-72.txt",
+      "width": 72,
+      "lineCount": 46,
+      "maxLineLength": 71,
+      "overLimit": []
+    },
+    {
+      "file": "render-expanded-92.txt",
+      "width": 92,
+      "lineCount": 45,
+      "maxLineLength": 90,
+      "overLimit": []
+    },
+    {
+      "file": "render-fallback-72.txt",
+      "width": 72,
+      "lineCount": 37,
+      "maxLineLength": 69,
+      "overLimit": []
+    },
+    {
+      "file": "render-fallback-92.txt",
+      "width": 92,
+      "lineCount": 36,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "render-model-72.txt",
+      "width": 72,
+      "lineCount": 39,
+      "maxLineLength": 71,
+      "overLimit": []
+    },
+    {
+      "file": "render-model-92.txt",
+      "width": 92,
+      "lineCount": 38,
+      "maxLineLength": 85,
+      "overLimit": []
+    }
+  ]
+}

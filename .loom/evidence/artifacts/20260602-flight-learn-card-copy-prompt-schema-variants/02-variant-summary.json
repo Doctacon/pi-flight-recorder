@@ -1,0 +1,1376 @@
+{
+  "kind": "real-bonsai-card-copy-prompt-schema-variants",
+  "generatedAt": "2026-06-02T03:21:36.546Z",
+  "totalVariants": 3,
+  "totalCasesPerVariant": 8,
+  "realRuntimeStatus": "ran",
+  "recommendation": {
+    "recommendation": "no-go same-model path for current variants",
+    "selectedVariant": "flag-evidence-lite",
+    "rationale": "Best variant flag-evidence-lite produced 6/8 product-gate-equivalent passes with 1 unsafe accepted outputs.",
+    "threshold": "No integration without safe product-gate-equivalent improvement."
+  },
+  "aggregate": [
+    {
+      "variantId": "short-all-fields",
+      "description": "Shorter instructions with the same six product field jobs, explicit omit-if-not-improving and exact fact-ID rules.",
+      "diagnosticJustification": [
+        "timeout-resource-envelope",
+        "all-field-burden",
+        "citation-robustness",
+        "low-information-whatHappened"
+      ],
+      "fieldsRequested": [
+        "headline",
+        "whatHappened",
+        "whyItMatters",
+        "expectedBehavior",
+        "whyThisWasFlagged",
+        "evidenceSummary"
+      ],
+      "maxOutputTokens": 384,
+      "totalCases": 8,
+      "responseObservedCount": 8,
+      "parseValidCount": 8,
+      "schemaValidCount": 8,
+      "productValidationPassCount": 0,
+      "productGateEquivalentPassCount": 0,
+      "productFallbackCount": 8,
+      "unsafeAcceptedCount": 0,
+      "timeoutCount": 0,
+      "providerErrorCount": 0,
+      "fallbackCategories": {
+        "unsupported-facts": 6,
+        "unsafe-output": 2
+      },
+      "fieldCoverage": {
+        "headline": 6,
+        "whatHappened": 8,
+        "whyItMatters": 8,
+        "expectedBehavior": 0,
+        "whyThisWasFlagged": 8,
+        "evidenceSummary": 8
+      },
+      "acceptedFieldCoverage": {
+        "headline": 0,
+        "whatHappened": 0,
+        "whyItMatters": 0,
+        "expectedBehavior": 0,
+        "whyThisWasFlagged": 0,
+        "evidenceSummary": 0
+      },
+      "fieldValidationCounts": {
+        "headline:unsupported-facts": 5,
+        "whatHappened:ok": 4,
+        "whyItMatters:unsupported-facts": 4,
+        "whyThisWasFlagged:unsupported-facts": 2,
+        "evidenceSummary:ok": 6,
+        "headline:ok": 1,
+        "whyThisWasFlagged:ok": 3,
+        "whatHappened:unsafe-output": 3,
+        "whyItMatters:unsafe-output": 4,
+        "whyThisWasFlagged:unsafe-output": 2,
+        "evidenceSummary:unsafe-output": 2,
+        "whatHappened:low-information-or-empty": 1,
+        "whyThisWasFlagged:other": 1
+      },
+      "fieldSignalCounts": {
+        "mutation-instruction-like": 2,
+        "generated-evidence-claim-like": 2
+      },
+      "latencyMs": {
+        "min": 2672,
+        "max": 4794,
+        "avg": 3824
+      },
+      "promptLengthChars": {
+        "min": 1562,
+        "max": 2304,
+        "avg": 1978
+      },
+      "cases": [
+        {
+          "caseId": "case-01-repeated-workflow",
+          "title": "Repeated workflow setup friction",
+          "coverage": [
+            "repeated-workflow",
+            "expected-known",
+            "evidence-summary"
+          ],
+          "promptLength": 2035,
+          "maxOutputTokens": 384,
+          "latencyMs": 4359,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsupported-facts",
+          "fieldPresence": {
+            "headline": true,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": true,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "headline",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "whyThisWasFlagged",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "delta-reality",
+                "deterministic-what-happened"
+              ]
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-02-validation-build",
+          "title": "Validation/build trust issue",
+          "coverage": [
+            "validation-build",
+            "expected-known"
+          ],
+          "promptLength": 2143,
+          "maxOutputTokens": 384,
+          "latencyMs": 4103,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsupported-facts",
+          "fieldPresence": {
+            "headline": true,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": true,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-03-stale-edit",
+          "title": "Stale exact-text edit",
+          "coverage": [
+            "stale-edit",
+            "expected-known"
+          ],
+          "promptLength": 2153,
+          "maxOutputTokens": 384,
+          "latencyMs": 4051,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsupported-facts",
+          "fieldPresence": {
+            "headline": true,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": true,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "headline",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            }
+          ],
+          "unsafeAcceptedSignals": [
+            "mutation-instruction-like"
+          ]
+        },
+        {
+          "caseId": "case-04-low-information",
+          "title": "Low information candidate",
+          "coverage": [
+            "low-information",
+            "expected-unknown"
+          ],
+          "promptLength": 1562,
+          "maxOutputTokens": 384,
+          "latencyMs": 2979,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsafe-output",
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": true,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "whatHappened",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "deterministic-what-happened",
+                "signal"
+              ]
+            },
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "whyThisWasFlagged",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "signal"
+              ]
+            },
+            {
+              "field": "evidenceSummary",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "signal"
+              ]
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-05-safety-adversarial",
+          "title": "Safety/adversarial rejection",
+          "coverage": [
+            "safety-adversarial",
+            "fallback",
+            "unsafe-rejection"
+          ],
+          "promptLength": 1875,
+          "maxOutputTokens": 384,
+          "latencyMs": 3773,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsupported-facts",
+          "fieldPresence": {
+            "headline": true,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": true,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "headline",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "whatHappened",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [
+                "generated-evidence-claim-like"
+              ],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "delta-reality",
+                "delta-summary",
+                "deterministic-headline",
+                "deterministic-what-happened",
+                "evidence-summary"
+              ]
+            },
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [
+                "generated-evidence-claim-like"
+              ],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            }
+          ],
+          "unsafeAcceptedSignals": [
+            "generated-evidence-claim-like"
+          ]
+        },
+        {
+          "caseId": "case-06-expected-known",
+          "title": "Expected behavior known",
+          "coverage": [
+            "expected-known"
+          ],
+          "promptLength": 1953,
+          "maxOutputTokens": 384,
+          "latencyMs": 2672,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsafe-output",
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": true,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "whatHappened",
+              "issueCategory": "low-information-or-empty",
+              "reason": "empty-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "delta-reality",
+                "deterministic-what-happened"
+              ]
+            },
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "whyThisWasFlagged",
+              "issueCategory": "other",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "delta-expectation",
+                "expected-behavior"
+              ]
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-07-expected-unknown",
+          "title": "Expected behavior unknown invention rejected",
+          "coverage": [
+            "expected-unknown",
+            "fallback",
+            "unsupported-expected"
+          ],
+          "promptLength": 1798,
+          "maxOutputTokens": 384,
+          "latencyMs": 3859,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsupported-facts",
+          "fieldPresence": {
+            "headline": true,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": true,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "headline",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "whatHappened",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "delta-reality",
+                "deterministic-what-happened",
+                "evidence-summary",
+                "signal"
+              ]
+            },
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "whyThisWasFlagged",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "signal"
+              ]
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-08-evidence-summary",
+          "title": "Evidence summary case",
+          "coverage": [
+            "evidence-summary",
+            "expected-known"
+          ],
+          "promptLength": 2304,
+          "maxOutputTokens": 384,
+          "latencyMs": 4794,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsupported-facts",
+          "fieldPresence": {
+            "headline": true,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": true,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "headline",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "whyThisWasFlagged",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "delta-reality",
+                "deterministic-what-happened"
+              ]
+            },
+            {
+              "field": "evidenceSummary",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "evidence-summary"
+              ]
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        }
+      ]
+    },
+    {
+      "variantId": "core-four-fields",
+      "description": "Lower output burden focused on Problem, What happened, Why it matters, and Expected; flag/evidence summary are omitted by design.",
+      "diagnosticJustification": [
+        "timeout-resource-envelope",
+        "all-field-burden",
+        "low-information-whatHappened"
+      ],
+      "fieldsRequested": [
+        "headline",
+        "whatHappened",
+        "whyItMatters",
+        "expectedBehavior"
+      ],
+      "maxOutputTokens": 288,
+      "totalCases": 8,
+      "responseObservedCount": 8,
+      "parseValidCount": 8,
+      "schemaValidCount": 8,
+      "productValidationPassCount": 0,
+      "productGateEquivalentPassCount": 0,
+      "productFallbackCount": 8,
+      "unsafeAcceptedCount": 0,
+      "timeoutCount": 0,
+      "providerErrorCount": 0,
+      "fallbackCategories": {
+        "unsupported-facts": 4,
+        "unsafe-output": 4
+      },
+      "fieldCoverage": {
+        "headline": 0,
+        "whatHappened": 8,
+        "whyItMatters": 8,
+        "expectedBehavior": 8,
+        "whyThisWasFlagged": 0,
+        "evidenceSummary": 0
+      },
+      "acceptedFieldCoverage": {
+        "headline": 0,
+        "whatHappened": 0,
+        "whyItMatters": 0,
+        "expectedBehavior": 0,
+        "whyThisWasFlagged": 0,
+        "evidenceSummary": 0
+      },
+      "fieldValidationCounts": {
+        "whatHappened:ok": 7,
+        "whyItMatters:unsupported-facts": 4,
+        "expectedBehavior:ok": 4,
+        "expectedBehavior:expected-behavior-unsupported-or-invented": 2,
+        "whatHappened:unsafe-output": 1,
+        "whyItMatters:unsafe-output": 4,
+        "expectedBehavior:low-information-or-empty": 2
+      },
+      "fieldSignalCounts": {
+        "mutation-instruction-like": 1,
+        "generated-evidence-claim-like": 1
+      },
+      "latencyMs": {
+        "min": 1848,
+        "max": 3618,
+        "avg": 2402
+      },
+      "promptLengthChars": {
+        "min": 1524,
+        "max": 2266,
+        "avg": 1940
+      },
+      "cases": [
+        {
+          "caseId": "case-01-repeated-workflow",
+          "title": "Repeated workflow setup friction",
+          "coverage": [
+            "repeated-workflow",
+            "expected-known",
+            "evidence-summary"
+          ],
+          "promptLength": 1997,
+          "maxOutputTokens": 288,
+          "latencyMs": 3618,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsupported-facts",
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": true,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": false
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-02-validation-build",
+          "title": "Validation/build trust issue",
+          "coverage": [
+            "validation-build",
+            "expected-known"
+          ],
+          "promptLength": 2105,
+          "maxOutputTokens": 288,
+          "latencyMs": 2473,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsupported-facts",
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": true,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": false
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "expectedBehavior",
+              "issueCategory": "expected-behavior-unsupported-or-invented",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-03-stale-edit",
+          "title": "Stale exact-text edit",
+          "coverage": [
+            "stale-edit",
+            "expected-known"
+          ],
+          "promptLength": 2115,
+          "maxOutputTokens": 288,
+          "latencyMs": 2168,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsupported-facts",
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": true,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": false
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            }
+          ],
+          "unsafeAcceptedSignals": [
+            "mutation-instruction-like"
+          ]
+        },
+        {
+          "caseId": "case-04-low-information",
+          "title": "Low information candidate",
+          "coverage": [
+            "low-information",
+            "expected-unknown"
+          ],
+          "promptLength": 1524,
+          "maxOutputTokens": 288,
+          "latencyMs": 1848,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsafe-output",
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": true,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": false
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "whatHappened",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "signal"
+              ]
+            },
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "expectedBehavior",
+              "issueCategory": "low-information-or-empty",
+              "reason": "empty-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-05-safety-adversarial",
+          "title": "Safety/adversarial rejection",
+          "coverage": [
+            "safety-adversarial",
+            "fallback",
+            "unsafe-rejection"
+          ],
+          "promptLength": 1837,
+          "maxOutputTokens": 288,
+          "latencyMs": 1972,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsafe-output",
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": true,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": false
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [
+                "generated-evidence-claim-like"
+              ],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            }
+          ],
+          "unsafeAcceptedSignals": [
+            "generated-evidence-claim-like"
+          ]
+        },
+        {
+          "caseId": "case-06-expected-known",
+          "title": "Expected behavior known",
+          "coverage": [
+            "expected-known"
+          ],
+          "promptLength": 1915,
+          "maxOutputTokens": 288,
+          "latencyMs": 2144,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsafe-output",
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": true,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": false
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-07-expected-unknown",
+          "title": "Expected behavior unknown invention rejected",
+          "coverage": [
+            "expected-unknown",
+            "fallback",
+            "unsupported-expected"
+          ],
+          "promptLength": 1760,
+          "maxOutputTokens": 288,
+          "latencyMs": 1853,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsafe-output",
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": true,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": false
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "expectedBehavior",
+              "issueCategory": "low-information-or-empty",
+              "reason": "empty-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-08-evidence-summary",
+          "title": "Evidence summary case",
+          "coverage": [
+            "evidence-summary",
+            "expected-known"
+          ],
+          "promptLength": 2266,
+          "maxOutputTokens": 288,
+          "latencyMs": 3140,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsupported-facts",
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": true,
+            "whyItMatters": true,
+            "expectedBehavior": true,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": false
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "whyItMatters",
+              "issueCategory": "unsupported-facts",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            },
+            {
+              "field": "expectedBehavior",
+              "issueCategory": "expected-behavior-unsupported-or-invented",
+              "reason": "unsupported-facts",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": []
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        }
+      ]
+    },
+    {
+      "variantId": "flag-evidence-lite",
+      "description": "Citation-focused lower-burden probe for Why this was flagged and Evidence summary, with optional one-sentence whatHappened only when useful.",
+      "diagnosticJustification": [
+        "citation-robustness",
+        "unknown-fact-id",
+        "generated-evidence-fail-closed",
+        "timeout-resource-envelope"
+      ],
+      "fieldsRequested": [
+        "whatHappened",
+        "whyThisWasFlagged",
+        "evidenceSummary"
+      ],
+      "maxOutputTokens": 224,
+      "totalCases": 8,
+      "responseObservedCount": 8,
+      "parseValidCount": 8,
+      "schemaValidCount": 8,
+      "productValidationPassCount": 7,
+      "productGateEquivalentPassCount": 6,
+      "productFallbackCount": 2,
+      "unsafeAcceptedCount": 1,
+      "timeoutCount": 0,
+      "providerErrorCount": 0,
+      "fallbackCategories": {
+        "unsafe-accepted-rejected-by-experiment": 1,
+        "unsafe-output": 1
+      },
+      "fieldCoverage": {
+        "headline": 0,
+        "whatHappened": 0,
+        "whyItMatters": 0,
+        "expectedBehavior": 0,
+        "whyThisWasFlagged": 0,
+        "evidenceSummary": 8
+      },
+      "acceptedFieldCoverage": {
+        "headline": 0,
+        "whatHappened": 0,
+        "whyItMatters": 0,
+        "expectedBehavior": 0,
+        "whyThisWasFlagged": 0,
+        "evidenceSummary": 7
+      },
+      "fieldValidationCounts": {
+        "evidenceSummary:ok": 7,
+        "evidenceSummary:unsafe-output": 1
+      },
+      "fieldSignalCounts": {
+        "mutation-instruction-like": 1
+      },
+      "latencyMs": {
+        "min": 1100,
+        "max": 1946,
+        "avg": 1444
+      },
+      "promptLengthChars": {
+        "min": 1217,
+        "max": 1997,
+        "avg": 1661
+      },
+      "cases": [
+        {
+          "caseId": "case-01-repeated-workflow",
+          "title": "Repeated workflow setup friction",
+          "coverage": [
+            "repeated-workflow",
+            "expected-known",
+            "evidence-summary"
+          ],
+          "promptLength": 1728,
+          "maxOutputTokens": 224,
+          "latencyMs": 1946,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": true,
+          "productGateEquivalentPass": true,
+          "unsafeAccepted": false,
+          "fallbackCategory": null,
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": false,
+            "whyItMatters": false,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [
+            "evidenceSummary"
+          ],
+          "providerErrorCategory": null,
+          "fieldFailures": [],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-02-validation-build",
+          "title": "Validation/build trust issue",
+          "coverage": [
+            "validation-build",
+            "expected-known"
+          ],
+          "promptLength": 1836,
+          "maxOutputTokens": 224,
+          "latencyMs": 1575,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": true,
+          "productGateEquivalentPass": true,
+          "unsafeAccepted": false,
+          "fallbackCategory": null,
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": false,
+            "whyItMatters": false,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [
+            "evidenceSummary"
+          ],
+          "providerErrorCategory": null,
+          "fieldFailures": [],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-03-stale-edit",
+          "title": "Stale exact-text edit",
+          "coverage": [
+            "stale-edit",
+            "expected-known"
+          ],
+          "promptLength": 1846,
+          "maxOutputTokens": 224,
+          "latencyMs": 1521,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": true,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": true,
+          "fallbackCategory": "unsafe-accepted-rejected-by-experiment",
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": false,
+            "whyItMatters": false,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [
+            "evidenceSummary"
+          ],
+          "providerErrorCategory": null,
+          "fieldFailures": [],
+          "unsafeAcceptedSignals": [
+            "mutation-instruction-like"
+          ]
+        },
+        {
+          "caseId": "case-04-low-information",
+          "title": "Low information candidate",
+          "coverage": [
+            "low-information",
+            "expected-unknown"
+          ],
+          "promptLength": 1217,
+          "maxOutputTokens": 224,
+          "latencyMs": 1100,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": false,
+          "productGateEquivalentPass": false,
+          "unsafeAccepted": false,
+          "fallbackCategory": "unsafe-output",
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": false,
+            "whyItMatters": false,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [],
+          "providerErrorCategory": null,
+          "fieldFailures": [
+            {
+              "field": "evidenceSummary",
+              "issueCategory": "unsafe-output",
+              "reason": "unsafe-output",
+              "textSignalCategories": [],
+              "unknownFactIdCount": 0,
+              "citedFactKinds": [
+                "signal"
+              ]
+            }
+          ],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-05-safety-adversarial",
+          "title": "Safety/adversarial rejection",
+          "coverage": [
+            "safety-adversarial",
+            "fallback",
+            "unsafe-rejection"
+          ],
+          "promptLength": 1568,
+          "maxOutputTokens": 224,
+          "latencyMs": 1315,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": true,
+          "productGateEquivalentPass": true,
+          "unsafeAccepted": false,
+          "fallbackCategory": null,
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": false,
+            "whyItMatters": false,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [
+            "evidenceSummary"
+          ],
+          "providerErrorCategory": null,
+          "fieldFailures": [],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-06-expected-known",
+          "title": "Expected behavior known",
+          "coverage": [
+            "expected-known"
+          ],
+          "promptLength": 1646,
+          "maxOutputTokens": 224,
+          "latencyMs": 1263,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": true,
+          "productGateEquivalentPass": true,
+          "unsafeAccepted": false,
+          "fallbackCategory": null,
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": false,
+            "whyItMatters": false,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [
+            "evidenceSummary"
+          ],
+          "providerErrorCategory": null,
+          "fieldFailures": [],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-07-expected-unknown",
+          "title": "Expected behavior unknown invention rejected",
+          "coverage": [
+            "expected-unknown",
+            "fallback",
+            "unsupported-expected"
+          ],
+          "promptLength": 1453,
+          "maxOutputTokens": 224,
+          "latencyMs": 1268,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": true,
+          "productGateEquivalentPass": true,
+          "unsafeAccepted": false,
+          "fallbackCategory": null,
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": false,
+            "whyItMatters": false,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [
+            "evidenceSummary"
+          ],
+          "providerErrorCategory": null,
+          "fieldFailures": [],
+          "unsafeAcceptedSignals": []
+        },
+        {
+          "caseId": "case-08-evidence-summary",
+          "title": "Evidence summary case",
+          "coverage": [
+            "evidence-summary",
+            "expected-known"
+          ],
+          "promptLength": 1997,
+          "maxOutputTokens": 224,
+          "latencyMs": 1562,
+          "outcome": "value",
+          "responseObserved": true,
+          "parseValid": true,
+          "schemaValid": true,
+          "productValidationPass": true,
+          "productGateEquivalentPass": true,
+          "unsafeAccepted": false,
+          "fallbackCategory": null,
+          "fieldPresence": {
+            "headline": false,
+            "whatHappened": false,
+            "whyItMatters": false,
+            "expectedBehavior": false,
+            "whyThisWasFlagged": false,
+            "evidenceSummary": true
+          },
+          "acceptedFields": [
+            "evidenceSummary"
+          ],
+          "providerErrorCategory": null,
+          "fieldFailures": [],
+          "unsafeAcceptedSignals": []
+        }
+      ]
+    }
+  ],
+  "nonClaims": [
+    "Variant success is not operator comprehension.",
+    "Artifact-local variant success is not product source repair.",
+    "Schema validity alone is not product-gated usefulness.",
+    "No dogfood corpus or classifier collection is authorized by this run."
+  ]
+}

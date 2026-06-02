@@ -1,0 +1,26 @@
+{
+  "pass": true,
+  "defaultFilesChecked": [
+    "render-draft-72.txt",
+    "render-draft-92.txt",
+    "render-fallback-72.txt",
+    "render-fallback-92.txt",
+    "render-model-72.txt",
+    "render-model-92.txt"
+  ],
+  "forbiddenDefaultFindings": [],
+  "expandedChecks": [
+    {
+      "file": "render-expanded-72.txt",
+      "hasExpandedProvenance": true,
+      "hasEvidenceRefs": true,
+      "hasRawClueBehindExpansion": true
+    },
+    {
+      "file": "render-expanded-92.txt",
+      "hasExpandedProvenance": true,
+      "hasEvidenceRefs": true,
+      "hasRawClueBehindExpansion": true
+    }
+  ]
+}

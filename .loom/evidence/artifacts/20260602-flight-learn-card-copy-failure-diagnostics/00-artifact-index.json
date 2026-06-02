@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-06-02T03:04:44.179Z",
+  "ticket": "ticket:20260602-flight-learn-card-copy-failure-diagnostics",
+  "corpus": {
+    "totalCases": 8,
+    "cases": [
+      {
+        "caseId": "case-01-repeated-workflow",
+        "title": "Repeated workflow setup friction",
+        "coverage": [
+          "repeated-workflow",
+          "expected-known",
+          "evidence-summary"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-02-validation-build",
+        "title": "Validation/build trust issue",
+        "coverage": [
+          "validation-build",
+          "expected-known"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-03-stale-edit",
+        "title": "Stale exact-text edit",
+        "coverage": [
+          "stale-edit",
+          "expected-known"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-04-low-information",
+        "title": "Low information candidate",
+        "coverage": [
+          "low-information",
+          "expected-unknown"
+        ],
+        "evidenceRefCount": 0
+      },
+      {
+        "caseId": "case-05-safety-adversarial",
+        "title": "Safety/adversarial rejection",
+        "coverage": [
+          "safety-adversarial",
+          "fallback",
+          "unsafe-rejection"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-06-expected-known",
+        "title": "Expected behavior known",
+        "coverage": [
+          "expected-known"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-07-expected-unknown",
+        "title": "Expected behavior unknown invention rejected",
+        "coverage": [
+          "expected-unknown",
+          "fallback",
+          "unsupported-expected"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-08-evidence-summary",
+        "title": "Evidence summary case",
+        "coverage": [
+          "evidence-summary",
+          "expected-known"
+        ],
+        "evidenceRefCount": 3
+      }
+    ]
+  },
+  "artifacts": {
+    "failureTaxonomy": "01-failure-taxonomy.json",
+    "runtimeProvenance": "02-runtime-provenance.json",
+    "runOutput": "03-diagnostic-run-output.json",
+    "sourceSideEffectScan": "04-source-side-effect-scan.json",
+    "postRunListenerCheck": "05-post-run-listener-check.txt",
+    "artifactPrivacyScan": "06-artifact-privacy-scan.json",
+    "finalDiffCheck": "07-final-diff-check.txt",
+    "finalPrivacyScan": "08-final-privacy-scan.json",
+    "finalStatus": "09-final-status.txt"
+  },
+  "nonClaims": [
+    "Failure diagnostics do not prove operator comprehension.",
+    "Failure diagnostics do not authorize weakening privacy, route/action, mutation, expected-behavior, evidence, or source-of-truth gates.",
+    "Failure diagnostics do not start dogfood corpus/outcome collection."
+  ]
+}

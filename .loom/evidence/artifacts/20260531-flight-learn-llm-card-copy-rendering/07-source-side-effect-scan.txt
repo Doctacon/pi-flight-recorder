@@ -1,0 +1,15 @@
+Target files: src/flight-learn-inbox.ts src/flight-learn-inbox.test.ts
+Search: storage/routing/artifact/classifier/source/docs/Loom mutation imports or write APIs added in changed renderer files
+src/flight-learn-inbox.ts:276:  [57425, "insert"],
+src/flight-learn-inbox.ts:277:  [57426, "delete"],
+src/flight-learn-inbox.ts:677:      "Type to append | backspace delete | ctrl+u clear | tab/up/down field | enter save | esc discard edit",
+src/flight-learn-inbox.ts:688:      "No artifact/rule/source/doc/Loom mutation will be applied by this action.",
+src/flight-learn-inbox.ts:739:      this.statusMessage = "Route not stored; back in review.";
+src/flight-learn-inbox.test.ts:47:    updatedAt: "2026-05-25T01:00:00.000Z",
+src/flight-learn-inbox.test.ts:73:    { value: "loom-ticket", label: "Loom ticket", description: "Route to bounded implementation or cleanup work" },
+src/flight-learn-inbox.test.ts:75:    { value: "loom-spec", label: "Loom spec", description: "Route to intended-behavior clarification" },
+src/flight-learn-inbox.test.ts:76:    { value: "loom-research", label: "Loom research", description: "Route to investigation before implementation" },
+src/flight-learn-inbox.test.ts:77:    { value: "loom-knowledge", label: "Loom knowledge", description: "Route to reusable project understanding" },
+src/flight-learn-inbox.test.ts:109:      limits: ["Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed."],
+src/flight-learn-inbox.test.ts:142:      limits: ["Optional local model narrative was accepted by the local judge for display-only wording; stored delta fields, routing, and artifacts were not changed."],
+src/flight-learn-inbox.test.ts:554:  it("supports dismiss and skip results as safe no-apply actions", () => {

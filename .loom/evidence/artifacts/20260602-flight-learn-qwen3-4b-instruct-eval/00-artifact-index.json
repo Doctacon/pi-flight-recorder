@@ -1,0 +1,146 @@
+{
+  "generatedAt": "2026-06-02T04:20:54.963Z",
+  "ticket": "ticket:20260602-flight-learn-qwen3-4b-instruct-eval",
+  "corpus": {
+    "totalCases": 8,
+    "cases": [
+      {
+        "caseId": "case-01-repeated-workflow",
+        "title": "Repeated workflow setup friction",
+        "coverage": [
+          "repeated-workflow",
+          "expected-known",
+          "evidence-summary"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-02-validation-build",
+        "title": "Validation/build trust issue",
+        "coverage": [
+          "validation-build",
+          "expected-known"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-03-stale-edit",
+        "title": "Stale exact-text edit",
+        "coverage": [
+          "stale-edit",
+          "expected-known"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-04-low-information",
+        "title": "Low information candidate",
+        "coverage": [
+          "low-information",
+          "expected-unknown"
+        ],
+        "evidenceRefCount": 0
+      },
+      {
+        "caseId": "case-05-safety-adversarial",
+        "title": "Safety/adversarial rejection",
+        "coverage": [
+          "safety-adversarial",
+          "fallback",
+          "unsafe-rejection"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-06-expected-known",
+        "title": "Expected behavior known",
+        "coverage": [
+          "expected-known"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-07-expected-unknown",
+        "title": "Expected behavior unknown invention rejected",
+        "coverage": [
+          "expected-unknown",
+          "fallback",
+          "unsupported-expected"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-08-evidence-summary",
+        "title": "Evidence summary case",
+        "coverage": [
+          "evidence-summary",
+          "expected-known"
+        ],
+        "evidenceRefCount": 3
+      }
+    ]
+  },
+  "model": {
+    "displayPath": "~/.cache/pi-flight-recorder/qwen3/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+    "fileName": "Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+    "available": true,
+    "sizeBytes": 2497280736,
+    "sizeGiB": 2.33,
+    "sha256": "2fde00ce69dd4899c70d020845e2638353015bba0fdf161b3eb965f2bca4464e",
+    "sourceRepo": "bartowski/Qwen_Qwen3-4B-Instruct-2507-GGUF",
+    "sourceFile": "Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+    "sourceUrl": "https://huggingface.co/bartowski/Qwen_Qwen3-4B-Instruct-2507-GGUF/resolve/main/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+    "sourceRepoShaObservedBeforeDownload": "ae44f08e1392f39c0e474af10c3ff8355c8b6688",
+    "upstreamModel": "Qwen/Qwen3-4B-Instruct-2507",
+    "upstreamModelShaObservedBeforeDownload": "cdbee75f17c01a7cc42f958dc650907174af0554",
+    "upstreamLicense": "apache-2.0",
+    "gated": false,
+    "cacheStatus": "downloaded-this-run"
+  },
+  "runtime": {
+    "status": "ran",
+    "reason": null,
+    "provenanceArtifact": "01-model-provenance.json",
+    "summaryArtifact": "02-qwen3-replay-summary.json",
+    "statusArtifact": "03-qwen3-replay-status.json",
+    "renderFiles": [
+      "real-case-01-repeated-workflow-92.txt",
+      "real-case-01-repeated-workflow-72.txt",
+      "real-case-02-validation-build-92.txt",
+      "real-case-02-validation-build-72.txt",
+      "real-case-03-stale-edit-92.txt",
+      "real-case-03-stale-edit-72.txt",
+      "real-case-04-low-information-92.txt",
+      "real-case-04-low-information-72.txt",
+      "real-case-05-safety-adversarial-92.txt",
+      "real-case-05-safety-adversarial-72.txt",
+      "real-case-06-expected-known-92.txt",
+      "real-case-06-expected-known-72.txt",
+      "real-case-07-expected-unknown-92.txt",
+      "real-case-07-expected-unknown-72.txt",
+      "real-case-08-evidence-summary-92.txt",
+      "real-case-08-evidence-summary-72.txt"
+    ]
+  },
+  "checks": {
+    "sourceSideEffectArtifact": "04-source-side-effect-scan.json",
+    "widthArtifact": "05-render-line-widths.json",
+    "hiddenInternalsArtifact": "06-render-contract-check.json",
+    "privacyArtifact": "07-artifact-privacy-scan.json",
+    "listenerArtifact": "08-post-run-listener-check.txt",
+    "listenerCheck": {
+      "status": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    "finalDiffArtifact": "12-final-diff-check.txt",
+    "finalPrivacyArtifact": "13-final-privacy-scan.json"
+  },
+  "nonClaims": [
+    "Replay/render evidence does not prove operator comprehension.",
+    "Schema-valid output does not prove useful model-enabled card copy.",
+    "No dogfood corpus/outcome collection started.",
+    "No product source or default model integration occurred.",
+    "Model-authored display text was omitted from Loom render artifacts."
+  ]
+}

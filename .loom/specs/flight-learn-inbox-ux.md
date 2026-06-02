@@ -4,7 +4,7 @@ ID: spec:flight-learn-inbox-ux
 Type: Spec
 Status: active
 Created: 2026-05-25
-Updated: 2026-05-29
+Updated: 2026-05-31
 
 ## Summary
 
@@ -121,6 +121,13 @@ The UI should preserve all existing safety boundaries: candidate generation can 
 - REQ-039: A local LLM draft explanation MUST be visually and semantically distinct from an accepted narrative. The card should label it with language such as `Local LLM draft — facts below are source of truth`, and should not imply verifier/judge acceptance.
 - REQ-040: A local LLM draft explanation MUST NOT persist as stored delta truth, update artifact candidates, rank routes, create rules/docs/source/Loom records, feed classifier labels, or change any routing/storage side effect. It may only help the operator read the current card.
 - REQ-041: The stricter accepted-narrative path remains available as an upgrade when verifier/judge acceptance succeeds, but it MUST NOT block draft comprehension when the operator has explicitly opted into local model reading help and hard draft display gates pass.
+- REQ-042: When the explicitly enabled local-model path is available and the relevant card-copy fields pass hard gates, the primary human-readable focused-card copy MUST prefer local-LLM-authored display text from bounded redacted facts for these field jobs: `Problem`, `What happened?`, `Why it matters`, `Expected`, `Why this was flagged`, and optional collapsed `Evidence summary`.
+- REQ-043: Local LLM card copy MUST NOT mean generated evidence. Evidence remains deterministic source material. Model text may summarize bounded redacted evidence for comprehension, but raw/redacted evidence refs remain the inspectable source of truth.
+- REQ-044: The local card-copy response contract MUST separate field jobs and support references for generated fields. It should distinguish at least headline/problem, what-happened narrative, impact, expected-behavior wording, flag rationale, and evidence summary so downstream rendering does not reuse detector/provenance/debug strings as reader-facing copy.
+- REQ-045: `Raw clue`, raw commands, raw paths, detector names, confidence scores, cluster IDs, record IDs, storage/source labels, and similar provenance/debug details MUST NOT appear as default primary sections in the focused card. They may be available behind explicit evidence/debug expansion when redacted and safe.
+- REQ-046: The visible `Evidence` section MUST stay collapsed by default. In the collapsed state it SHOULD show count/availability and MAY show a safe local-LLM evidence summary; raw/redacted refs appear only after explicit operator expansion.
+- REQ-047: `Expected` copy MUST NOT invent intended behavior. If expected behavior is unknown, local-model and deterministic fallback copy must say that Pi does not know the intended behavior yet and keep the edit affordance visible.
+- REQ-048: Deterministic fallback MUST also demote internal provenance/debug language from the primary reading path. Fallback need not be as rich as model-enabled copy, but it should use conservative user-facing wording plus route/observe/dismiss/skip/evidence actions rather than forcing the user to decode detector internals.
 
 ## Scenarios
 
@@ -200,7 +207,7 @@ GIVEN the operator has explicitly configured an approved local model runtime and
 AND a pending delta has a deterministic diagnosis plus bounded redacted facts
 WHEN the operator opens `/flight-learn` with local-model polish enabled
 THEN the system may ask the local model for structured diagnosis wording
-AND the prompt/input contains only bounded redacted facts, not raw session transcripts
+AND the prompt/input contains only bounded redacted facts, not full private session text
 AND valid output replaces only the display wording for the current card
 AND invalid, slow, unavailable, or unsafe output falls back to deterministic wording
 AND routing, storage, artifact candidates, rules, source files, Loom records, and prompts remain unchanged.
@@ -254,6 +261,41 @@ AND deterministic facts/evidence remain visible as source of truth
 AND route/observe/dismiss/skip actions remain human-controlled
 AND no stored delta, artifact candidate, route ranking, rule, source, docs, Loom, skill, prompt, or classifier state changes because the draft was displayed.
 
+### SCN-013: Local LLM authors the primary card copy
+
+Exercises: REQ-042, REQ-043, REQ-044, REQ-045, REQ-046
+
+GIVEN the operator explicitly enables the local-model path
+AND a pending delta has bounded redacted facts, detector signals, and evidence summaries
+AND the local model returns schema-compatible card-copy fields that pass hard display gates
+WHEN `/flight-learn` renders the focused card
+THEN `Problem`, `What happened?`, `Why it matters`, `Expected`, `Why this was flagged`, and the collapsed evidence summary read as local-LLM-authored comprehension copy
+AND the card does not show `Raw clue`, detector labels, confidence scores, cluster IDs, raw commands, raw paths, or record IDs as default primary sections
+AND raw/redacted evidence remains hidden behind explicit expansion.
+
+### SCN-014: Expected behavior and evidence boundaries stay truthful
+
+Exercises: REQ-043, REQ-046, REQ-047
+
+GIVEN a pending delta has no known expected behavior
+AND the local model attempts to infer or invent what the expected behavior should have been
+WHEN `/flight-learn` validates the model response
+THEN invented expected-behavior copy is rejected or omitted
+AND the card says Pi does not know the intended behavior yet
+AND the edit affordance remains visible
+AND any evidence summary is treated as display-only text, not as a replacement for inspectable evidence refs.
+
+### SCN-015: Fallback remains usable without internal-debug default
+
+Exercises: REQ-034, REQ-045, REQ-046, REQ-047, REQ-048
+
+GIVEN the local model is disabled, unavailable, slow, malformed, or unsafe
+WHEN `/flight-learn` renders the focused card
+THEN deterministic fallback discloses the limitation when useful
+AND keeps route/observe/dismiss/skip/evidence actions visible
+AND does not force raw detector names, cluster IDs, confidence scores, raw commands, or raw paths into the primary reading path
+AND lets the operator expand evidence/provenance only when needed.
+
 ## Evidence Plan
 
 - REQ-001 through REQ-007 / SCN-001 through SCN-003: fake-Pi command/component tests prove `/flight-learn` opens the custom inbox for pending deltas, selection/edit/route/dismiss/skip flows store the same safe records as the old flow, and no durable artifact mutation occurs.
@@ -267,6 +309,7 @@ AND no stored delta, artifact candidate, route ranking, rule, source, docs, Loom
 - REQ-030 through REQ-032 / SCN-010: narrative-specific tests and artifacts should prove `Problem` and `What happened?` are not duplicate sections when local narrative polish is accepted, the local-model narrative is grounded in bounded facts, and unsafe/unsupported/slow/unavailable narrative output falls back without side effects. Real Bonsai 4B evidence should include both structured corpus metrics and at least one redacted focused-card render or Pi TUI capture showing the longer narrative in context.
 - REQ-033 through REQ-036 / SCN-011: comprehension validation should include rendered model-enabled and fallback cards plus operator-facing review notes that answer whether the card can be understood and routed without first decoding raw evidence. Evidence should distinguish schema/verifier success from comprehension success and should block corpus/outcome collection if the operator cannot confidently explain the card.
 - REQ-037 through REQ-041 / SCN-012: local draft comprehension evidence should include tests and render artifacts for a draft explanation that passes hard display gates but is not judge-accepted, plus rejected draft cases for raw path/session/secret/prompt/route/mutation/overlong/unknown-fact content. Evidence must prove draft display has no storage/routing/artifact/source/Loom/classifier side effects.
+- REQ-042 through REQ-048 / SCN-013 through SCN-015: local LLM card-copy evidence should include fake-provider tests for all primary explanation fields, field-specific support/gate failures, render artifacts proving `Raw clue`/detector/provenance details are absent from the default reading path, collapsed evidence-summary renders, deterministic fallback renders, privacy scans, and operator comprehension notes. Real local-runtime claims require an explicitly authorized local runtime smoke or a recorded blocker.
 - Visual UX claim: before strong release claims, capture at least one real interactive Pi TUI screenshot or ANSI log showing the custom inbox with representative data.
 
 ## Open Questions
@@ -295,7 +338,13 @@ Why it matters
   Repeated setup/cwd friction makes it harder to trust whether the latest code actually passed.
 
 Expected
-  unknown — press e to add what should have happened
+  Pi does not know the intended behavior yet — press e to add it.
+
+Why this was flagged
+  The same validation pattern appeared in recent local sessions, so Pi is treating this as recurring friction rather than one isolated failure. Internal detector details are hidden unless evidence is expanded.
+
+Evidence
+  3 redacted refs available. Local summary shown above; press v to inspect concise refs.
 
 Choose a follow-up
 > Code legibility
@@ -315,7 +364,7 @@ Bad inbox behavior:
 ```text
 Choose an expectation delta
 1. Repeated failure pattern: bash bash -lc 'echo ...' [delta_...]
-2. Repeated failure pattern: bash cd /Users/<user>/Code/... && npm ...
+2. Repeated failure pattern: bash cd [local path omitted] && npm ...
 ...
 ```
 
@@ -323,12 +372,24 @@ Also bad:
 
 ```text
 + Pending deltas -----------+ + Selected delta -----------------------+
-| > 5/6 bash cd /Users/... | | At a glance | Why suggested | Evidence |
+| > 5/6 bash cd [local path omitted] | | At a glance | Why suggested | Evidence |
 +--------------------------+ +----------------------------------------+
 Follow-up choices: 1 Code legibility 2 Test/check [3 Flight Rule] 4 Observe
 ```
 
 This is still too much of a table. It makes the selected item, explanation, evidence, and route choice compete for attention.
+
+Also bad:
+
+```text
+Raw clue
+  Repeated failure pattern: file-not-found failures
+
+Why suggested
+  detector-name (0.60): internal cluster identifier has related occurrences...
+```
+
+That makes the operator decode provenance as if it were the product explanation. Those details belong behind expansion/debug, not in the default reading path.
 
 A reviewer should be able to tell whether the UI reduces cognitive load: fewer giant text blobs, less path noise, visible current step, visible safe actions, and no need to infer workflow state across separate dialogs.
 
@@ -415,5 +476,5 @@ Non-examples:
 - `evidence:20260527-flight-learn-plain-english-feedback` - operator screenshot/feedback showing that focused-card layout improved but primary diagnosis text remains too code-heavy and one-line/truncated.
 - `research:20260529-llama-cpp-constrained-json` - records constrained-output route tradeoffs for local narrative generation.
 - `evidence:20260529-llama-cpp-constrained-json-probe` - proves the installed local Bonsai 4B/llama.cpp path can enforce the narrative JSON shape at generator time.
-- `/Users/crlough/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/docs/tui.md` - Pi TUI capabilities and component constraints.
-- `/Users/crlough/.bun/install/global/node_modules/@earendil-works/pi-coding-agent/docs/extensions.md` - extension UI APIs, command handlers, and custom UI integration.
+- Pi coding-agent `docs/tui.md` - Pi TUI capabilities and component constraints.
+- Pi coding-agent `docs/extensions.md` - extension UI APIs, command handlers, and custom UI integration.

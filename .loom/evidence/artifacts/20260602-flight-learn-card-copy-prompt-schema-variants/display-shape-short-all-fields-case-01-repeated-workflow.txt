@@ -1,0 +1,12 @@
+Variant: short-all-fields
+Case: case-01-repeated-workflow
+Product-gate-equivalent pass: false
+Fallback category: unsupported-facts
+Display field shape (model text omitted; no raw model output persisted):
+- headline: present
+- whatHappened: present
+- whyItMatters: present
+- expectedBehavior: omitted
+- whyThisWasFlagged: present
+- evidenceSummary: present
+Evidence remains deterministic and inspectable; this artifact records shape only.

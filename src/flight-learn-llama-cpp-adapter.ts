@@ -75,7 +75,7 @@ type LlamaCppJsonSchemaResponseFormat = {
 const LOCAL_DIAGNOSIS_POLISH_RESPONSE_SCHEMA: JsonSchema = {
   type: "object",
   additionalProperties: false,
-  required: ["schemaVersion", "whatHappened"],
+  required: ["schemaVersion"],
   properties: {
     schemaVersion: { type: "integer", enum: [2] },
     headline: { type: "string", minLength: 1, maxLength: 120 },
@@ -107,8 +107,27 @@ const LOCAL_DIAGNOSIS_POLISH_RESPONSE_SCHEMA: JsonSchema = {
     },
     whyItMatters: { type: "string", minLength: 1, maxLength: 300 },
     expectedBehavior: { type: ["string", "null"], maxLength: 320 },
+    whyThisWasFlagged: factCitedDisplayFieldSchema(360),
+    evidenceSummary: factCitedDisplayFieldSchema(360),
   },
 };
+
+function factCitedDisplayFieldSchema(maxTextLength: number): JsonSchema {
+  return {
+    type: "object",
+    additionalProperties: false,
+    required: ["text", "factIds"],
+    properties: {
+      text: { type: "string", minLength: 1, maxLength: maxTextLength },
+      factIds: {
+        type: "array",
+        minItems: 1,
+        maxItems: 8,
+        items: { type: "string", pattern: "^F[0-9]+$" },
+      },
+    },
+  };
+}
 
 const LOCAL_NARRATIVE_JUDGE_RESPONSE_SCHEMA: JsonSchema = {
   type: "object",

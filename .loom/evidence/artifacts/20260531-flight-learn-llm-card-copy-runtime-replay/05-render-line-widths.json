@@ -1,0 +1,229 @@
+{
+  "pass": true,
+  "checks": [
+    {
+      "file": "fake-case-01-repeated-workflow-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 78,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-01-repeated-workflow-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-02-validation-build-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 77,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-02-validation-build-72.txt",
+      "width": 72,
+      "lineCount": 37,
+      "maxLineLength": 69,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-03-stale-edit-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-03-stale-edit-72.txt",
+      "width": 72,
+      "lineCount": 38,
+      "maxLineLength": 70,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-04-low-information-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 82,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-04-low-information-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-05-safety-adversarial-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-05-safety-adversarial-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-06-expected-known-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-06-expected-known-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-07-expected-unknown-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-07-expected-unknown-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-08-evidence-summary-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 76,
+      "overLimit": []
+    },
+    {
+      "file": "fake-case-08-evidence-summary-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 69,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-01-repeated-workflow-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-01-repeated-workflow-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-02-validation-build-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-02-validation-build-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-03-stale-edit-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-03-stale-edit-72.txt",
+      "width": 72,
+      "lineCount": 38,
+      "maxLineLength": 70,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-04-low-information-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 82,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-04-low-information-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-05-safety-adversarial-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-05-safety-adversarial-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-06-expected-known-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-06-expected-known-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-07-expected-unknown-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-07-expected-unknown-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-08-evidence-summary-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-case-08-evidence-summary-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 69,
+      "overLimit": []
+    }
+  ]
+}

@@ -109,6 +109,14 @@ function validPolishJson(): string {
     },
     whyItMatters: "That makes the validation result hard to trust.",
     expectedBehavior: "Run validation from a fresh project shell.",
+    whyThisWasFlagged: {
+      text: "Pi saw 2 related validation failures from the same stale shell pattern.",
+      factIds: ["F9", "F10"],
+    },
+    evidenceSummary: {
+      text: "Validation failed from a stale pane.",
+      factIds: ["F21"],
+    },
   });
 }
 
@@ -123,6 +131,14 @@ function validNarrativePolishJson(): string {
     },
     whyItMatters: "That makes the validation result hard to trust.",
     expectedBehavior: "Run validation from a fresh project shell.",
+    whyThisWasFlagged: {
+      text: "Pi saw 2 related validation failures from the same stale shell pattern.",
+      factIds: ["F9", "F10"],
+    },
+    evidenceSummary: {
+      text: "Validation failed from a stale pane.",
+      factIds: ["F21"],
+    },
   });
 }
 
@@ -327,12 +343,32 @@ function assertGeneratorSchema(body: Record<string, unknown>): void {
   const schema = responseFormatJsonSchema(body);
   expect(responseFormat.json_schema?.name).toBe("flight_learn_diagnosis_polish_v2");
   expect(schema["additionalProperties"]).toBe(false);
-  expect(schema["required"]).toEqual(["schemaVersion", "whatHappened"]);
+  expect(schema["required"]).toEqual(["schemaVersion"]);
   const properties = propertiesOf(schema);
   expect(objectProperty(properties, "schemaVersion")["enum"]).toEqual([2]);
   expect(properties).toHaveProperty("headline");
   expect(properties).toHaveProperty("whyItMatters");
   expect(properties).toHaveProperty("expectedBehavior");
+  expect(properties).toHaveProperty("whyThisWasFlagged");
+  expect(properties).toHaveProperty("evidenceSummary");
+
+  const whyFlagged = objectProperty(properties, "whyThisWasFlagged");
+  expect(whyFlagged["additionalProperties"]).toBe(false);
+  expect(whyFlagged["required"]).toEqual(["text", "factIds"]);
+  expect(objectProperty(propertiesOf(whyFlagged), "text")["maxLength"]).toBe(360);
+  const whyFlaggedFactIds = objectProperty(propertiesOf(whyFlagged), "factIds");
+  expect(whyFlaggedFactIds["minItems"]).toBe(1);
+  expect(whyFlaggedFactIds["maxItems"]).toBe(8);
+  expect(objectProperty(whyFlaggedFactIds, "items")["pattern"]).toBe("^F[0-9]+$");
+
+  const evidenceSummary = objectProperty(properties, "evidenceSummary");
+  expect(evidenceSummary["additionalProperties"]).toBe(false);
+  expect(evidenceSummary["required"]).toEqual(["text", "factIds"]);
+  expect(objectProperty(propertiesOf(evidenceSummary), "text")["maxLength"]).toBe(360);
+  const evidenceSummaryFactIds = objectProperty(propertiesOf(evidenceSummary), "factIds");
+  expect(evidenceSummaryFactIds["minItems"]).toBe(1);
+  expect(evidenceSummaryFactIds["maxItems"]).toBe(8);
+  expect(objectProperty(evidenceSummaryFactIds, "items")["pattern"]).toBe("^F[0-9]+$");
 
   const whatHappened = objectProperty(properties, "whatHappened");
   expect(whatHappened["additionalProperties"]).toBe(false);

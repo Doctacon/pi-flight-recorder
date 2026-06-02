@@ -1,0 +1,98 @@
+# Side-effect/source-boundary scan
+
+Changed implementation files scanned:
+- src/flight-learn-local-diagnosis-model.ts
+- src/flight-learn-llama-cpp-adapter.ts
+
+Import scan for storage/fs/artifact/classifier modules:
+src/flight-learn-local-diagnosis-model.ts:312:  /\b(?:ls|cat|grep|rg|sed|awk|curl|wget|rm|cp|mv|mkdir|touch|chmod|chown|ssh|scp|rsync|find|xargs|tar|unzip|zip)\s+(?:--?[A-Za-z0-9][\w-]*|[^\s]+)\b/i,
+src/flight-learn-local-diagnosis-model.ts:323:  /\b(?:artifact|candidate|flight\s*rule|loom\s+(?:ticket|spec|research|knowledge|record)|classifier|route\s+ranking)\b/i,
+src/flight-learn-local-diagnosis-model.ts:964:    "Reject or return uncertain when support is unclear, confidence is low, action/follow-up/route/classifier advice appears, or the candidate is not useful. Uncertainty fails closed.",
+
+Boundary-word scan in changed implementation files (guardrail/display text expected):
+src/flight-learn-llama-cpp-adapter.ts:179:export function createLlamaCppLocalDiagnosisPolishOptions(config?: unknown): LocalDiagnosisPolishOptions {
+src/flight-learn-llama-cpp-adapter.ts:180:  const provider = createLlamaCppLocalDiagnosisPolishProvider(config);
+src/flight-learn-llama-cpp-adapter.ts:188:  const judgeProvider = createLlamaCppLocalNarrativeJudgeProvider(judgeConfig);
+src/flight-learn-llama-cpp-adapter.ts:198:export function createLlamaCppLocalDiagnosisPolishProvider(config?: unknown): LocalDiagnosisPolishProvider | null {
+src/flight-learn-llama-cpp-adapter.ts:203:export function createLlamaCppLocalNarrativeJudgeProvider(config?: unknown): LocalNarrativeJudgeProvider | null {
+src/flight-learn-llama-cpp-adapter.ts:267:async function postChatCompletion(config: ParsedLlamaCppConfig, request: { prompt: string; signal: AbortSignal }, responseFormat: LlamaCppJsonSchemaResponseFormat): Promise<string> {
+src/flight-learn-llama-cpp-adapter.ts:269:    messages: [{ role: "user", content: request.prompt }],
+src/flight-learn-llama-cpp-adapter.ts:451:  if (!isPlainObject(request.candidate) || request.candidate["field"] !== "whatHappened" || !Array.isArray(request.candidate["sentences"])) {
+src/flight-learn-llama-cpp-adapter.ts:457:function assertPromptRequest(request: { prompt: string; signal: AbortSignal }): void {
+src/flight-learn-llama-cpp-adapter.ts:458:  if (typeof request.prompt !== "string" || request.prompt.length === 0 || request.prompt.length > MAX_PROMPT_CHARS) {
+src/flight-learn-local-diagnosis-model.ts:45: * Provider boundary for explicitly enabled local/open-source diagnosis polish.
+src/flight-learn-local-diagnosis-model.ts:47: * The interface intentionally carries a bounded prompt and has no generic URL,
+src/flight-learn-local-diagnosis-model.ts:57:  prompt: string;
+src/flight-learn-local-diagnosis-model.ts:94:    source: ExpectationDelta["source"];
+src/flight-learn-local-diagnosis-model.ts:130:  sourceType: DeltaEvidenceRef["sourceType"];
+src/flight-learn-local-diagnosis-model.ts:182:  prompt: string;
+src/flight-learn-local-diagnosis-model.ts:193:  candidate: LocalNarrativeJudgeCandidate;
+src/flight-learn-local-diagnosis-model.ts:280:const DELTA_SOURCE_VALUES = new Set<ExpectationDelta["source"]>(["manual", "detector", "reflection", "import"]);
+src/flight-learn-local-diagnosis-model.ts:281:const DELTA_STATUS_VALUES = new Set<ExpectationDelta["status"]>(["candidate", "accepted", "dismissed", "routed", "resolved", "recurring"]);
+src/flight-learn-local-diagnosis-model.ts:284:const EVIDENCE_SOURCE_TYPE_VALUES = new Set<DeltaEvidenceRef["sourceType"]>(["occurrence", "episode", "cluster", "proposal", "rule-candidate", "flight-rule", "session-entry", "manual"]);
+src/flight-learn-local-diagnosis-model.ts:293:  /\[\s*(?:REDACTED(?:[_\s-][A-Z0-9 _-]+)?|stack trace omitted|raw session transcript omitted|prompt text omitted|local path omitted)\s*\]/i,
+src/flight-learn-local-diagnosis-model.ts:317:  /\b(?:route|routes|routed|routing)\b/i,
+src/flight-learn-local-diagnosis-model.ts:319:  /(?:^|[.!?]\s+)(?:then\s+|please\s+)*(?:add|edit|modify|change|delete|remove|fix|write|create|update)\s+(?:a\s+|an\s+|the\s+)?(?:test|tests|file|files|code|source|module|dependency|prompt|rule|ticket|artifact|candidate|loom|skill)\b/i,
+src/flight-learn-local-diagnosis-model.ts:320:  /\b(?:you|we|they|the\s+assistant|the\s+user)\s+(?:(?:can|could|should|might|may|would|must|will)|(?:(?:need|needs|has|have)\s+to))\s+(?:then\s+|also\s+|please\s+)*(?:add|edit|modify|change|delete|remove|fix|write|create|update|route|choose|select|press|click|apply|store|save|persist|rerun|re-run|reinstall|review)\b/i,
+src/flight-learn-local-diagnosis-model.ts:321:  /\b(?:you|we|they|the\s+user)\s+(?:(?:can|could|should|might|may|would|must|will)|(?:(?:need|needs|has|have)\s+to))\s+(?:then\s+|also\s+|please\s+)*keep\s+(?:editing|writing|changing|updating|creating|routing|reviewing|rerunning|reinstalling)\b/i,
+src/flight-learn-local-diagnosis-model.ts:322:  /\b(?:create|apply|store|save|persist|write)\s+(?:a\s+)?(?:route|artifact|candidate|rule|ticket|loom|file|prompt|skill|source)/i,
+src/flight-learn-local-diagnosis-model.ts:323:  /\b(?:artifact|candidate|flight\s*rule|loom\s+(?:ticket|spec|research|knowledge|record)|classifier|route\s+ranking)\b/i,
+src/flight-learn-local-diagnosis-model.ts:325:  /\b(?:source files?|docs?|prompts?|skills?)\s+(?:should|must|need|needs|will)\s+(?:be\s+)?(?:changed|updated|created|written|mutated)\b/i,
+src/flight-learn-local-diagnosis-model.ts:327:  /\b(?:detector|reflection\s+cluster|cluster_[a-z0-9_-]+|confidence(?:\s+score)?|record\s+ids?|source\s+ids?|session\s+ids?|entry\s+ids?|fact\s+ids?|sourceType|sourceFile|sessionFile|cwd)\b/i,
+src/flight-learn-local-diagnosis-model.ts:328:  /\b(?:generated|created|added|fabricated|invented|synthesized)\s+(?:new\s+|extra\s+)?(?:evidence|refs?|snippets?)\b/i,
+src/flight-learn-local-diagnosis-model.ts:333:const WHAT_HAPPENED_GENERIC_IMPERATIVE_VERBS = "re-?run|run|validate|check|use(?!\\s+of\\b)|do|perform|execute|retry|inspect|verify|confirm|open|install|reinstall|fix|update|edit|write|create|route|choose|select|press|click|apply|store|save|persist";
+src/flight-learn-local-diagnosis-model.ts:334:const WHAT_HAPPENED_IMPERATIVE_CLAUSE_PATTERN = new RegExp(`^(?:(?:and|then|please|now|next)\\s+)*(?:(?:${WHAT_HAPPENED_GENERIC_IMPERATIVE_VERBS})\\b|review\\s+(?:the|this|that|result|output|evidence|card|issue|failure|pattern)\\b|keep\\s+(?:validating|editing|writing|changing|updating|creating|routing|reviewing|rerunning|reinstalling)\\b)`, "i");
+src/flight-learn-local-diagnosis-model.ts:335:const WHAT_HAPPENED_INTRODUCTORY_ACTION_PATTERN = new RegExp(`^(?:after|before|when|once|if|because|for|during|to)\\b[^.!?;:,]{0,120}\\b(?:(?:and|then|please|now|next)\\s+)*(?:(?:${WHAT_HAPPENED_GENERIC_IMPERATIVE_VERBS})\\b|review\\s+(?:the|this|that|result|output|evidence|card|issue|failure|pattern)\\b|keep\\s+(?:validating|editing|writing|changing|updating|creating|routing|reviewing|rerunning|reinstalling)\\b)`, "i");
+src/flight-learn-local-diagnosis-model.ts:336:const CONCRETE_MUTATION_SUBJECT = "source|code|docs?|documentation|loom|rule|ticket|artifact|candidate|prompt|skill|database|migration|production|data|file|files?|module|dependency|schema|storage|record|records?";
+src/flight-learn-local-diagnosis-model.ts:337:const CONCRETE_MUTATION_VERB = "changed|modified|updated|created|deleted|removed|written|rewritten|wrote|rewrote|edited|mutated|corrupted|broke|broken|deployed|migrated|overwrote|overwritten";
+src/flight-learn-local-diagnosis-model.ts:344:  /\b(?:system|developer|user)\s+prompt\b/i,
+src/flight-learn-local-diagnosis-model.ts:345:  /\bfull\s+prompt\b/i,
+src/flight-learn-local-diagnosis-model.ts:446:    const candidate = value.slice(index, end);
+src/flight-learn-local-diagnosis-model.ts:447:    if (!isPathLikeLocalCandidate(candidate)) {
+src/flight-learn-local-diagnosis-model.ts:488:function isPathLikeLocalCandidate(candidate: string): boolean {
+src/flight-learn-local-diagnosis-model.ts:489:  const trimmed = candidate.replace(/[),.;!?]+$/g, "");
+src/flight-learn-local-diagnosis-model.ts:536:  if (looksLikePrompt(normalized)) return "[prompt text omitted]";
+src/flight-learn-local-diagnosis-model.ts:575:    sourceType: safeEnumValue(ref.sourceType, EVIDENCE_SOURCE_TYPE_VALUES, "manual"),
+src/flight-learn-local-diagnosis-model.ts:635:    source: safeEnumValue(input.delta.source, DELTA_SOURCE_VALUES, "manual"),
+src/flight-learn-local-diagnosis-model.ts:636:    status: safeEnumValue(input.delta.status, DELTA_STATUS_VALUES, "candidate"),
+src/flight-learn-local-diagnosis-model.ts:676:    "Use only the bounded redacted fact packet and its facts[] entries. Do not add facts, routes, actions, artifacts, file paths, secrets, stack traces, commands, or transcript text.",
+src/flight-learn-local-diagnosis-model.ts:680:    "For whyThisWasFlagged and evidenceSummary, return {\"text\":\"...\",\"factIds\":[\"F1\"]}. evidenceSummary must summarize existing evidence facts only; do not create, imply, invent, or replace evidence refs.",
+src/flight-learn-local-diagnosis-model.ts:682:    "Do not include confidence, scores, metadata, notes, rationale, route, action, status, severity, record IDs, detector names, cluster IDs, or any other non-display field.",
+src/flight-learn-local-diagnosis-model.ts:685:    "The JSON is display-only wording for the current card and must not instruct routing, ranking, storage, artifact creation, source edits, Loom records, rules, skills, or prompt changes.",
+src/flight-learn-local-diagnosis-model.ts:700:  const prompt = buildLocalDiagnosisPrompt(factPacket);
+src/flight-learn-local-diagnosis-model.ts:708:      Promise.resolve(options.provider.completeLocalDiagnosisPolish({ prompt, factPacket: providerFactPacket, signal: controller.signal })),
+src/flight-learn-local-diagnosis-model.ts:779:  candidate: LocalNarrativeJudgeCandidate,
+src/flight-learn-local-diagnosis-model.ts:788:  const request = buildLocalNarrativeJudgeRequest(factPacket, candidate, controller.signal);
+src/flight-learn-local-diagnosis-model.ts:804:  return validateLocalNarrativeJudgeResponse(providerResponse.value, candidate);
+src/flight-learn-local-diagnosis-model.ts:905:    "Optional local model phrasing was used for display-only wording; stored delta fields, routing, and artifacts were not changed.",
+src/flight-learn-local-diagnosis-model.ts:913:    "Optional local model narrative was accepted by the local judge for display-only wording; stored delta fields, routing, and artifacts were not changed.",
+src/flight-learn-local-diagnosis-model.ts:921:    "Local LLM draft was shown as non-authoritative reading help; deterministic facts, storage, routing, and artifacts remain the source of truth.",
+src/flight-learn-local-diagnosis-model.ts:933:  candidate: LocalNarrativeJudgeCandidate,
+src/flight-learn-local-diagnosis-model.ts:949:    candidate: {
+src/flight-learn-local-diagnosis-model.ts:951:      text: candidate.text,
+src/flight-learn-local-diagnosis-model.ts:952:      sentences: candidate.sentences.map((sentence) => ({
+src/flight-learn-local-diagnosis-model.ts:960:  const prompt = [
+src/flight-learn-local-diagnosis-model.ts:961:    "You are an optional local-only judge for a Pi Flight Learn whatHappened narrative candidate.",
+src/flight-learn-local-diagnosis-model.ts:962:    "Use only the bounded redacted facts and candidate sentences in this request. Do not add facts, rewrite text, choose routes, classify, rank, store, mutate artifacts, edit source, or mention raw paths/secrets/transcripts.",
+src/flight-learn-local-diagnosis-model.ts:964:    "Reject or return uncertain when support is unclear, confidence is low, action/follow-up/route/classifier advice appears, or the candidate is not useful. Uncertainty fails closed.",
+src/flight-learn-local-diagnosis-model.ts:969:  return { ...requestWithoutPromptAndSignal, prompt, signal };
+src/flight-learn-local-diagnosis-model.ts:972:export function validateLocalNarrativeJudgeResponse(rawResponse: string, candidate: LocalNarrativeJudgeCandidate): JudgeValidationResult {
+src/flight-learn-local-diagnosis-model.ts:1006:  if (sentenceResponses.length !== candidate.sentences.length) {
+src/flight-learn-local-diagnosis-model.ts:1007:    return { ok: false, reason: "schema-invalid", issue: "local narrative judge sentence coverage did not match candidate" };
+src/flight-learn-local-diagnosis-model.ts:1010:  const candidateByIndex = new Map(candidate.sentences.map((sentence) => [sentence.index, sentence]));
+src/flight-learn-local-diagnosis-model.ts:1013:    const sentenceValidation = validateLocalNarrativeJudgeSentenceResponse(sentenceResponse, candidateByIndex, seenIndexes);
+src/flight-learn-local-diagnosis-model.ts:1016:  if (seenIndexes.size !== candidate.sentences.length) {
+src/flight-learn-local-diagnosis-model.ts:1017:    return { ok: false, reason: "schema-invalid", issue: "local narrative judge sentence coverage did not match candidate" };
+src/flight-learn-local-diagnosis-model.ts:1033:  candidateByIndex: Map<number, LocalNarrativeJudgeCandidateSentence>,
+src/flight-learn-local-diagnosis-model.ts:1042:  const candidate = candidateByIndex.get(index as number);
+src/flight-learn-local-diagnosis-model.ts:1043:  if (!candidate || seenIndexes.has(index as number)) return { ok: false, reason: "schema-invalid", issue: "local narrative judge sentence coverage did not match candidate" };
+src/flight-learn-local-diagnosis-model.ts:1062:  const citedFactIds = new Set(candidate.factIds);
+src/flight-learn-local-diagnosis-model.ts:1141:    if (normalized.candidate) narrativeCandidate = normalized.candidate;
+src/flight-learn-local-diagnosis-model.ts:1151:type FieldValidationResult = { ok: true; value: string | null; candidate?: LocalNarrativeJudgeCandidate | null } | { ok: false; reason: LocalDiagnosisPolishFallbackReason; issue: string };
+src/flight-learn-local-diagnosis-model.ts:1240:  const candidateSentences: LocalNarrativeJudgeCandidateSentence[] = [];
+src/flight-learn-local-diagnosis-model.ts:1275:      return { ok: false, reason: "unsupported-facts", issue: "whatHappened narrative included unsupported concrete mutation claims" };
+src/flight-learn-local-diagnosis-model.ts:1278:    candidateSentences.push({
+src/flight-learn-local-diagnosis-model.ts:1279:      index: candidateSentences.length,
+src/flight-learn-local-diagnosis-model.ts:1301:  return { ok: true, value: combined, candidate: { field: "whatHappened", text: combined, sentences: candidateSentences } };
+
+Interpretation: no storage/fs/artifact/classifier imports or write APIs were added in changed implementation files. Matches above are provider prompt text, validator guardrails, request schema names, or existing display-only limit strings; model output still flows only into LocalDiagnosisPolishResult.view display fields.

@@ -1,0 +1,88 @@
+{
+  "generatedAt": "2026-06-02T03:21:36.546Z",
+  "diagnosticEvidence": "evidence:20260602-flight-learn-card-copy-failure-diagnostics",
+  "baseline": {
+    "productGatePassCount": 0,
+    "cases": 8,
+    "dominantFailures": [
+      "timeout-resource-envelope",
+      "unsafe-output",
+      "citation robustness",
+      "low-information whatHappened"
+    ]
+  },
+  "variants": [
+    {
+      "variantId": "short-all-fields",
+      "schemaName": "flight_learn_card_copy_short_all_fields_v1",
+      "description": "Shorter instructions with the same six product field jobs, explicit omit-if-not-improving and exact fact-ID rules.",
+      "fieldsRequested": [
+        "headline",
+        "whatHappened",
+        "whyItMatters",
+        "expectedBehavior",
+        "whyThisWasFlagged",
+        "evidenceSummary"
+      ],
+      "maxOutputTokens": 384,
+      "diagnosticJustification": [
+        "timeout-resource-envelope",
+        "all-field-burden",
+        "citation-robustness",
+        "low-information-whatHappened"
+      ],
+      "productCompatibleMapping": "Variant output maps to schemaVersion 2 product validator shape; omitted fields remain omitted.",
+      "nonGoals": [
+        "no product source edits",
+        "no gate relaxation",
+        "no new model/runtime"
+      ]
+    },
+    {
+      "variantId": "core-four-fields",
+      "schemaName": "flight_learn_card_copy_core_four_fields_v1",
+      "description": "Lower output burden focused on Problem, What happened, Why it matters, and Expected; flag/evidence summary are omitted by design.",
+      "fieldsRequested": [
+        "headline",
+        "whatHappened",
+        "whyItMatters",
+        "expectedBehavior"
+      ],
+      "maxOutputTokens": 288,
+      "diagnosticJustification": [
+        "timeout-resource-envelope",
+        "all-field-burden",
+        "low-information-whatHappened"
+      ],
+      "productCompatibleMapping": "Variant output maps to schemaVersion 2 product validator shape; omitted fields remain omitted.",
+      "nonGoals": [
+        "no product source edits",
+        "no gate relaxation",
+        "no new model/runtime"
+      ]
+    },
+    {
+      "variantId": "flag-evidence-lite",
+      "schemaName": "flight_learn_card_copy_flag_evidence_lite_v1",
+      "description": "Citation-focused lower-burden probe for Why this was flagged and Evidence summary, with optional one-sentence whatHappened only when useful.",
+      "fieldsRequested": [
+        "whatHappened",
+        "whyThisWasFlagged",
+        "evidenceSummary"
+      ],
+      "maxOutputTokens": 224,
+      "diagnosticJustification": [
+        "citation-robustness",
+        "unknown-fact-id",
+        "generated-evidence-fail-closed",
+        "timeout-resource-envelope"
+      ],
+      "productCompatibleMapping": "Variant output maps to schemaVersion 2 product validator shape; omitted fields remain omitted.",
+      "nonGoals": [
+        "no product source edits",
+        "no gate relaxation",
+        "no new model/runtime"
+      ]
+    }
+  ]
+}

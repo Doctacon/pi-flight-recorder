@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-06-02T03:21:36.546Z",
+  "realRuntimeStatus": {
+    "status": "ran",
+    "reason": null
+  },
+  "modelChecksumMatched": true,
+  "recommendation": "no-go same-model path for current variants",
+  "selectedVariant": "flag-evidence-lite",
+  "variantPassCounts": {
+    "short-all-fields": 0,
+    "core-four-fields": 0,
+    "flag-evidence-lite": 6
+  },
+  "unsafeAcceptedCounts": {
+    "short-all-fields": 0,
+    "core-four-fields": 0,
+    "flag-evidence-lite": 1
+  },
+  "privacyBoundary": "Raw prompts, raw model responses, and raw server logs were not persisted by this harness."
+}

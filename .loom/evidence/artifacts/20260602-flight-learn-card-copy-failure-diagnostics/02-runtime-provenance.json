@@ -1,0 +1,34 @@
+{
+  "status": "ran",
+  "reason": null,
+  "runtime": {
+    "path": "/opt/homebrew/bin/llama-server",
+    "available": true,
+    "versionStatus": 0,
+    "versionStdoutPreview": "",
+    "versionStderrPreview": "version: 9360 (6b4e4bd58) built with AppleClang 17.0.0.17000604 for Darwin arm64"
+  },
+  "model": {
+    "path": "~/.cache/pi-flight-recorder/bonsai/Bonsai-4B-Q1_0.gguf",
+    "available": true,
+    "sha256": "4524b3f997f0f06444e568d1f26e2efd69effa3218c7ad3047432fb171e42168",
+    "expectedSha256": "4524b3f997f0f06444e568d1f26e2efd69effa3218c7ad3047432fb171e42168",
+    "matchesExpected": true
+  },
+  "baseUrl": "http://127.0.0.1:52618/",
+  "loopbackOnly": true,
+  "hostedProviderUsed": false,
+  "automaticDownloadOrInstall": false,
+  "health": {
+    "ok": true,
+    "health": {
+      "status": "ok"
+    }
+  },
+  "serverLogSummary": {
+    "stdoutBytes": 0,
+    "stderrBytes": 15650,
+    "rawLogsPersisted": false,
+    "note": "Raw llama-server logs were temporary and deleted after byte-count summary without reading or persisting contents."
+  }
+}

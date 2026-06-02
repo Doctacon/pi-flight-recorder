@@ -1,0 +1,108 @@
+{
+  "generatedAt": "2026-06-02T03:21:36.546Z",
+  "ticket": "ticket:20260602-flight-learn-card-copy-prompt-schema-variants",
+  "corpus": {
+    "totalCases": 8,
+    "cases": [
+      {
+        "caseId": "case-01-repeated-workflow",
+        "title": "Repeated workflow setup friction",
+        "coverage": [
+          "repeated-workflow",
+          "expected-known",
+          "evidence-summary"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-02-validation-build",
+        "title": "Validation/build trust issue",
+        "coverage": [
+          "validation-build",
+          "expected-known"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-03-stale-edit",
+        "title": "Stale exact-text edit",
+        "coverage": [
+          "stale-edit",
+          "expected-known"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-04-low-information",
+        "title": "Low information candidate",
+        "coverage": [
+          "low-information",
+          "expected-unknown"
+        ],
+        "evidenceRefCount": 0
+      },
+      {
+        "caseId": "case-05-safety-adversarial",
+        "title": "Safety/adversarial rejection",
+        "coverage": [
+          "safety-adversarial",
+          "fallback",
+          "unsafe-rejection"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-06-expected-known",
+        "title": "Expected behavior known",
+        "coverage": [
+          "expected-known"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-07-expected-unknown",
+        "title": "Expected behavior unknown invention rejected",
+        "coverage": [
+          "expected-unknown",
+          "fallback",
+          "unsupported-expected"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-08-evidence-summary",
+        "title": "Evidence summary case",
+        "coverage": [
+          "evidence-summary",
+          "expected-known"
+        ],
+        "evidenceRefCount": 3
+      }
+    ]
+  },
+  "artifacts": {
+    "variantMatrix": "01-variant-matrix.json",
+    "variantSummary": "02-variant-summary.json",
+    "variantResults": "03-variant-results.json",
+    "runtimeProvenance": "04-runtime-provenance.json",
+    "sourceSideEffectScan": "05-source-side-effect-scan.json",
+    "postRunListenerCheck": "06-post-run-listener-check.txt",
+    "runOutput": "07-variant-run-output.json",
+    "artifactPrivacyScan": "08-artifact-privacy-scan.json",
+    "harnessSyntaxCheck": "09-harness-syntax-check.txt",
+    "finalDiffCheck": "10-final-diff-check.txt",
+    "finalPrivacyScan": "11-final-privacy-scan.json",
+    "finalStatus": "12-final-status.txt",
+    "displayShapeFiles": [
+      "display-shape-short-all-fields-case-01-repeated-workflow.txt",
+      "display-shape-core-four-fields-case-01-repeated-workflow.txt",
+      "display-shape-flag-evidence-lite-case-01-repeated-workflow.txt"
+    ]
+  },
+  "nonClaims": [
+    "Variant success is not operator comprehension.",
+    "Artifact-local variant success is not product source repair.",
+    "Schema validity alone is not product-gated usefulness.",
+    "No dogfood corpus or classifier collection is authorized by this run."
+  ]
+}

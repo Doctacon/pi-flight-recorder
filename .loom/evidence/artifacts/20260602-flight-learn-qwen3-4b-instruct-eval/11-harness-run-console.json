@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-06-02T04:20:54.963Z",
+  "realRuntimeStatus": {
+    "status": "ran",
+    "reason": null
+  },
+  "summary": {
+    "totalCases": 8,
+    "parseValidCount": 0,
+    "schemaValidCount": 0,
+    "productGatePassCount": 0,
+    "safeProductGatePassCount": 0,
+    "unsafeAcceptedCount": 0,
+    "fallbackReasons": {
+      "timeout": 8
+    },
+    "latencyMs": {
+      "min": 5003,
+      "max": 5023,
+      "avg": 5008
+    },
+    "memoryRssKb": {
+      "min": 782016,
+      "max": 1821184,
+      "avg": 1143583
+    },
+    "gateDisposition": "keep-downstream-comprehension-validation-blocked"
+  },
+  "widthPass": true,
+  "hiddenInternalsPass": true,
+  "privacyPass": true,
+  "sourceSideEffectPass": true,
+  "artifactDir": ".loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval"
+}

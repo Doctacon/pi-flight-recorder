@@ -1,0 +1,38 @@
+{
+  "pass": true,
+  "scannedFiles": 22,
+  "forbiddenPatternCount": 0,
+  "findings": [],
+  "allowedSyntheticFindings": [
+    {
+      "file": "src/flight-learn-inbox.test.ts",
+      "pattern": "raw_home_path",
+      "match": "[synthetic fake-user path omitted]",
+      "reason": "synthetic redaction test fixture"
+    },
+    {
+      "file": "src/flight-learn-inbox.test.ts",
+      "pattern": "raw_home_path",
+      "match": "[synthetic fake-user path omitted]",
+      "reason": "synthetic redaction test fixture"
+    },
+    {
+      "file": "src/flight-learn-inbox.test.ts",
+      "pattern": "raw_home_path",
+      "match": "[synthetic fake-user path omitted]",
+      "reason": "synthetic redaction test fixture"
+    },
+    {
+      "file": "src/flight-learn-inbox.test.ts",
+      "pattern": "raw_home_path",
+      "match": "[synthetic fake-user path omitted]",
+      "reason": "synthetic redaction test fixture"
+    },
+    {
+      "file": "src/flight-learn-inbox.test.ts",
+      "pattern": "raw_home_path",
+      "match": "[synthetic fake-user path omitted]",
+      "reason": "synthetic redaction test fixture"
+    }
+  ]
+}

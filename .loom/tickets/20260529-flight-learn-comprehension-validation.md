@@ -16,6 +16,8 @@ Validate whether draft-enabled `/flight-learn` focused cards are understandable 
 ## Related Records
 
 - `plan:20260529-flight-learn-comprehension-path` - parent plan and gate before corpus collection.
+- `plan:20260531-flight-learn-llm-authored-card-copy` - successor repair plan created after operator screenshot feedback showed the current focused card still exposes too much detector/provenance language.
+- `evidence:20260531-flight-learn-llm-card-copy-operator-feedback` - operator screenshot feedback that changes the intended card shape before comprehension can be validated.
 - `ticket:20260529-flight-learn-local-draft-comprehension-gate` - prerequisite draft UI/model integration to validate.
 - `ticket:20260529-flight-learn-model-comprehension-integration` - stricter accepted-narrative integration remains blocked unless new evidence supports it.
 - `spec:flight-learn-inbox-ux` REQ-033 through REQ-041 and SCN-011 through SCN-012 - model-enabled card is the comprehension bar, local draft is non-authoritative reading help, fallback remains safe and non-dead-ending, corpus waits until cards are understandable.
@@ -77,7 +79,9 @@ Stop conditions:
 
 ## Current State
 
-Blocked on actual operator review notes. Ralph produced a representative synthetic/redacted render pack and structured operator review packet at `evidence:20260529-flight-learn-comprehension-validation` with artifacts under `.loom/evidence/artifacts/20260529-flight-learn-comprehension-validation/`. The pack covers 8 cards across draft, fallback, repeated workflow, validation/build, stale edit, low-information, and safety/adversarial states at widths 92 and 72. Actual operator comprehension notes were not available in this worker run, so the gate status is `operator-review-pending`; dogfood corpus/outcome collection must not start. Next action: the operator should fill `17-operator-review-packet.json` or provide equivalent structured answers, then rerun gate calculation and audit before closure.
+Blocked. Ralph produced a representative synthetic/redacted render pack and structured operator review packet at `evidence:20260529-flight-learn-comprehension-validation`, but the operator's later screenshot feedback showed that the current card shape itself is not the intended comprehension surface: default sections still expose deterministic detector/provenance language such as raw clue and why-suggested internals. Dogfood corpus/outcome collection must not start from this packet.
+
+The next path is `plan:20260531-flight-learn-llm-authored-card-copy`, which should repair the local-LLM-authored primary card copy and then run successor validation via `ticket:20260531-flight-learn-llm-card-copy-comprehension-validation`. This ticket remains blocked as a predecessor packet and should not be used as the go/no-go gate unless the operator explicitly reopens this exact packet after the repair plan.
 
 ## Journal
 
@@ -86,3 +90,4 @@ Blocked on actual operator review notes. Ralph produced a representative synthet
 - 2026-05-29: Dependency `ticket:20260529-flight-learn-local-draft-comprehension-gate` closed with `evidence:20260529-flight-learn-local-draft-comprehension-gate` and clear follow-up audit `audit:20260529-flight-learn-local-draft-comprehension-gate-followup-review`. Moved ticket to open for the next validation slice.
 - 2026-05-29: Driver set ticket active and prepared bounded Ralph worker run. Scope is evidence/render-pack/operator-review preparation only; actual operator comprehension must not be fabricated by the worker.
 - 2026-05-29: Ralph worker produced render pack and review packet. Artifacts include 8 synthetic/redacted cards at widths 92 and 72, `17-operator-review-packet.json` with blank operator notes, and `18-worker-precheck.json` explicitly marked not operator comprehension evidence. Width check passed, privacy scan passed, and `git diff --check` passed. No product source changed. Moved ticket to blocked on actual operator review notes.
+- 2026-05-31: Operator supplied a live `/flight-learn` screenshot and clarified that the primary explanation sections should be local-LLM-authored while evidence remains hidden by default. Recorded `evidence:20260531-flight-learn-llm-card-copy-operator-feedback` and created successor repair plan `plan:20260531-flight-learn-llm-authored-card-copy`. This predecessor packet remains blocked and should not unblock dogfood corpus/outcome collection.

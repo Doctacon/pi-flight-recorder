@@ -1,0 +1,3 @@
+Pre-followup focused tests were run before applying audit-fix changes.
+Result: passed; 2 files, 41 tests.
+Purpose: baseline only; final green evidence is in 01-focused-tests.txt.

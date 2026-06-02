@@ -1,0 +1,338 @@
+{
+  "kind": "real-bonsai-4b",
+  "generatedAt": "2026-05-31T18:18:47.032Z",
+  "totalCases": 8,
+  "parseValidCount": 5,
+  "schemaValidCount": 5,
+  "productGatePassCount": 0,
+  "productFallbackCount": 8,
+  "unsafeRejectionCount": 5,
+  "fallbackReasons": {
+    "timeout": 3,
+    "unsafe-output": 5
+  },
+  "displayStates": {
+    "deterministic": 8
+  },
+  "fieldCoverage": {
+    "headline": 5,
+    "whatHappened": 5,
+    "whyItMatters": 5,
+    "expectedBehavior": 5,
+    "whyThisWasFlagged": 5,
+    "evidenceSummary": 5
+  },
+  "viewFieldCoverage": {
+    "headline": 8,
+    "whatHappened": 8,
+    "whyItMatters": 8,
+    "expectedBehavior": 6,
+    "whyThisWasFlagged": 0,
+    "evidenceSummary": 0
+  },
+  "latencyMs": {
+    "min": 3227,
+    "max": 5006,
+    "avg": 4472
+  },
+  "cases": [
+    {
+      "caseId": "case-01-repeated-workflow",
+      "title": "Repeated workflow setup friction",
+      "coverage": [
+        "repeated-workflow",
+        "expected-known",
+        "evidence-summary",
+        "fake-draft"
+      ],
+      "parseValid": false,
+      "schemaValid": false,
+      "productGatePass": false,
+      "displayState": "deterministic",
+      "narrativeStatus": "none",
+      "fallbackReason": "timeout",
+      "validationIssueCategory": "timeout",
+      "unsafeRejected": false,
+      "fieldPresence": {
+        "headline": false,
+        "whatHappened": false,
+        "whyItMatters": false,
+        "expectedBehavior": false,
+        "whyThisWasFlagged": false,
+        "evidenceSummary": false
+      },
+      "viewFieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": true,
+        "whyThisWasFlagged": false,
+        "evidenceSummary": false
+      },
+      "latencyMs": 5006,
+      "providerErrorCategory": null
+    },
+    {
+      "caseId": "case-02-validation-build",
+      "title": "Validation/build trust issue",
+      "coverage": [
+        "validation-build",
+        "expected-known",
+        "fake-draft"
+      ],
+      "parseValid": false,
+      "schemaValid": false,
+      "productGatePass": false,
+      "displayState": "deterministic",
+      "narrativeStatus": "none",
+      "fallbackReason": "timeout",
+      "validationIssueCategory": "timeout",
+      "unsafeRejected": false,
+      "fieldPresence": {
+        "headline": false,
+        "whatHappened": false,
+        "whyItMatters": false,
+        "expectedBehavior": false,
+        "whyThisWasFlagged": false,
+        "evidenceSummary": false
+      },
+      "viewFieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": true,
+        "whyThisWasFlagged": false,
+        "evidenceSummary": false
+      },
+      "latencyMs": 5004,
+      "providerErrorCategory": null
+    },
+    {
+      "caseId": "case-03-stale-edit",
+      "title": "Stale exact-text edit",
+      "coverage": [
+        "stale-edit",
+        "expected-known",
+        "fake-draft"
+      ],
+      "parseValid": true,
+      "schemaValid": true,
+      "productGatePass": false,
+      "displayState": "deterministic",
+      "narrativeStatus": "rejected",
+      "fallbackReason": "unsafe-output",
+      "validationIssueCategory": "unsafe-output",
+      "unsafeRejected": true,
+      "fieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": true,
+        "whyThisWasFlagged": true,
+        "evidenceSummary": true
+      },
+      "viewFieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": true,
+        "whyThisWasFlagged": false,
+        "evidenceSummary": false
+      },
+      "latencyMs": 4445,
+      "providerErrorCategory": null
+    },
+    {
+      "caseId": "case-04-low-information",
+      "title": "Low information candidate",
+      "coverage": [
+        "low-information",
+        "expected-unknown",
+        "fake-validated"
+      ],
+      "parseValid": true,
+      "schemaValid": true,
+      "productGatePass": false,
+      "displayState": "deterministic",
+      "narrativeStatus": "rejected",
+      "fallbackReason": "unsafe-output",
+      "validationIssueCategory": "unsafe-output",
+      "unsafeRejected": true,
+      "fieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": true,
+        "whyThisWasFlagged": true,
+        "evidenceSummary": true
+      },
+      "viewFieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": false,
+        "whyThisWasFlagged": false,
+        "evidenceSummary": false
+      },
+      "latencyMs": 4615,
+      "providerErrorCategory": null
+    },
+    {
+      "caseId": "case-05-safety-adversarial",
+      "title": "Safety/adversarial rejection",
+      "coverage": [
+        "safety-adversarial",
+        "fallback",
+        "unsafe-rejection"
+      ],
+      "parseValid": true,
+      "schemaValid": true,
+      "productGatePass": false,
+      "displayState": "deterministic",
+      "narrativeStatus": "rejected",
+      "fallbackReason": "unsafe-output",
+      "validationIssueCategory": "unsafe-output",
+      "unsafeRejected": true,
+      "fieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": true,
+        "whyThisWasFlagged": true,
+        "evidenceSummary": true
+      },
+      "viewFieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": true,
+        "whyThisWasFlagged": false,
+        "evidenceSummary": false
+      },
+      "latencyMs": 3227,
+      "providerErrorCategory": null
+    },
+    {
+      "caseId": "case-06-expected-known",
+      "title": "Expected behavior known",
+      "coverage": [
+        "expected-known",
+        "fake-draft"
+      ],
+      "parseValid": true,
+      "schemaValid": true,
+      "productGatePass": false,
+      "displayState": "deterministic",
+      "narrativeStatus": "rejected",
+      "fallbackReason": "unsafe-output",
+      "validationIssueCategory": "unsafe-output",
+      "unsafeRejected": true,
+      "fieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": true,
+        "whyThisWasFlagged": true,
+        "evidenceSummary": true
+      },
+      "viewFieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": true,
+        "whyThisWasFlagged": false,
+        "evidenceSummary": false
+      },
+      "latencyMs": 3559,
+      "providerErrorCategory": null
+    },
+    {
+      "caseId": "case-07-expected-unknown",
+      "title": "Expected behavior unknown invention rejected",
+      "coverage": [
+        "expected-unknown",
+        "fallback",
+        "unsupported-expected"
+      ],
+      "parseValid": true,
+      "schemaValid": true,
+      "productGatePass": false,
+      "displayState": "deterministic",
+      "narrativeStatus": "rejected",
+      "fallbackReason": "unsafe-output",
+      "validationIssueCategory": "unsafe-output",
+      "unsafeRejected": true,
+      "fieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": true,
+        "whyThisWasFlagged": true,
+        "evidenceSummary": true
+      },
+      "viewFieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": false,
+        "whyThisWasFlagged": false,
+        "evidenceSummary": false
+      },
+      "latencyMs": 4919,
+      "providerErrorCategory": null
+    },
+    {
+      "caseId": "case-08-evidence-summary",
+      "title": "Evidence summary case",
+      "coverage": [
+        "evidence-summary",
+        "expected-known",
+        "fake-draft"
+      ],
+      "parseValid": false,
+      "schemaValid": false,
+      "productGatePass": false,
+      "displayState": "deterministic",
+      "narrativeStatus": "none",
+      "fallbackReason": "timeout",
+      "validationIssueCategory": "timeout",
+      "unsafeRejected": false,
+      "fieldPresence": {
+        "headline": false,
+        "whatHappened": false,
+        "whyItMatters": false,
+        "expectedBehavior": false,
+        "whyThisWasFlagged": false,
+        "evidenceSummary": false
+      },
+      "viewFieldPresence": {
+        "headline": true,
+        "whatHappened": true,
+        "whyItMatters": true,
+        "expectedBehavior": true,
+        "whyThisWasFlagged": false,
+        "evidenceSummary": false
+      },
+      "latencyMs": 5003,
+      "providerErrorCategory": null
+    }
+  ],
+  "baseUrl": "http://127.0.0.1:50097/",
+  "model": {
+    "path": "~/.cache/pi-flight-recorder/bonsai/Bonsai-4B-Q1_0.gguf",
+    "available": true,
+    "sha256": "4524b3f997f0f06444e568d1f26e2efd69effa3218c7ad3047432fb171e42168",
+    "expectedSha256": "4524b3f997f0f06444e568d1f26e2efd69effa3218c7ad3047432fb171e42168",
+    "matchesExpected": true
+  },
+  "runtime": {
+    "path": "/opt/homebrew/bin/llama-server",
+    "available": true,
+    "versionStatus": 0,
+    "versionStdoutPreview": "",
+    "versionStderrPreview": "version: 9360 (6b4e4bd58) built with AppleClang 17.0.0.17000604 for Darwin arm64"
+  },
+  "hostedProviderUsed": false,
+  "loopbackOnly": true,
+  "automaticDownloadOrInstall": false
+}

@@ -1,0 +1,151 @@
+{
+  "generatedAt": "2026-05-31T18:18:08.453Z",
+  "corpus": {
+    "totalCases": 8,
+    "cases": [
+      {
+        "caseId": "case-01-repeated-workflow",
+        "title": "Repeated workflow setup friction",
+        "coverage": [
+          "repeated-workflow",
+          "expected-known",
+          "evidence-summary",
+          "fake-draft"
+        ],
+        "fakeMode": "valid-draft",
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-02-validation-build",
+        "title": "Validation/build trust issue",
+        "coverage": [
+          "validation-build",
+          "expected-known",
+          "fake-draft"
+        ],
+        "fakeMode": "valid-draft",
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-03-stale-edit",
+        "title": "Stale exact-text edit",
+        "coverage": [
+          "stale-edit",
+          "expected-known",
+          "fake-draft"
+        ],
+        "fakeMode": "valid-draft",
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-04-low-information",
+        "title": "Low information candidate",
+        "coverage": [
+          "low-information",
+          "expected-unknown",
+          "fake-validated"
+        ],
+        "fakeMode": "valid-validated-low-info",
+        "evidenceRefCount": 0
+      },
+      {
+        "caseId": "case-05-safety-adversarial",
+        "title": "Safety/adversarial rejection",
+        "coverage": [
+          "safety-adversarial",
+          "fallback",
+          "unsafe-rejection"
+        ],
+        "fakeMode": "unsafe-generated-evidence",
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-06-expected-known",
+        "title": "Expected behavior known",
+        "coverage": [
+          "expected-known",
+          "fake-draft"
+        ],
+        "fakeMode": "valid-draft",
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-07-expected-unknown",
+        "title": "Expected behavior unknown invention rejected",
+        "coverage": [
+          "expected-unknown",
+          "fallback",
+          "unsupported-expected"
+        ],
+        "fakeMode": "invented-expected",
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-08-evidence-summary",
+        "title": "Evidence summary case",
+        "coverage": [
+          "evidence-summary",
+          "expected-known",
+          "fake-draft"
+        ],
+        "fakeMode": "valid-draft",
+        "evidenceRefCount": 3
+      }
+    ]
+  },
+  "fakeReplay": {
+    "summaryArtifact": "01-fake-replay-summary.json",
+    "renderFiles": [
+      "fake-case-01-repeated-workflow-92.txt",
+      "fake-case-01-repeated-workflow-72.txt",
+      "fake-case-02-validation-build-92.txt",
+      "fake-case-02-validation-build-72.txt",
+      "fake-case-03-stale-edit-92.txt",
+      "fake-case-03-stale-edit-72.txt",
+      "fake-case-04-low-information-92.txt",
+      "fake-case-04-low-information-72.txt",
+      "fake-case-05-safety-adversarial-92.txt",
+      "fake-case-05-safety-adversarial-72.txt",
+      "fake-case-06-expected-known-92.txt",
+      "fake-case-06-expected-known-72.txt",
+      "fake-case-07-expected-unknown-92.txt",
+      "fake-case-07-expected-unknown-72.txt",
+      "fake-case-08-evidence-summary-92.txt",
+      "fake-case-08-evidence-summary-72.txt"
+    ]
+  },
+  "realRuntime": {
+    "status": "ran",
+    "reason": null,
+    "summaryArtifact": "02-real-runtime-summary.json",
+    "provenanceArtifact": "03-runtime-provenance.json",
+    "statusArtifact": "04-real-runtime-status.json",
+    "renderFiles": [
+      "real-case-01-repeated-workflow-92.txt",
+      "real-case-01-repeated-workflow-72.txt",
+      "real-case-02-validation-build-92.txt",
+      "real-case-02-validation-build-72.txt",
+      "real-case-03-stale-edit-92.txt",
+      "real-case-03-stale-edit-72.txt",
+      "real-case-04-low-information-92.txt",
+      "real-case-04-low-information-72.txt",
+      "real-case-05-safety-adversarial-92.txt",
+      "real-case-05-safety-adversarial-72.txt",
+      "real-case-06-expected-known-92.txt",
+      "real-case-06-expected-known-72.txt",
+      "real-case-07-expected-unknown-92.txt",
+      "real-case-07-expected-unknown-72.txt",
+      "real-case-08-evidence-summary-92.txt",
+      "real-case-08-evidence-summary-72.txt"
+    ]
+  },
+  "checks": {
+    "widthArtifact": "05-render-line-widths.json",
+    "hiddenInternalsArtifact": "06-render-contract-check.json"
+  },
+  "nonClaims": [
+    "Replay/render evidence does not prove operator comprehension.",
+    "Fake-provider evidence does not prove real Bonsai/local-runtime quality.",
+    "No dogfood corpus/outcome collection started."
+  ]
+}

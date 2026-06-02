@@ -4,10 +4,10 @@ ID: ticket:20260529-flight-learn-dogfood-corpus-outcomes
 Type: Ticket
 Status: blocked
 Created: 2026-05-29
-Updated: 2026-05-29
+Updated: 2026-05-31
 Risk: medium - this uses the learning loop on real or representative data and can compromise future classifier readiness if labels are collected from misunderstood cards.
 Priority: medium - important for the core product loop, but only after comprehension validation clears.
-Depends On: ticket:20260529-flight-learn-comprehension-validation
+Depends On: ticket:20260531-flight-learn-llm-card-copy-comprehension-validation
 
 ## Summary
 
@@ -16,7 +16,9 @@ Seed the first privacy-safe dogfood corpus/outcome set from `/flight-learn` afte
 ## Related Records
 
 - `plan:20260529-flight-learn-comprehension-path` - parent plan and reason this ticket comes after comprehension validation.
-- `ticket:20260529-flight-learn-comprehension-validation` - prerequisite gate; must explicitly recommend proceeding.
+- `ticket:20260531-flight-learn-llm-card-copy-comprehension-validation` - successor prerequisite gate after local-LLM-authored card-copy repair; must explicitly recommend proceeding.
+- `ticket:20260529-flight-learn-comprehension-validation` - predecessor packet now blocked after operator screenshot feedback; useful historical context but no longer sufficient to unblock this ticket.
+- `plan:20260531-flight-learn-llm-authored-card-copy` - repair plan that must complete through successor validation before this dogfood ticket starts.
 - `research:20260529-flight-recorder-core-loop-stocktake` - defines the core loop and warns that classifier automation needs manually routed outcome corpus.
 - `spec:delta-artifact-learning-loop` - owns delta/artifact/outcome semantics and human-gated artifact routing.
 - `spec:flight-learn-inbox-ux` REQ-036 - corpus/outcome collection should begin only after cards are understandable enough for confident human routing.
@@ -78,8 +80,9 @@ Stop conditions:
 
 ## Current State
 
-Blocked by dependency. Do not execute until `ticket:20260529-flight-learn-comprehension-validation` closes with an explicit recommendation to start corpus/outcome collection.
+Blocked by dependency. Do not execute until `ticket:20260531-flight-learn-llm-card-copy-comprehension-validation` closes with an explicit recommendation to start corpus/outcome collection. The predecessor validation packet is blocked and cannot unblock dogfood because operator feedback changed the intended card shape.
 
 ## Journal
 
 - 2026-05-29: Created by Loom Weaver as the fifth child ticket of `plan:20260529-flight-learn-comprehension-path`. This ticket moves the project back to the core learning loop only after model-enabled comprehension is validated.
+- 2026-05-31: Updated dependency to successor validation `ticket:20260531-flight-learn-llm-card-copy-comprehension-validation` after operator screenshot feedback triggered `plan:20260531-flight-learn-llm-authored-card-copy`.

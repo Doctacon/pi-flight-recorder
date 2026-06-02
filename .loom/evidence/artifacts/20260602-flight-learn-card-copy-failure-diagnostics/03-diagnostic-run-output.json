@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-06-02T03:04:44.179Z",
+  "realRuntimeStatus": {
+    "status": "ran",
+    "reason": null
+  },
+  "modelChecksumMatched": true,
+  "productGatePassCount": 0,
+  "responseObservedCount": 2,
+  "fallbackReasons": {
+    "timeout": 6,
+    "unsafe-output": 2
+  },
+  "topRepairTargets": [
+    "timeout-resource-envelope: shorten prompt/lower output burden before changing gates",
+    "fact-citation robustness: whyThisWasFlagged/evidenceSummary cited unsupported or unknown facts in observed output",
+    "omit-or-shrink narrative burden: whatHappened became low-information/duplicate in observed output",
+    "non-negotiable safety: generated-evidence wording was observed and must remain fail-closed"
+  ],
+  "privacyBoundary": "Raw prompts, raw model responses, and raw server logs were not persisted by this harness.",
+  "diagnosticLimit": "Only 2/8 raw responses completed before timeout; raw responses were not persisted."
+}

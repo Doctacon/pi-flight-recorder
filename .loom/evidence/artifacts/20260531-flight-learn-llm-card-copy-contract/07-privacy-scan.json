@@ -1,0 +1,20 @@
+{
+  "pass": true,
+  "scannedFiles": 13,
+  "allowlist": {
+    "syntheticUserPaths": 36,
+    "syntheticSessionPaths": 4,
+    "fixtureCredentialAssignments": 5,
+    "redactedBearerMentions": 2,
+    "guardrailTextMentions": 19,
+    "redactedRepoPathMentions": 3,
+    "notes": [
+      "Synthetic /Users/alice fixtures exercise redaction behavior in tests and are not private operator paths.",
+      "Fixture credential assignments use placeholder values such as <fixture-...>, not real secrets.",
+      "Bearer redacted appears only in an unsafe-config test fixture.",
+      "Guardrail strings such as prompt text omitted are expected validator/test text, not persisted raw prompts.",
+      "Command artifacts use <repo> instead of the local repository path."
+    ]
+  },
+  "findings": []
+}

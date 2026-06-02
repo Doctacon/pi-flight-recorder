@@ -1,6 +1,6 @@
 import { buildFlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
-import type { LocalDiagnosisPolishFallbackReason, LocalDiagnosisPolishResult } from "./flight-learn-local-diagnosis-model.js";
-import { compactSnippet } from "./redact.js";
+import type { LocalDiagnosisPolishFallbackReason, LocalDiagnosisPolishedView, LocalDiagnosisPolishResult } from "./flight-learn-local-diagnosis-model.js";
+import { sanitizeStoredText } from "./redact.js";
 import type { ArtifactCandidateType, DeltaDetectorSignal, DeltaEvidenceRef, ExpectationDelta } from "./types.js";
 
 export interface FlightLearnRouteChoice<T extends string = string> {
@@ -200,23 +200,42 @@ function fieldsStillMatchDelta(delta: ExpectationDelta, fields: Record<EditableF
     && originalFieldValue(delta.impact) === originalFieldValue(fields.impact);
 }
 
+function safeSnippet(value: string, maxLength: number): string {
+  return sanitizeStoredText(value.replace(/\s+/g, " "), maxLength).replace(/\s+/g, " ").trim();
+}
+
 function signalLine(signal: DeltaDetectorSignal): string {
   const confidence = signal.confidence !== null ? ` (${signal.confidence.toFixed(2)})` : "";
-  return `${signal.type}${confidence}: ${compactSnippet(signal.explanation.replace(/\s+/g, " "), 110)}`;
+  return `${signal.type}${confidence}: ${safeSnippet(signal.explanation, 110)}`;
 }
 
 function evidenceLine(ref: DeltaEvidenceRef): string {
-  const source = [ref.sourceType, ref.sourceId ?? ref.entryId].filter(Boolean).join("/") || ref.sourceType;
-  const where = [ref.cwd, ref.sessionFile].filter(Boolean).join("; ") || "local source unknown";
-  const snippet = ref.snippet ? ` :: ${compactSnippet(ref.snippet.replace(/\s+/g, " "), 95)}` : "";
+  const sourceId = ref.sourceId ?? ref.entryId;
+  const source = [ref.sourceType, sourceId ? safeSnippet(sourceId, 48) : null].filter(Boolean).join("/") || ref.sourceType;
+  const where = [ref.cwd, ref.sessionFile].filter((value): value is string => Boolean(value)).map((value) => safeSnippet(value, 96)).join("; ") || "local source unknown";
+  const snippet = ref.snippet ? ` :: ${safeSnippet(ref.snippet, 95)}` : "";
   return `${source} (${where})${snippet}`;
 }
 
 function evidencePreviewLine(ref: DeltaEvidenceRef): string {
-  const source = [ref.sourceType, ref.sourceId ?? ref.entryId].filter(Boolean).join("/") || ref.sourceType;
-  const snippet = ref.snippet ? compactSnippet(ref.snippet.replace(/\s+/g, " "), 115) : null;
+  const sourceId = ref.sourceId ?? ref.entryId;
+  const source = [ref.sourceType, sourceId ? safeSnippet(sourceId, 48) : null].filter(Boolean).join("/") || ref.sourceType;
+  const snippet = ref.snippet ? safeSnippet(ref.snippet, 115) : null;
   const where = ref.cwd?.split(/[\\/]/).filter(Boolean).at(-1);
-  return snippet ? `${source}: ${snippet}` : `${source}: local evidence ref${where ? ` (${compactSnippet(where, 48)})` : ""}`;
+  return snippet ? `${source}: ${snippet}` : `${source}: local evidence ref${where ? ` (${safeSnippet(where, 48)})` : ""}`;
+}
+
+function focusedUnknownExpectedText(): string {
+  return "Pi does not know the intended behavior yet — press e to add it.";
+}
+
+function defaultWhyThisWasFlagged(item: FlightLearnDeltaInboxItem): string {
+  const refCount = item.delta.evidenceRefs.length;
+  if (refCount > 0) {
+    return `Pi grouped this as a recurring local issue from ${refCount} redacted evidence ref${refCount === 1 ? "" : "s"}. Expand evidence to inspect concise refs before routing.`;
+  }
+  if (item.signals.length > 0) return "Pi grouped this from local review signals, but no evidence refs are attached. Use observe or dismiss if the issue is unclear.";
+  return "Pi has limited flagging detail for this item. Use the problem, impact, and evidence controls before routing.";
 }
 
 function border(title: string, width: number): string {
@@ -477,15 +496,14 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
       impact: fields.impact.trim() || null,
     };
     const polishedResult = fieldsStillMatchDelta(delta, fields) ? item.localDiagnosisPolish : undefined;
-    const diagnosis = polishedResult?.view ?? buildFlightLearnDiagnosisView({ delta: displayDelta, signals: item.signals });
+    const diagnosis: LocalDiagnosisPolishedView = polishedResult?.view ?? buildFlightLearnDiagnosisView({ delta: displayDelta, signals: item.signals });
     const modelStatus = localDiagnosisStatusLine(polishedResult);
-    const expectedText = diagnosis.expectedBehavior ?? "unknown — press e to add what should have happened";
+    const expectedText = diagnosis.expectedBehavior ?? focusedUnknownExpectedText();
     const sourceFactLines = this.focusedSourceFactLines(polishedResult, width);
-    const rawClueLines = diagnosis.rawClue ? ["", "Raw clue", ...wrapFocusedProse(diagnosis.rawClue, width)] : [];
     const lines: string[] = [
       clip(`Flight Learn — Issue ${this.selectedItemIndex + 1} of ${this.items.length}`, width),
       clip(`${this.items.length} pending · ${delta.evidenceRefs.length} evidence ref${delta.evidenceRefs.length === 1 ? "" : "s"} · ↑/↓ changes issue`, width),
-      ...(modelStatus ? [clip(modelStatus, width)] : []),
+      ...(modelStatus ? wrapText(modelStatus, width) : []),
       "",
       "Problem",
       ...wrapFocusedProse(diagnosis.headline, width),
@@ -499,13 +517,12 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
       "Expected",
       ...wrapFocusedProse(expectedText, width),
       ...(sourceFactLines.length > 0 ? ["", "Source facts", ...sourceFactLines] : []),
-      ...rawClueLines,
       "",
-      "Why suggested",
-      ...this.focusedSignalLines(item, width),
+      "Why this was flagged",
+      ...this.focusedWhyFlaggedLines(item, diagnosis, width),
       "",
       "Evidence",
-      ...this.focusedEvidenceLines(delta, width),
+      ...this.focusedEvidenceLines(delta, width, diagnosis.evidenceSummary),
       "",
       "Choose a follow-up",
       ...this.focusedRouteLines(width),
@@ -539,17 +556,34 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
 
   private focusedSignalLines(item: FlightLearnDeltaInboxItem, width: number): string[] {
     const primarySignal = item.signals[0];
-    if (!primarySignal) return wrapIndented("No detector signal recorded. Route only if the issue is still clear from the summary and evidence.", width);
+    if (!primarySignal) return wrapIndented("No local signal recorded. Route only if the issue is still clear from the summary and evidence.", width);
     return wrapIndented(signalLine(primarySignal), width);
   }
 
-  private focusedEvidenceLines(delta: ExpectationDelta, width: number): string[] {
+  private focusedWhyFlaggedLines(
+    item: FlightLearnDeltaInboxItem,
+    diagnosis: { whyThisWasFlagged?: string; rawClue?: string | null },
+    width: number,
+  ): string[] {
+    const lines = wrapFocusedProse(diagnosis.whyThisWasFlagged ?? defaultWhyThisWasFlagged(item), width);
+    if (!this.evidenceExpanded) return lines;
+    lines.push(...wrapIndented("Expanded provenance:", width));
+    lines.push(...this.focusedSignalLines(item, width));
+    if (diagnosis.rawClue) lines.push(...wrapIndented(`Raw clue: ${safeSnippet(diagnosis.rawClue, 150)}`, width));
+    return lines;
+  }
+
+  private focusedEvidenceLines(delta: ExpectationDelta, width: number, evidenceSummary: string | undefined): string[] {
     if (!this.evidenceExpanded) {
-      return wrapIndented(`${delta.evidenceRefs.length} ref${delta.evidenceRefs.length === 1 ? "" : "s"} hidden by default — press v to view concise refs.`, width);
+      return [
+        ...(evidenceSummary ? wrapFocusedProse(evidenceSummary, width) : []),
+        ...wrapIndented(`${delta.evidenceRefs.length} ref${delta.evidenceRefs.length === 1 ? "" : "s"} hidden by default — press v to inspect concise refs.`, width),
+      ];
     }
     const refs = delta.evidenceRefs.slice(0, 5);
     const hiddenEvidence = Math.max(0, delta.evidenceRefs.length - refs.length);
     return [
+      ...(evidenceSummary ? wrapFocusedProse(evidenceSummary, width) : []),
       ...(refs.length > 0 ? refs.flatMap((ref) => wrapIndented(`- ${evidencePreviewLine(ref)}`, width)) : wrapIndented("No evidence refs recorded.", width)),
       ...(hiddenEvidence > 0 ? wrapIndented(`- ${hiddenEvidence} more evidence ref${hiddenEvidence === 1 ? "" : "s"}; full refs stay in local storage.`, width) : []),
     ];
@@ -776,7 +810,7 @@ export class FlightLearnDeltaInboxComponent implements FlightLearnCustomComponen
   }
 
   private focusedSectionHeading(line: string): boolean {
-    return ["Problem", "What happened?", "Why it matters", "Expected", "Source facts", "Raw clue", "Why suggested", "Evidence", "Choose a follow-up"].includes(line);
+    return ["Problem", "What happened?", "Why it matters", "Expected", "Source facts", "Why this was flagged", "Evidence", "Choose a follow-up"].includes(line);
   }
 
   private accent(value: string): string {

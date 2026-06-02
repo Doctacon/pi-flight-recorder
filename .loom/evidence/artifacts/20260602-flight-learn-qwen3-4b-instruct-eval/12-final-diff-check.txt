@@ -1,0 +1,36 @@
+## scoped git diff --check
+## tracked diff stat for scoped files
+## untracked artifact listing
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/00-artifact-index.json
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/01-model-provenance.json
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/02-qwen3-replay-summary.json
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/03-qwen3-replay-status.json
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/04-source-side-effect-scan.json
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/05-render-line-widths.json
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/06-render-contract-check.json
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/07-artifact-privacy-scan.json
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/08-post-run-listener-check.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/09-replay-run-output.json
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/10-harness-syntax-check.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/11-harness-run-console.json
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/12-final-diff-check.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/13-final-privacy-scan.json
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-01-repeated-workflow-72.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-01-repeated-workflow-92.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-02-validation-build-72.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-02-validation-build-92.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-03-stale-edit-72.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-03-stale-edit-92.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-04-low-information-72.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-04-low-information-92.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-05-safety-adversarial-72.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-05-safety-adversarial-92.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-06-expected-known-72.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-06-expected-known-92.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-07-expected-unknown-72.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-07-expected-unknown-92.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-08-evidence-summary-72.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/real-case-08-evidence-summary-92.txt
+.loom/evidence/artifacts/20260602-flight-learn-qwen3-4b-instruct-eval/run-qwen3-4b-instruct-eval.mjs
+## trailing whitespace scan for new qwen evidence/ticket/artifacts
+no trailing whitespace findings
