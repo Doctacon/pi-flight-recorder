@@ -1,0 +1,1 @@
+git diff --check scoped paths: pass

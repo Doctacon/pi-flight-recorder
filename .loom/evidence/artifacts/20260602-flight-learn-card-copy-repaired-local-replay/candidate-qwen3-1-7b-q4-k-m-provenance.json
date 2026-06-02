@@ -1,0 +1,46 @@
+{
+  "candidateId": "qwen3-1-7b-q4-k-m",
+  "label": "Qwen3 1.7B Q4_K_M",
+  "source": {
+    "sourceRepo": "bartowski/Qwen_Qwen3-1.7B-GGUF",
+    "sourceFile": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "upstreamModel": "Qwen/Qwen3-1.7B",
+    "licenseNote": "third-party GGUF; upstream Qwen3 family is Apache-2.0 per project research",
+    "priorEvidence": "evidence:20260602-flight-learn-small-model-batch-eval"
+  },
+  "cache": {
+    "status": "verified",
+    "displayPath": "~/.cache/pi-flight-recorder/qwen3-1.7b/Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "sizeBytes": 1282439584,
+    "sizeGiB": 1.19,
+    "sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "expectedSha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "downloadedNow": false
+  },
+  "runtime": {
+    "path": "/opt/homebrew/bin/llama-server",
+    "available": true,
+    "versionStatus": 0,
+    "versionStdoutPreview": "",
+    "versionStderrPreview": "version: 9360 (6b4e4bd58) built with AppleClang 17.0.0.17000604 for Darwin arm64"
+  },
+  "authorization": "Already cached and authorized by evidence:20260602-flight-learn-small-model-batch-eval; no downloads or installs performed in this replay.",
+  "baseUrl": "http://127.0.0.1:56719/",
+  "health": {
+    "ok": true,
+    "health": {
+      "status": "ok"
+    }
+  },
+  "serverLogSummary": {
+    "stdoutBytes": 0,
+    "stderrBytes": 11963,
+    "rawLogsPersisted": false,
+    "note": "Raw llama-server logs were temporary and deleted after byte-count summary without reading or persisting contents."
+  },
+  "memoryRssKb": {
+    "min": 1820736,
+    "max": 2350400,
+    "avg": 2100016
+  }
+}

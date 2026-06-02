@@ -1,0 +1,46 @@
+{
+  "candidateId": "phi4-mini-q4-k-m",
+  "label": "Phi-4-mini-instruct Q4_K_M",
+  "source": {
+    "sourceRepo": "unsloth/Phi-4-mini-instruct-GGUF",
+    "sourceFile": "Phi-4-mini-instruct-Q4_K_M.gguf",
+    "upstreamModel": "microsoft/Phi-4-mini-instruct",
+    "licenseNote": "mit observed on unsloth GGUF model API and upstream Microsoft model card",
+    "priorEvidence": "evidence:20260602-flight-learn-small-model-batch-eval"
+  },
+  "cache": {
+    "status": "verified",
+    "displayPath": "~/.cache/pi-flight-recorder/phi4-mini/Phi-4-mini-instruct-Q4_K_M.gguf",
+    "sizeBytes": 2491874272,
+    "sizeGiB": 2.32,
+    "sha256": "88c00229914083cd112853aab84ed51b87bdf6b9ce42f532d8c85c7c63b1730a",
+    "expectedSha256": "88c00229914083cd112853aab84ed51b87bdf6b9ce42f532d8c85c7c63b1730a",
+    "downloadedNow": false
+  },
+  "runtime": {
+    "path": "/opt/homebrew/bin/llama-server",
+    "available": true,
+    "versionStatus": 0,
+    "versionStdoutPreview": "",
+    "versionStderrPreview": "version: 9360 (6b4e4bd58) built with AppleClang 17.0.0.17000604 for Darwin arm64"
+  },
+  "authorization": "Already cached and authorized by evidence:20260602-flight-learn-small-model-batch-eval; no downloads or installs performed in this replay.",
+  "baseUrl": "http://127.0.0.1:56737/",
+  "health": {
+    "ok": true,
+    "health": {
+      "status": "ok"
+    }
+  },
+  "serverLogSummary": {
+    "stdoutBytes": 0,
+    "stderrBytes": 9238,
+    "rawLogsPersisted": false,
+    "note": "Raw llama-server logs were temporary and deleted after byte-count summary without reading or persisting contents."
+  },
+  "memoryRssKb": {
+    "min": 2993344,
+    "max": 3247216,
+    "avg": 3131414
+  }
+}

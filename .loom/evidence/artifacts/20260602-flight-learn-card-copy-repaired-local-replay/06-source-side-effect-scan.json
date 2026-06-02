@@ -1,0 +1,75 @@
+{
+  "pass": true,
+  "finalSourceSideEffect": {
+    "pass": true,
+    "sourceBefore": {
+      "src/flight-learn-local-diagnosis-model.ts": "9eb4bf3cee94712ff78801ddfad30b98ee8402d693d1ff3c5677bb1cb901a2ed",
+      "src/flight-learn-llama-cpp-adapter.ts": "15fd0b2ae2720afa7c638f03b4602d43121fd656c4a5957ec36f47559b7ef0ba",
+      "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+    },
+    "sourceAfter": {
+      "src/flight-learn-local-diagnosis-model.ts": "9eb4bf3cee94712ff78801ddfad30b98ee8402d693d1ff3c5677bb1cb901a2ed",
+      "src/flight-learn-llama-cpp-adapter.ts": "15fd0b2ae2720afa7c638f03b4602d43121fd656c4a5957ec36f47559b7ef0ba",
+      "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+    },
+    "changedSources": []
+  },
+  "perCandidate": {
+    "smollm2-1-7b-q4-k-m": {
+      "pass": true,
+      "sourceBefore": {
+        "src/flight-learn-local-diagnosis-model.ts": "9eb4bf3cee94712ff78801ddfad30b98ee8402d693d1ff3c5677bb1cb901a2ed",
+        "src/flight-learn-llama-cpp-adapter.ts": "15fd0b2ae2720afa7c638f03b4602d43121fd656c4a5957ec36f47559b7ef0ba",
+        "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+      },
+      "sourceAfter": {
+        "src/flight-learn-local-diagnosis-model.ts": "9eb4bf3cee94712ff78801ddfad30b98ee8402d693d1ff3c5677bb1cb901a2ed",
+        "src/flight-learn-llama-cpp-adapter.ts": "15fd0b2ae2720afa7c638f03b4602d43121fd656c4a5957ec36f47559b7ef0ba",
+        "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+      },
+      "changedSources": []
+    },
+    "smollm3-3b-q4-k-m": {
+      "pass": true,
+      "sourceBefore": {
+        "src/flight-learn-local-diagnosis-model.ts": "9eb4bf3cee94712ff78801ddfad30b98ee8402d693d1ff3c5677bb1cb901a2ed",
+        "src/flight-learn-llama-cpp-adapter.ts": "15fd0b2ae2720afa7c638f03b4602d43121fd656c4a5957ec36f47559b7ef0ba",
+        "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+      },
+      "sourceAfter": {
+        "src/flight-learn-local-diagnosis-model.ts": "9eb4bf3cee94712ff78801ddfad30b98ee8402d693d1ff3c5677bb1cb901a2ed",
+        "src/flight-learn-llama-cpp-adapter.ts": "15fd0b2ae2720afa7c638f03b4602d43121fd656c4a5957ec36f47559b7ef0ba",
+        "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+      },
+      "changedSources": []
+    },
+    "qwen3-1-7b-q4-k-m": {
+      "pass": true,
+      "sourceBefore": {
+        "src/flight-learn-local-diagnosis-model.ts": "9eb4bf3cee94712ff78801ddfad30b98ee8402d693d1ff3c5677bb1cb901a2ed",
+        "src/flight-learn-llama-cpp-adapter.ts": "15fd0b2ae2720afa7c638f03b4602d43121fd656c4a5957ec36f47559b7ef0ba",
+        "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+      },
+      "sourceAfter": {
+        "src/flight-learn-local-diagnosis-model.ts": "9eb4bf3cee94712ff78801ddfad30b98ee8402d693d1ff3c5677bb1cb901a2ed",
+        "src/flight-learn-llama-cpp-adapter.ts": "15fd0b2ae2720afa7c638f03b4602d43121fd656c4a5957ec36f47559b7ef0ba",
+        "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+      },
+      "changedSources": []
+    },
+    "phi4-mini-q4-k-m": {
+      "pass": true,
+      "sourceBefore": {
+        "src/flight-learn-local-diagnosis-model.ts": "9eb4bf3cee94712ff78801ddfad30b98ee8402d693d1ff3c5677bb1cb901a2ed",
+        "src/flight-learn-llama-cpp-adapter.ts": "15fd0b2ae2720afa7c638f03b4602d43121fd656c4a5957ec36f47559b7ef0ba",
+        "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+      },
+      "sourceAfter": {
+        "src/flight-learn-local-diagnosis-model.ts": "9eb4bf3cee94712ff78801ddfad30b98ee8402d693d1ff3c5677bb1cb901a2ed",
+        "src/flight-learn-llama-cpp-adapter.ts": "15fd0b2ae2720afa7c638f03b4602d43121fd656c4a5957ec36f47559b7ef0ba",
+        "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+      },
+      "changedSources": []
+    }
+  }
+}

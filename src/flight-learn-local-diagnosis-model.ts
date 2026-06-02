@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { buildFlightLearnDiagnosisView, type FlightLearnDiagnosisInput, type FlightLearnDiagnosisView } from "./flight-learn-diagnosis.js";
 import { sanitizeStoredText } from "./redact.js";
 import type { DeltaDetectorSignal, DeltaEvidenceRef, ExpectationDelta } from "./types.js";
@@ -258,11 +260,118 @@ const MAX_FACT_IDS_PER_DISPLAY_FIELD = 8;
 
 type ResponseFieldName = keyof typeof RESPONSE_FIELD_LIMITS;
 type FactCitedDisplayFieldName = "whyThisWasFlagged" | "evidenceSummary";
+
+export type LocalDiagnosisPolishDiagnosticKind = "accepted" | "omitted" | "soft-rejection" | "hard-rejection" | "schema-rejection" | "not-present";
+export type LocalDiagnosisPolishDiagnosticValueKind = "array" | "boolean" | "null" | "number" | "object" | "string" | "undefined";
+export type LocalDiagnosisPolishDiagnosticRuleId =
+  | "response.malformed-json"
+  | "response.not-object"
+  | "response.extra-top-level-key"
+  | "response.schema-version-invalid"
+  | "response.empty-output"
+  | "field.not-present"
+  | "field.invalid-type"
+  | "field.unknown-value-omitted"
+  | "field.length-limit"
+  | "field.unsupported-facts"
+  | "expected.missing-support-facts"
+  | "expected.negation-mismatch"
+  | "expected.unsupported-facts"
+  | "fact-field.not-object"
+  | "fact-field.extra-key"
+  | "fact-field.text-invalid-type"
+  | "fact-field.fact-ids-missing"
+  | "fact-field.fact-ids-too-many"
+  | "fact-field.fact-id-invalid-type"
+  | "fact-field.fact-id-duplicate"
+  | "fact-field.fact-id-unknown"
+  | "fact-field.empty-text-omitted"
+  | "fact-field.length-limit"
+  | "fact-field.evidence-summary-non-evidence-fact"
+  | "fact-field.why-flagged-missing-support-kind"
+  | "fact-field.unsupported-facts"
+  | "what-happened.not-object"
+  | "what-happened.extra-key"
+  | "what-happened.sentences-not-array"
+  | "what-happened.empty-sentences-omitted"
+  | "what-happened.too-many-sentences"
+  | "what-happened.sentence-not-object"
+  | "what-happened.sentence-extra-key"
+  | "what-happened.sentence-text-invalid-type"
+  | "what-happened.sentence-fact-ids-missing"
+  | "what-happened.sentence-fact-ids-too-many"
+  | "what-happened.sentence-fact-id-invalid-type"
+  | "what-happened.sentence-fact-id-duplicate"
+  | "what-happened.sentence-fact-id-unknown"
+  | "what-happened.sentence-empty-omitted"
+  | "what-happened.sentence-multiple-sentences"
+  | "what-happened.sentence-action-advice"
+  | "what-happened.sentence-unsupported-mutation-claim"
+  | "what-happened.length-limit"
+  | "what-happened.duplicate-display-text-omitted"
+  | "unsafe.prompt-or-full-prompt"
+  | "unsafe.transcript"
+  | "unsafe.secret"
+  | "unsafe.raw-path"
+  | "unsafe.raw-command"
+  | "unsafe.route-or-action-advice"
+  | "unsafe.mutation-instruction"
+  | "unsafe.generated-evidence-claim"
+  | "unsafe.internal-provenance"
+  | "unsafe.non-display-content";
+
+export interface LocalDiagnosisPolishDiagnosticTextMetrics {
+  rawLength: number;
+  normalizedLength: number;
+  sha256: string;
+}
+
+export interface LocalDiagnosisPolishFieldDiagnostic {
+  field: ResponseFieldName;
+  present: boolean;
+  valueKind: LocalDiagnosisPolishDiagnosticValueKind;
+  diagnosticKind: LocalDiagnosisPolishDiagnosticKind;
+  outcome: "accepted" | "omitted" | "rejected" | "not-present";
+  reason: LocalDiagnosisPolishFallbackReason | null;
+  issue: string | null;
+  ruleId: LocalDiagnosisPolishDiagnosticRuleId | null;
+  textMetrics?: LocalDiagnosisPolishDiagnosticTextMetrics;
+  sentenceCount?: number;
+  sentenceIndex?: number;
+  citedFactCount?: number;
+  unknownFactIdCount?: number;
+  repeatedFactIdCount?: number;
+  unsupportedContentTokenCount?: number;
+  unsupportedNumberTokenCount?: number;
+}
+
+export interface LocalDiagnosisPolishResponseDiagnostics {
+  schemaVersion: 1;
+  response: {
+    rawLength: number;
+    sha256: string;
+    parseValid: boolean;
+    objectValid: boolean;
+    valueKind: LocalDiagnosisPolishDiagnosticValueKind;
+    allowedTopLevelKeyPresence: Record<LocalDiagnosisTopLevelResponseField, boolean>;
+    extraTopLevelKeyCount: number;
+    extraTopLevelKeyHashes: Array<{ length: number; sha256: string }>;
+  };
+  productEquivalent: {
+    ok: boolean;
+    reason: LocalDiagnosisPolishFallbackReason | null;
+    issue: string | null;
+    firstFailureRuleId: LocalDiagnosisPolishDiagnosticRuleId | null;
+    firstFailureField: ResponseFieldName | null;
+  };
+  fields: LocalDiagnosisPolishFieldDiagnostic[];
+}
 type LocalDiagnosisTopLevelResponseField = ResponseFieldName | "schemaVersion";
 
 const RESPONSE_FIELDS: ResponseFieldName[] = ["headline", "whatHappened", "whyItMatters", "expectedBehavior", "whyThisWasFlagged", "evidenceSummary"];
 const TOP_LEVEL_RESPONSE_FIELDS = new Set<LocalDiagnosisTopLevelResponseField>(["schemaVersion", "headline", "whatHappened", "whyItMatters", "expectedBehavior", "whyThisWasFlagged", "evidenceSummary"]);
 const FACT_CITED_DISPLAY_FIELDS = new Set<FactCitedDisplayFieldName>(["whyThisWasFlagged", "evidenceSummary"]);
+const CORE_RESPONSE_FIELDS = new Set<ResponseFieldName>(["headline", "whatHappened", "whyItMatters", "expectedBehavior"]);
 const FACT_CITED_DISPLAY_RESPONSE_FIELDS = new Set(["text", "factIds"]);
 const WHY_FLAGGED_SUPPORT_KINDS = new Set<LocalDiagnosisSupportFactKind>(["delta-summary", "delta-reality", "occurrence-count", "signal", "evidence-summary", "deterministic-headline", "deterministic-what-happened"]);
 const EXPECTED_BEHAVIOR_SUPPORT_KINDS = new Set<LocalDiagnosisSupportFactKind>(["expected-behavior", "delta-expectation"]);
@@ -325,11 +434,10 @@ const DISPLAY_ONLY_FORBIDDEN_PATTERNS: RegExp[] = [
   /\b(?:artifact|candidate|flight\s*rule|loom\s+(?:ticket|spec|research|knowledge|record)|classifier|route\s+ranking)\b/i,
   /\b(?:follow-up|followup)\b/i,
   /\b(?:source files?|docs?|prompts?|skills?)\s+(?:should|must|need|needs|will)\s+(?:be\s+)?(?:changed|updated|created|written|mutated)\b/i,
-  /\b(?:fact\s+packet|bounded\s+fact\s+packet|(?:bounded|redacted)\s+packets?|packets?\b|allowed\s+keys?|json\s+(?:object|schema|response)|response\s+schema|deltas?\b|signals?\b|bounds?\b|analysis\s+fields?|headlines?\b|display\s+fields?|schema\s+fields?|field\s+names?|problem\s+(?:field|key|section)|whatHappened\s+(?:field|key))\b/i,
+  /\b(?:fact\s+packet|bounded\s+fact\s+packet|(?:bounded|redacted)\s+packets?|packets?\b|allowed\s+keys?|json\s+(?:object|schema|response)|response\s+schema|deltas?\b|bounds?\b|analysis\s+fields?|headlines?\b|display\s+fields?|schema\s+fields?|field\s+names?|problem\s+(?:field|key|section)|whatHappened\s+(?:field|key))\b/i,
   /\b(?:detector|reflection\s+cluster|cluster_[a-z0-9_-]+|confidence(?:\s+score)?|record\s+ids?|source\s+ids?|session\s+ids?|entry\s+ids?|fact\s+ids?|sourceType|sourceFile|sessionFile|cwd)\b/i,
   /\b(?:generated|created|added|fabricated|invented|synthesized)\s+(?:new\s+|extra\s+)?(?:evidence|refs?|snippets?)\b/i,
   /\b(?:new|extra|fabricated|invented|synthetic)\s+(?:evidence|refs?|snippets?)\b/i,
-  /\b(?:Problem|Problems|PROBLEM|PROBLEMS)\b/,
 ];
 
 const WHAT_HAPPENED_GENERIC_IMPERATIVE_VERBS = "re-?run|run|validate|check|use(?!\\s+of\\b)|do|perform|execute|retry|inspect|verify|confirm|open|install|reinstall|fix|update|edit|write|create|route|choose|select|press|click|apply|store|save|persist";
@@ -357,19 +465,24 @@ const STOP_WORDS = new Set([
 ]);
 
 const COMMON_DIAGNOSIS_TOKENS = new Set([
-  "assistant", "available", "behavior", "clear", "current", "describes", "evidence", "flagged", "follow", "friction", "hard", "issue", "local", "made", "makes", "matter", "matters", "needed", "needs", "observed", "points", "problem", "progress", "recent", "recorded", "redacted", "repeated", "repeatedly", "result", "results", "review", "session", "sessions", "state", "stored", "summarizes", "summary", "text", "trust", "unclear", "unknown", "workflow",
+  "assistant", "available", "behavior", "card", "clear", "current", "describes", "evidence", "expected", "explains", "field", "flagged", "follow", "friction", "hard", "human", "issue", "local", "made", "makes", "matter", "matters", "needed", "needs", "observed", "operator", "points", "problem", "progress", "recent", "recorded", "redacted", "repeated", "repeatedly", "result", "results", "review", "session", "sessions", "state", "stored", "summarizes", "summary", "text", "trust", "unclear", "unknown", "workflow",
 ]);
 
+const UNSUPPORTED_CONCRETE_TOKENS = new Set([
+  "actor", "actors", "admin", "api", "auth", "authentication", "cache", "cached", "client", "container", "containers", "corrupt", "corrupted", "customer", "data", "database", "databases", "dependency", "dependencies", "deploy", "deployed", "deployment", "docker", "endpoint", "endpoints", "environment", "environments", "external", "file", "files", "migration", "migrations", "module", "modules", "network", "outage", "permission", "permissions", "production", "rebuild", "rebuilt", "request", "requests", "server", "service", "services", "source", "token", "tokens", "user", "users",
+]);
+const MAX_UNSUPPORTED_PARAPHRASE_TOKENS = 2;
+
 const SYNONYM_GROUPS: string[][] = [
-  ["validation", "validate", "validated", "validating", "check", "checks", "test", "tests"],
+  ["validation", "validate", "validated", "validating", "check", "checks", "test", "tests", "verification", "verify", "verified"],
   ["build", "typecheck", "compile", "compilation"],
-  ["shell", "terminal", "pane", "session"],
-  ["old", "stale"],
-  ["rerun", "reran", "retry", "retried"],
+  ["shell", "terminal", "pane", "session", "environment"],
+  ["old", "stale", "outdated", "previous"],
+  ["rerun", "reran", "retry", "retried", "repeat", "repeated", "recurrence", "recurring"],
   ["path", "file", "module", "import", "dependency"],
   ["package", "extension", "install", "setup"],
   ["assumption", "understanding", "correction", "corrected"],
-  ["trust", "reliable", "untrustworthy", "confidence"],
+  ["trust", "reliable", "untrustworthy", "confidence", "rely", "reliability"],
 ];
 
 function normalizeTimeoutMs(value: number | undefined): number {
@@ -678,9 +791,10 @@ export function buildLocalDiagnosisPrompt(factPacket: LocalDiagnosisFactPacket):
     "Use only the bounded redacted fact packet and its facts[] entries. Do not add facts, routes, actions, artifacts, file paths, secrets, stack traces, commands, or transcript text.",
     "Return only a JSON object with schemaVersion: 2. Allowed keys: schemaVersion, headline, whatHappened, whyItMatters, expectedBehavior, whyThisWasFlagged, evidenceSummary. Omit any display key you cannot improve. No other top-level keys are allowed.",
     "Field jobs: headline/Problem stays concise, conservative, and headline-shaped; whatHappened is the narrative field; whyItMatters explains impact; expectedBehavior is included only when supported by expected-behavior or delta-expectation facts, not inferred from reality, impact, signals, or evidence; whyThisWasFlagged explains why local evidence flagged this issue; evidenceSummary summarizes existing evidence facts only.",
-    "For whatHappened, do not return a string. Return {\"sentences\":[{\"text\":\"...\",\"factIds\":[\"F1\"]}]}. Each sentence needs 1 or more factIds, and every factId must exactly match an id in facts[].",
+    "You may return one useful core field instead of all fields. Core fields are headline, whatHappened, whyItMatters, and expectedBehavior. Optional flag/evidence fields should be omitted unless you can safely improve them from cited facts.",
+    "For whatHappened, do not return a string. If you can improve it, return {\"sentences\":[{\"text\":\"...\",\"factIds\":[\"F1\"]}]}. Each sentence needs 1 or more factIds, and every factId must exactly match an id in facts[].",
     "For whyThisWasFlagged and evidenceSummary, return {\"text\":\"...\",\"factIds\":[\"F1\"]}. evidenceSummary must summarize existing evidence facts only; do not create, imply, invent, or replace evidence refs.",
-    "Write 2-4 concise whatHappened sentence objects that explain the observed sequence, recurrence, pattern, or uncertainty and are distinct from the headline. The factIds are deterministic support handles, not proof of entailment; unsupported meaning will be handled by a later local judge path.",
+    "If returning whatHappened, write 1-3 concise sentence objects that explain the observed sequence, recurrence, pattern, or uncertainty and are distinct from the headline. The factIds are deterministic support handles, not proof of entailment; unsupported meaning will be handled by a later local judge path.",
     "Do not include confidence, scores, metadata, notes, rationale, route, action, status, severity, record IDs, detector names, cluster IDs, or any other non-display field.",
     "Do not echo or summarize the fact packet structure. Do not mention internal field names such as JSON, allowed keys, delta, signals, bounds, analysis, or headline fields. You may refer generically to stored evidence when it helps.",
     `Length limits: headline <= ${RESPONSE_FIELD_LIMITS.headline} chars; combined whatHappened text <= ${RESPONSE_FIELD_LIMITS.whatHappened} and <= ${WHAT_HAPPENED_MAX_SENTENCES} sentence objects; whyItMatters <= ${RESPONSE_FIELD_LIMITS.whyItMatters}; expectedBehavior <= ${RESPONSE_FIELD_LIMITS.expectedBehavior}; whyThisWasFlagged <= ${RESPONSE_FIELD_LIMITS.whyThisWasFlagged}; evidenceSummary <= ${RESPONSE_FIELD_LIMITS.evidenceSummary}.`,
@@ -1115,6 +1229,402 @@ function judgeFailClosedResult(reason: LocalNarrativeJudgeFailClosedReason): Jud
   }
 }
 
+export function diagnoseLocalDiagnosisPolishResponse(rawResponse: string, context: LocalDiagnosisPolishValidationContext): LocalDiagnosisPolishResponseDiagnostics {
+  let parsed: unknown;
+  let parseValid = true;
+  try {
+    parsed = JSON.parse(rawResponse.trim());
+  } catch {
+    parseValid = false;
+    parsed = undefined;
+  }
+
+  const parsedObject = isPlainObject(parsed) ? parsed : null;
+  const objectValid = parsedObject !== null;
+  const allowedTopLevelKeyPresence = diagnosticTopLevelKeyPresence(parsedObject);
+  const extraTopLevelKeys = parsedObject ? Object.keys(parsedObject).filter((key) => !TOP_LEVEL_RESPONSE_FIELDS.has(key as LocalDiagnosisTopLevelResponseField)) : [];
+  const fields = parsedObject
+    ? RESPONSE_FIELDS.map((field) => diagnoseResponseField(field, parsedObject[field], Object.prototype.hasOwnProperty.call(parsedObject, field), context))
+    : RESPONSE_FIELDS.map((field) => notPresentFieldDiagnostic(field));
+
+  const productValidation = validateLocalDiagnosisPolishResponse(rawResponse, context);
+  const firstFailure = diagnosticFirstProductFailure(parseValid, objectValid, parsedObject, fields, productValidation);
+
+  return {
+    schemaVersion: 1,
+    response: {
+      rawLength: rawResponse.length,
+      sha256: sha256DiagnosticText(rawResponse),
+      parseValid,
+      objectValid,
+      valueKind: diagnosticValueKind(parsed),
+      allowedTopLevelKeyPresence,
+      extraTopLevelKeyCount: extraTopLevelKeys.length,
+      extraTopLevelKeyHashes: extraTopLevelKeys.map((key) => ({ length: key.length, sha256: sha256DiagnosticText(key) })),
+    },
+    productEquivalent: {
+      ok: productValidation.ok,
+      reason: productValidation.ok ? null : productValidation.reason,
+      issue: productValidation.ok ? null : productValidation.issue,
+      firstFailureRuleId: firstFailure.ruleId,
+      firstFailureField: firstFailure.field,
+    },
+    fields,
+  };
+}
+
+function diagnosticTopLevelKeyPresence(parsed: Record<string, unknown> | null): Record<LocalDiagnosisTopLevelResponseField, boolean> {
+  const entries = [...TOP_LEVEL_RESPONSE_FIELDS].map((key) => [key, parsed !== null && Object.prototype.hasOwnProperty.call(parsed, key)]);
+  return Object.fromEntries(entries) as Record<LocalDiagnosisTopLevelResponseField, boolean>;
+}
+
+function diagnosticFirstProductFailure(
+  parseValid: boolean,
+  objectValid: boolean,
+  parsed: Record<string, unknown> | null,
+  fields: LocalDiagnosisPolishFieldDiagnostic[],
+  productValidation: LocalDiagnosisPolishValidationResult,
+): { ruleId: LocalDiagnosisPolishDiagnosticRuleId | null; field: ResponseFieldName | null } {
+  if (productValidation.ok) return { ruleId: null, field: null };
+  if (!parseValid) return { ruleId: "response.malformed-json", field: null };
+  if (!objectValid || parsed === null) return { ruleId: "response.not-object", field: null };
+  if (Object.keys(parsed).some((key) => !TOP_LEVEL_RESPONSE_FIELDS.has(key as LocalDiagnosisTopLevelResponseField))) {
+    return { ruleId: "response.extra-top-level-key", field: null };
+  }
+  if (parsed["schemaVersion"] !== 2) return { ruleId: "response.schema-version-invalid", field: null };
+  const firstUnsafeRejected = fields.find((field) => field.outcome === "rejected" && field.reason === "unsafe-output");
+  if (firstUnsafeRejected) return { ruleId: firstUnsafeRejected.ruleId, field: firstUnsafeRejected.field };
+  const firstCardLevelRejected = fields.find((field) => isDiagnosticCardLevelFailure(field));
+  if (firstCardLevelRejected) return { ruleId: firstCardLevelRejected.ruleId, field: firstCardLevelRejected.field };
+  const hasAcceptedCoreField = fields.some((field) => CORE_RESPONSE_FIELDS.has(field.field) && field.outcome === "accepted");
+  if (!hasAcceptedCoreField) {
+    const firstRejected = fields.find((field) => field.outcome === "rejected");
+    if (firstRejected) return { ruleId: firstRejected.ruleId, field: firstRejected.field };
+  }
+  return { ruleId: "response.empty-output", field: null };
+}
+
+function isDiagnosticCardLevelFailure(field: LocalDiagnosisPolishFieldDiagnostic): boolean {
+  if (field.outcome !== "rejected") return false;
+  if (field.reason === "unsafe-output" || field.reason === "schema-invalid") return true;
+  if (isSourceOfTruthRule(field.ruleId)) return true;
+  if ((field.field === "headline" || field.field === "whyItMatters") && field.ruleId === "field.unsupported-facts") return true;
+  if (field.ruleId === "what-happened.sentence-unsupported-mutation-claim") return true;
+  return false;
+}
+
+function diagnoseResponseField(
+  field: ResponseFieldName,
+  value: unknown,
+  present: boolean,
+  context: LocalDiagnosisPolishValidationContext,
+): LocalDiagnosisPolishFieldDiagnostic {
+  if (!present) return notPresentFieldDiagnostic(field);
+  if (field === "whatHappened") return diagnoseWhatHappenedField(value, context);
+  if (field === "whyThisWasFlagged" || field === "evidenceSummary") return diagnoseFactCitedDisplayField(field, value, context);
+  return diagnosePlainDisplayField(field, value, context);
+}
+
+function notPresentFieldDiagnostic(field: ResponseFieldName): LocalDiagnosisPolishFieldDiagnostic {
+  return {
+    field,
+    present: false,
+    valueKind: "undefined",
+    diagnosticKind: "not-present",
+    outcome: "not-present",
+    reason: null,
+    issue: null,
+    ruleId: "field.not-present",
+  };
+}
+
+function acceptedFieldDiagnostic(
+  field: ResponseFieldName,
+  value: unknown,
+  text: string | null,
+  extras: Partial<LocalDiagnosisPolishFieldDiagnostic> = {},
+): LocalDiagnosisPolishFieldDiagnostic {
+  return {
+    field,
+    present: true,
+    valueKind: diagnosticValueKind(value),
+    diagnosticKind: "accepted",
+    outcome: "accepted",
+    reason: null,
+    issue: null,
+    ruleId: null,
+    ...(text !== null ? { textMetrics: diagnosticTextMetrics(text) } : {}),
+    ...extras,
+  };
+}
+
+function omittedFieldDiagnostic(
+  field: ResponseFieldName,
+  value: unknown,
+  ruleId: LocalDiagnosisPolishDiagnosticRuleId,
+  issue: string,
+  text: string | null,
+  extras: Partial<LocalDiagnosisPolishFieldDiagnostic> = {},
+): LocalDiagnosisPolishFieldDiagnostic {
+  return {
+    field,
+    present: true,
+    valueKind: diagnosticValueKind(value),
+    diagnosticKind: "omitted",
+    outcome: "omitted",
+    reason: null,
+    issue,
+    ruleId,
+    ...(text !== null ? { textMetrics: diagnosticTextMetrics(text) } : {}),
+    ...extras,
+  };
+}
+
+function rejectedFieldDiagnostic(
+  field: ResponseFieldName,
+  value: unknown,
+  reason: LocalDiagnosisPolishFallbackReason,
+  issue: string,
+  ruleId: LocalDiagnosisPolishDiagnosticRuleId,
+  text: string | null,
+  extras: Partial<LocalDiagnosisPolishFieldDiagnostic> = {},
+): LocalDiagnosisPolishFieldDiagnostic {
+  return {
+    field,
+    present: true,
+    valueKind: diagnosticValueKind(value),
+    diagnosticKind: diagnosticKindForFailure(reason, ruleId),
+    outcome: "rejected",
+    reason,
+    issue,
+    ruleId,
+    ...(text !== null ? { textMetrics: diagnosticTextMetrics(text) } : {}),
+    ...extras,
+  };
+}
+
+function diagnosticKindForFailure(reason: LocalDiagnosisPolishFallbackReason, ruleId: LocalDiagnosisPolishDiagnosticRuleId): LocalDiagnosisPolishDiagnosticKind {
+  if (reason === "unsafe-output" || isSourceOfTruthRule(ruleId)) return "hard-rejection";
+  if (reason === "unsupported-facts" || reason === "empty-output") return "soft-rejection";
+  return "schema-rejection";
+}
+
+function isSourceOfTruthRule(ruleId: LocalDiagnosisPolishDiagnosticRuleId | null): boolean {
+  return ruleId === "fact-field.fact-id-unknown"
+    || ruleId === "what-happened.sentence-fact-id-unknown"
+    || ruleId === "what-happened.sentence-unsupported-mutation-claim";
+}
+
+function diagnosePlainDisplayField(
+  field: Exclude<ResponseFieldName, FactCitedDisplayFieldName | "whatHappened">,
+  value: unknown,
+  context: LocalDiagnosisPolishValidationContext,
+): LocalDiagnosisPolishFieldDiagnostic {
+  if (value === null && field === "expectedBehavior") return omittedFieldDiagnostic(field, value, "field.unknown-value-omitted", "expectedBehavior was null", null);
+  if (typeof value !== "string") return rejectedFieldDiagnostic(field, value, "schema-invalid", "display fields must be strings", "field.invalid-type", null);
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (UNKNOWN_VALUES.has(normalized.toLowerCase())) return omittedFieldDiagnostic(field, value, "field.unknown-value-omitted", "display field was empty or unknown", value);
+  if (normalized.length > RESPONSE_FIELD_LIMITS[field]) return rejectedFieldDiagnostic(field, value, "schema-invalid", "display field exceeded length limit", "field.length-limit", value);
+  const unsafeRule = diagnoseUnsafeOutputRule(normalized);
+  if (unsafeRule) return rejectedFieldDiagnostic(field, value, "unsafe-output", "display field included unsafe or non-display content", unsafeRule, value);
+  if (field === "expectedBehavior") return diagnoseExpectedBehaviorFieldForDiagnostics(value, normalized, context);
+  const support = buildSupportSet(context.factPacket);
+  const unsupported = unsupportedTokenSummary(normalized, support);
+  if (hasUnsupportedConcreteFacts(normalized, support)) {
+    return rejectedFieldDiagnostic(field, value, "unsupported-facts", "display field included unsupported concrete facts", "field.unsupported-facts", value, unsupportedDiagnosticCounts(unsupported));
+  }
+  return acceptedFieldDiagnostic(field, value, value);
+}
+
+function diagnoseExpectedBehaviorFieldForDiagnostics(
+  value: string,
+  normalized: string,
+  context: LocalDiagnosisPolishValidationContext,
+): LocalDiagnosisPolishFieldDiagnostic {
+  const expectedFacts = context.factPacket.facts.filter((fact) => EXPECTED_BEHAVIOR_SUPPORT_KINDS.has(fact.kind));
+  if (expectedFacts.length === 0) {
+    return rejectedFieldDiagnostic("expectedBehavior", value, "unsupported-facts", "expected behavior was not supported by expected-behavior facts", "expected.missing-support-facts", value);
+  }
+  if (hasExpectedBehaviorNegationMismatch(normalized, expectedFacts)) {
+    return rejectedFieldDiagnostic("expectedBehavior", value, "unsupported-facts", "expected behavior contradicted expected-behavior facts", "expected.negation-mismatch", value);
+  }
+  const unsupported = unsupportedTokenSummary(normalized, buildSupportSetFromFacts(expectedFacts));
+  if (unsupported.total > 0) {
+    return rejectedFieldDiagnostic("expectedBehavior", value, "unsupported-facts", "expected behavior included unsupported facts", "expected.unsupported-facts", value, unsupportedDiagnosticCounts(unsupported));
+  }
+  return acceptedFieldDiagnostic("expectedBehavior", value, value);
+}
+
+function diagnoseFactCitedDisplayField(
+  field: FactCitedDisplayFieldName,
+  value: unknown,
+  context: LocalDiagnosisPolishValidationContext,
+): LocalDiagnosisPolishFieldDiagnostic {
+  if (!isPlainObject(value)) return rejectedFieldDiagnostic(field, value, "schema-invalid", `${field} must be a fact-cited display object`, "fact-field.not-object", null);
+  const extraKey = Object.keys(value).find((fieldKey) => !FACT_CITED_DISPLAY_RESPONSE_FIELDS.has(fieldKey));
+  if (extraKey) return rejectedFieldDiagnostic(field, value, "schema-invalid", `${field} included unsupported fields`, "fact-field.extra-key", null);
+
+  const text = value["text"];
+  if (typeof text !== "string") return rejectedFieldDiagnostic(field, value, "schema-invalid", `${field} text must be a string`, "fact-field.text-invalid-type", null);
+  const normalized = text.replace(/\s+/g, " ").trim();
+
+  const factIds = value["factIds"];
+  if (!Array.isArray(factIds) || factIds.length === 0) return rejectedFieldDiagnostic(field, value, "schema-invalid", `${field} must cite one or more factIds`, "fact-field.fact-ids-missing", text);
+  if (factIds.length > MAX_FACT_IDS_PER_DISPLAY_FIELD) return rejectedFieldDiagnostic(field, value, "schema-invalid", `${field} cited too many factIds`, "fact-field.fact-ids-too-many", text, { citedFactCount: factIds.length });
+
+  const factsById = new Map(context.factPacket.facts.map((fact) => [fact.id, fact]));
+  const seenFactIds = new Set<string>();
+  const citedFacts: LocalDiagnosisSupportFact[] = [];
+  for (const factId of factIds) {
+    if (typeof factId !== "string") return rejectedFieldDiagnostic(field, value, "schema-invalid", `${field} factIds must be strings`, "fact-field.fact-id-invalid-type", text, { citedFactCount: factIds.length });
+    if (seenFactIds.has(factId)) return rejectedFieldDiagnostic(field, value, "schema-invalid", `${field} repeated a factId`, "fact-field.fact-id-duplicate", text, { repeatedFactIdCount: 1, citedFactCount: factIds.length });
+    seenFactIds.add(factId);
+    const fact = factsById.get(factId as LocalDiagnosisSupportFactId);
+    if (!fact) return rejectedFieldDiagnostic(field, value, "unsupported-facts", `${field} cited an unknown factId`, "fact-field.fact-id-unknown", text, { unknownFactIdCount: 1, citedFactCount: factIds.length });
+    citedFacts.push(fact);
+  }
+
+  if (!normalized || UNKNOWN_VALUES.has(normalized.toLowerCase())) return omittedFieldDiagnostic(field, value, "fact-field.empty-text-omitted", `${field} text was empty or unknown`, text, { citedFactCount: citedFacts.length });
+  if (normalized.length > RESPONSE_FIELD_LIMITS[field]) return rejectedFieldDiagnostic(field, value, "schema-invalid", `${field} exceeded length limit`, "fact-field.length-limit", text, { citedFactCount: citedFacts.length });
+  const unsafeRule = diagnoseUnsafeOutputRule(normalized);
+  if (unsafeRule) return rejectedFieldDiagnostic(field, value, "unsafe-output", `${field} included unsafe or non-display content`, unsafeRule, text, { citedFactCount: citedFacts.length });
+  if (field === "evidenceSummary" && citedFacts.some((fact) => fact.kind !== "evidence-summary")) {
+    return rejectedFieldDiagnostic(field, value, "unsupported-facts", "evidenceSummary must cite evidence-summary facts", "fact-field.evidence-summary-non-evidence-fact", text, { citedFactCount: citedFacts.length });
+  }
+  if (field === "whyThisWasFlagged" && !citedFacts.some((fact) => WHY_FLAGGED_SUPPORT_KINDS.has(fact.kind))) {
+    return rejectedFieldDiagnostic(field, value, "unsupported-facts", "whyThisWasFlagged did not cite flagging support facts", "fact-field.why-flagged-missing-support-kind", text, { citedFactCount: citedFacts.length });
+  }
+  const citedSupport = buildSupportSetFromFacts(citedFacts);
+  const unsupported = unsupportedTokenSummary(normalized, citedSupport);
+  if (hasUnsupportedConcreteFacts(normalized, citedSupport)) {
+    return rejectedFieldDiagnostic(field, value, "unsupported-facts", `${field} included unsupported concrete facts`, "fact-field.unsupported-facts", text, { citedFactCount: citedFacts.length, ...unsupportedDiagnosticCounts(unsupported) });
+  }
+  return acceptedFieldDiagnostic(field, value, text, { citedFactCount: citedFacts.length });
+}
+
+function diagnoseWhatHappenedField(value: unknown, context: LocalDiagnosisPolishValidationContext): LocalDiagnosisPolishFieldDiagnostic {
+  const field: ResponseFieldName = "whatHappened";
+  if (!isPlainObject(value)) return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened must be a fact-cited sentence object", "what-happened.not-object", null);
+  const extraKey = Object.keys(value).find((key) => !WHAT_HAPPENED_RESPONSE_FIELDS.has(key));
+  if (extraKey) return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened included unsupported fields", "what-happened.extra-key", null);
+
+  const sentencesValue = value["sentences"];
+  if (!Array.isArray(sentencesValue)) return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened must include sentences", "what-happened.sentences-not-array", null);
+  if (sentencesValue.length === 0) return omittedFieldDiagnostic(field, value, "what-happened.empty-sentences-omitted", "whatHappened sentences were empty", null, { sentenceCount: 0 });
+  if (sentencesValue.length > WHAT_HAPPENED_MAX_SENTENCES) {
+    return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened narrative exceeded sentence limit", "what-happened.too-many-sentences", null, { sentenceCount: sentencesValue.length });
+  }
+
+  const factsById = new Map(context.factPacket.facts.map((fact) => [fact.id, fact]));
+  const knownFactIds = new Set(factsById.keys());
+  const support = buildSupportSet(context.factPacket);
+  const sentenceTexts: string[] = [];
+  let omittedSentenceCount = 0;
+  for (const [index, sentence] of sentencesValue.entries()) {
+    if (!isPlainObject(sentence)) return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened sentences must be JSON objects", "what-happened.sentence-not-object", null, { sentenceIndex: index, sentenceCount: sentencesValue.length });
+    const sentenceExtraKey = Object.keys(sentence).find((key) => !WHAT_HAPPENED_SENTENCE_FIELDS.has(key));
+    if (sentenceExtraKey) return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened sentence included unsupported fields", "what-happened.sentence-extra-key", null, { sentenceIndex: index, sentenceCount: sentencesValue.length });
+
+    const text = sentence["text"];
+    if (typeof text !== "string") return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened sentence text must be a string", "what-happened.sentence-text-invalid-type", null, { sentenceIndex: index, sentenceCount: sentencesValue.length });
+    const normalized = text.replace(/\s+/g, " ").trim();
+
+    const factIds = sentence["factIds"];
+    if (!Array.isArray(factIds) || factIds.length === 0) {
+      return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened sentence must cite one or more factIds", "what-happened.sentence-fact-ids-missing", text, { sentenceIndex: index, sentenceCount: sentencesValue.length });
+    }
+    if (factIds.length > MAX_FACT_IDS_PER_NARRATIVE_SENTENCE) {
+      return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened sentence cited too many factIds", "what-happened.sentence-fact-ids-too-many", text, { sentenceIndex: index, sentenceCount: sentencesValue.length, citedFactCount: factIds.length });
+    }
+    const seenFactIds = new Set<string>();
+    for (const factId of factIds) {
+      if (typeof factId !== "string") return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened factIds must be strings", "what-happened.sentence-fact-id-invalid-type", text, { sentenceIndex: index, sentenceCount: sentencesValue.length, citedFactCount: factIds.length });
+      if (seenFactIds.has(factId)) return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened sentence repeated a factId", "what-happened.sentence-fact-id-duplicate", text, { sentenceIndex: index, sentenceCount: sentencesValue.length, repeatedFactIdCount: 1, citedFactCount: factIds.length });
+      seenFactIds.add(factId);
+      if (!knownFactIds.has(factId as LocalDiagnosisSupportFactId)) {
+        return rejectedFieldDiagnostic(field, value, "unsupported-facts", "whatHappened cited an unknown factId", "what-happened.sentence-fact-id-unknown", text, { sentenceIndex: index, sentenceCount: sentencesValue.length, unknownFactIdCount: 1, citedFactCount: factIds.length });
+      }
+    }
+
+    if (!normalized || UNKNOWN_VALUES.has(normalized.toLowerCase())) {
+      omittedSentenceCount += 1;
+      continue;
+    }
+    if (narrativeSentenceCount(normalized) > 1) return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened sentence object contained multiple sentences", "what-happened.sentence-multiple-sentences", text, { sentenceIndex: index, sentenceCount: sentencesValue.length });
+    const unsafeRule = diagnoseUnsafeOutputRule(normalized);
+    if (unsafeRule) return rejectedFieldDiagnostic(field, value, "unsafe-output", "whatHappened narrative included unsafe or non-display content", unsafeRule, text, { sentenceIndex: index, sentenceCount: sentencesValue.length });
+    if (containsWhatHappenedImperativeActionAdvice(normalized)) {
+      return rejectedFieldDiagnostic(field, value, "unsafe-output", "whatHappened narrative included unsafe or non-display content", "what-happened.sentence-action-advice", text, { sentenceIndex: index, sentenceCount: sentencesValue.length });
+    }
+    if (containsUnsupportedConcreteMutationClaim(normalized, support)) {
+      const unsupported = unsupportedTokenSummary(normalized, support);
+      return rejectedFieldDiagnostic(field, value, "unsupported-facts", "whatHappened narrative included unsupported concrete mutation claims", "what-happened.sentence-unsupported-mutation-claim", text, { sentenceIndex: index, sentenceCount: sentencesValue.length, ...unsupportedDiagnosticCounts(unsupported) });
+    }
+    sentenceTexts.push(normalized);
+  }
+
+  if (sentenceTexts.length === 0) return omittedFieldDiagnostic(field, value, "what-happened.sentence-empty-omitted", "whatHappened sentences were empty or unknown", null, { sentenceCount: omittedSentenceCount });
+  const combined = sentenceTexts.join(" ");
+  if (combined.length > RESPONSE_FIELD_LIMITS.whatHappened) {
+    return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened narrative exceeded length limit", "what-happened.length-limit", combined, { sentenceCount: sentenceTexts.length });
+  }
+  if (narrativeSentenceCount(combined) > WHAT_HAPPENED_MAX_SENTENCES) {
+    return rejectedFieldDiagnostic(field, value, "schema-invalid", "whatHappened narrative exceeded sentence limit", "what-happened.too-many-sentences", combined, { sentenceCount: sentenceTexts.length });
+  }
+  if (isDuplicateDisplayText(combined, [context.factPacket.deterministic.headline, context.factPacket.deterministic.whatHappened])) {
+    return omittedFieldDiagnostic(field, value, "what-happened.duplicate-display-text-omitted", "whatHappened duplicated deterministic display text", combined, { sentenceCount: sentenceTexts.length });
+  }
+  return acceptedFieldDiagnostic(field, value, combined, { sentenceCount: sentenceTexts.length });
+}
+
+function diagnoseUnsafeOutputRule(value: string): LocalDiagnosisPolishDiagnosticRuleId | null {
+  if (looksLikePrompt(value)) return "unsafe.prompt-or-full-prompt";
+  if (looksLikeTranscript(value)) return "unsafe.transcript";
+  if (SECRET_OUTPUT_PATTERNS.some((pattern) => pattern.test(value))) return "unsafe.secret";
+  if (containsRawPathLikeOutput(value)) return "unsafe.raw-path";
+  if (RAW_COMMAND_OUTPUT_PATTERNS.some((pattern) => pattern.test(value))) return "unsafe.raw-command";
+  if (/\b(?:route|routes|routed|routing|choose|select|press|click)\b/i.test(value) || /\b(?:follow-up|followup)\b/i.test(value)) return "unsafe.route-or-action-advice";
+  if (/(?:^|[.!?]\s+)(?:then\s+|please\s+)*(?:add|edit|modify|change|delete|remove|fix|write|create|update)\s+(?:a\s+|an\s+|the\s+)?(?:test|tests|file|files|code|source|module|dependency|prompt|rule|ticket|artifact|candidate|loom|skill)\b/i.test(value)) return "unsafe.mutation-instruction";
+  if (/\b(?:create|apply|store|save|persist|write)\s+(?:a\s+)?(?:route|artifact|candidate|rule|ticket|loom|file|prompt|skill|source)/i.test(value)) return "unsafe.mutation-instruction";
+  if (/\b(?:generated|created|added|fabricated|invented|synthesized)\s+(?:new\s+|extra\s+)?(?:evidence|refs?|snippets?)\b/i.test(value) || /\b(?:new|extra|fabricated|invented|synthetic)\s+(?:evidence|refs?|snippets?)\b/i.test(value)) return "unsafe.generated-evidence-claim";
+  if (/\b(?:fact\s+packet|bounded\s+fact\s+packet|(?:bounded|redacted)\s+packets?|packets?\b|allowed\s+keys?|json\s+(?:object|schema|response)|response\s+schema|deltas?\b|bounds?\b|analysis\s+fields?|headlines?\b|display\s+fields?|schema\s+fields?|field\s+names?|problem\s+(?:field|key|section)|whatHappened\s+(?:field|key))\b/i.test(value)) return "unsafe.internal-provenance";
+  if (/\b(?:detector|reflection\s+cluster|cluster_[a-z0-9_-]+|confidence(?:\s+score)?|record\s+ids?|source\s+ids?|session\s+ids?|entry\s+ids?|fact\s+ids?|sourceType|sourceFile|sessionFile|cwd)\b/i.test(value)) return "unsafe.internal-provenance";
+  if (DISPLAY_ONLY_FORBIDDEN_PATTERNS.some((pattern) => pattern.test(value))) return "unsafe.non-display-content";
+  return null;
+}
+
+function diagnosticValueKind(value: unknown): LocalDiagnosisPolishDiagnosticValueKind {
+  if (value === null) return "null";
+  if (Array.isArray(value)) return "array";
+  if (value === undefined) return "undefined";
+  if (typeof value === "string") return "string";
+  if (typeof value === "number") return "number";
+  if (typeof value === "boolean") return "boolean";
+  return "object";
+}
+
+function diagnosticTextMetrics(value: string): LocalDiagnosisPolishDiagnosticTextMetrics {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  return { rawLength: value.length, normalizedLength: normalized.length, sha256: sha256DiagnosticText(value) };
+}
+
+function sha256DiagnosticText(value: string): string {
+  return createHash("sha256").update(value, "utf8").digest("hex");
+}
+
+function unsupportedTokenSummary(value: string, support: Set<string>): { content: number; number: number; total: number } {
+  const unsupportedContent = contentTokens(value).filter((token) => !support.has(token));
+  const unsupportedNumbers = numberTokens(value).filter((token) => !support.has(token));
+  return { content: unsupportedContent.length, number: unsupportedNumbers.length, total: unsupportedContent.length + unsupportedNumbers.length };
+}
+
+function unsupportedDiagnosticCounts(summary: { content: number; number: number }): Pick<LocalDiagnosisPolishFieldDiagnostic, "unsupportedContentTokenCount" | "unsupportedNumberTokenCount"> {
+  return {
+    unsupportedContentTokenCount: summary.content,
+    unsupportedNumberTokenCount: summary.number,
+  };
+}
+
 export function validateLocalDiagnosisPolishResponse(rawResponse: string, context: LocalDiagnosisPolishValidationContext): LocalDiagnosisPolishValidationResult {
   let parsed: unknown;
   try {
@@ -1132,25 +1642,50 @@ export function validateLocalDiagnosisPolishResponse(rawResponse: string, contex
 
   const support = buildSupportSet(context.factPacket);
   const fields: LocalDiagnosisPolishDisplayFields = {};
-  let usefulFields = 0;
+  let usefulCoreFields = 0;
   let narrativeCandidate: LocalNarrativeJudgeCandidate | null = null;
+  let firstFieldLocalFailure: FieldValidationFailure | null = null;
+  let firstCardLevelFailure: FieldValidationFailure | null = null;
+  let firstUnsafeFailure: FieldValidationFailure | null = null;
 
   for (const key of RESPONSE_FIELDS) {
     if (!Object.prototype.hasOwnProperty.call(parsed, key)) continue;
     const value = parsed[key];
     const normalized = validateResponseField(key, value, context, support);
-    if (!normalized.ok) return normalized;
+    if (!normalized.ok) {
+      if (normalized.scope === "card-level") {
+        if (!firstCardLevelFailure) firstCardLevelFailure = normalized;
+        if (normalized.reason === "unsafe-output" && !firstUnsafeFailure) firstUnsafeFailure = normalized;
+      } else if (!firstFieldLocalFailure) {
+        firstFieldLocalFailure = normalized;
+      }
+      continue;
+    }
     if (normalized.candidate) narrativeCandidate = normalized.candidate;
     if (normalized.value === null) continue;
     fields[key] = normalized.value;
-    usefulFields += 1;
+    if (CORE_RESPONSE_FIELDS.has(key)) usefulCoreFields += 1;
   }
 
-  if (usefulFields === 0) return { ok: false, reason: "empty-output", issue: "provider response did not include useful display wording" };
+  if (firstUnsafeFailure) return firstUnsafeFailure;
+  if (firstCardLevelFailure) return firstCardLevelFailure;
+  if (usefulCoreFields === 0) {
+    return firstFieldLocalFailure ?? { ok: false, reason: "empty-output", issue: "provider response did not include useful core display wording" };
+  }
   return { ok: true, value: fields, narrativeCandidate };
 }
 
-type FieldValidationResult = { ok: true; value: string | null; candidate?: LocalNarrativeJudgeCandidate | null } | { ok: false; reason: LocalDiagnosisPolishFallbackReason; issue: string };
+type FieldValidationFailureScope = "field-local" | "card-level";
+type FieldValidationFailure = { ok: false; reason: LocalDiagnosisPolishFallbackReason; issue: string; scope: FieldValidationFailureScope };
+type FieldValidationResult = { ok: true; value: string | null; candidate?: LocalNarrativeJudgeCandidate | null } | FieldValidationFailure;
+
+function fieldLocalFailure(reason: LocalDiagnosisPolishFallbackReason, issue: string): FieldValidationFailure {
+  return { ok: false, reason, issue, scope: "field-local" };
+}
+
+function cardLevelFailure(reason: LocalDiagnosisPolishFallbackReason, issue: string): FieldValidationFailure {
+  return { ok: false, reason, issue, scope: "card-level" };
+}
 
 function validateResponseField(
   key: ResponseFieldName,
@@ -1163,13 +1698,13 @@ function validateResponseField(
     return validateFactCitedDisplayField(key as FactCitedDisplayFieldName, value, context);
   }
   if (value === null && key === "expectedBehavior") return { ok: true, value: null };
-  if (typeof value !== "string") return { ok: false, reason: "schema-invalid", issue: "display fields must be strings" };
+  if (typeof value !== "string") return cardLevelFailure("schema-invalid", "display fields must be strings");
   const normalized = value.replace(/\s+/g, " ").trim();
   if (UNKNOWN_VALUES.has(normalized.toLowerCase())) return { ok: true, value: null };
-  if (normalized.length > RESPONSE_FIELD_LIMITS[key]) return { ok: false, reason: "schema-invalid", issue: "display field exceeded length limit" };
-  if (containsUnsafeOutput(normalized)) return { ok: false, reason: "unsafe-output", issue: "display field included unsafe or non-display content" };
+  if (normalized.length > RESPONSE_FIELD_LIMITS[key]) return cardLevelFailure("schema-invalid", "display field exceeded length limit");
+  if (containsUnsafeOutput(normalized)) return cardLevelFailure("unsafe-output", "display field included unsafe or non-display content");
   if (key === "expectedBehavior") return validateExpectedBehaviorField(normalized, context);
-  if (hasUnsupportedFacts(normalized, support)) return { ok: false, reason: "unsupported-facts", issue: "display field included unsupported facts" };
+  if (hasUnsupportedConcreteFacts(normalized, support)) return cardLevelFailure("unsupported-facts", "display field included unsupported concrete facts");
   return { ok: true, value: normalized };
 }
 
@@ -1179,13 +1714,13 @@ function validateExpectedBehaviorField(
 ): FieldValidationResult {
   const expectedFacts = context.factPacket.facts.filter((fact) => EXPECTED_BEHAVIOR_SUPPORT_KINDS.has(fact.kind));
   if (expectedFacts.length === 0) {
-    return { ok: false, reason: "unsupported-facts", issue: "expected behavior was not supported by expected-behavior facts" };
+    return fieldLocalFailure("unsupported-facts", "expected behavior was not supported by expected-behavior facts");
   }
   if (hasExpectedBehaviorNegationMismatch(normalized, expectedFacts)) {
-    return { ok: false, reason: "unsupported-facts", issue: "expected behavior contradicted expected-behavior facts" };
+    return fieldLocalFailure("unsupported-facts", "expected behavior contradicted expected-behavior facts");
   }
   if (hasUnsupportedFacts(normalized, buildSupportSetFromFacts(expectedFacts))) {
-    return { ok: false, reason: "unsupported-facts", issue: "expected behavior included unsupported facts" };
+    return fieldLocalFailure("unsupported-facts", "expected behavior included unsupported facts");
   }
   return { ok: true, value: normalized };
 }
@@ -1201,40 +1736,40 @@ function validateFactCitedDisplayField(
   value: unknown,
   context: LocalDiagnosisPolishValidationContext,
 ): FieldValidationResult {
-  if (!isPlainObject(value)) return { ok: false, reason: "schema-invalid", issue: `${key} must be a fact-cited display object` };
+  if (!isPlainObject(value)) return cardLevelFailure("schema-invalid", `${key} must be a fact-cited display object`);
   const extraKey = Object.keys(value).find((fieldKey) => !FACT_CITED_DISPLAY_RESPONSE_FIELDS.has(fieldKey));
-  if (extraKey) return { ok: false, reason: "schema-invalid", issue: `${key} included unsupported fields` };
+  if (extraKey) return cardLevelFailure("schema-invalid", `${key} included unsupported fields`);
 
   const text = value["text"];
-  if (typeof text !== "string") return { ok: false, reason: "schema-invalid", issue: `${key} text must be a string` };
+  if (typeof text !== "string") return cardLevelFailure("schema-invalid", `${key} text must be a string`);
   const normalized = text.replace(/\s+/g, " ").trim();
 
   const factIds = value["factIds"];
-  if (!Array.isArray(factIds) || factIds.length === 0) return { ok: false, reason: "schema-invalid", issue: `${key} must cite one or more factIds` };
-  if (factIds.length > MAX_FACT_IDS_PER_DISPLAY_FIELD) return { ok: false, reason: "schema-invalid", issue: `${key} cited too many factIds` };
+  if (!Array.isArray(factIds) || factIds.length === 0) return cardLevelFailure("schema-invalid", `${key} must cite one or more factIds`);
+  if (factIds.length > MAX_FACT_IDS_PER_DISPLAY_FIELD) return cardLevelFailure("schema-invalid", `${key} cited too many factIds`);
 
   const factsById = new Map(context.factPacket.facts.map((fact) => [fact.id, fact]));
   const seenFactIds = new Set<string>();
   const citedFacts: LocalDiagnosisSupportFact[] = [];
   for (const factId of factIds) {
-    if (typeof factId !== "string") return { ok: false, reason: "schema-invalid", issue: `${key} factIds must be strings` };
-    if (seenFactIds.has(factId)) return { ok: false, reason: "schema-invalid", issue: `${key} repeated a factId` };
+    if (typeof factId !== "string") return cardLevelFailure("schema-invalid", `${key} factIds must be strings`);
+    if (seenFactIds.has(factId)) return cardLevelFailure("schema-invalid", `${key} repeated a factId`);
     seenFactIds.add(factId);
     const fact = factsById.get(factId as LocalDiagnosisSupportFactId);
-    if (!fact) return { ok: false, reason: "unsupported-facts", issue: `${key} cited an unknown factId` };
+    if (!fact) return cardLevelFailure("unsupported-facts", `${key} cited an unknown factId`);
     citedFacts.push(fact);
   }
 
   if (!normalized || UNKNOWN_VALUES.has(normalized.toLowerCase())) return { ok: true, value: null };
-  if (normalized.length > RESPONSE_FIELD_LIMITS[key]) return { ok: false, reason: "schema-invalid", issue: `${key} exceeded length limit` };
-  if (containsUnsafeOutput(normalized)) return { ok: false, reason: "unsafe-output", issue: `${key} included unsafe or non-display content` };
+  if (normalized.length > RESPONSE_FIELD_LIMITS[key]) return cardLevelFailure("schema-invalid", `${key} exceeded length limit`);
+  if (containsUnsafeOutput(normalized)) return cardLevelFailure("unsafe-output", `${key} included unsafe or non-display content`);
   if (key === "evidenceSummary" && citedFacts.some((fact) => fact.kind !== "evidence-summary")) {
-    return { ok: false, reason: "unsupported-facts", issue: "evidenceSummary must cite evidence-summary facts" };
+    return fieldLocalFailure("unsupported-facts", "evidenceSummary must cite evidence-summary facts");
   }
   if (key === "whyThisWasFlagged" && !citedFacts.some((fact) => WHY_FLAGGED_SUPPORT_KINDS.has(fact.kind))) {
-    return { ok: false, reason: "unsupported-facts", issue: "whyThisWasFlagged did not cite flagging support facts" };
+    return fieldLocalFailure("unsupported-facts", "whyThisWasFlagged did not cite flagging support facts");
   }
-  if (hasUnsupportedFacts(normalized, buildSupportSetFromFacts(citedFacts))) return { ok: false, reason: "unsupported-facts", issue: `${key} included unsupported facts` };
+  if (hasUnsupportedConcreteFacts(normalized, buildSupportSetFromFacts(citedFacts))) return fieldLocalFailure("unsupported-facts", `${key} included unsupported concrete facts`);
   return { ok: true, value: normalized };
 }
 
@@ -1243,16 +1778,16 @@ function validateWhatHappenedNarrative(
   context: LocalDiagnosisPolishValidationContext,
 ): FieldValidationResult {
   if (!isPlainObject(value)) {
-    return { ok: false, reason: "schema-invalid", issue: "whatHappened must be a fact-cited sentence object" };
+    return cardLevelFailure("schema-invalid", "whatHappened must be a fact-cited sentence object");
   }
   const extraKey = Object.keys(value).find((key) => !WHAT_HAPPENED_RESPONSE_FIELDS.has(key));
-  if (extraKey) return { ok: false, reason: "schema-invalid", issue: "whatHappened included unsupported fields" };
+  if (extraKey) return cardLevelFailure("schema-invalid", "whatHappened included unsupported fields");
 
   const sentencesValue = value["sentences"];
-  if (!Array.isArray(sentencesValue)) return { ok: false, reason: "schema-invalid", issue: "whatHappened must include sentences" };
+  if (!Array.isArray(sentencesValue)) return cardLevelFailure("schema-invalid", "whatHappened must include sentences");
   if (sentencesValue.length === 0) return { ok: true, value: null };
   if (sentencesValue.length > WHAT_HAPPENED_MAX_SENTENCES) {
-    return { ok: false, reason: "schema-invalid", issue: "whatHappened narrative exceeded sentence limit" };
+    return cardLevelFailure("schema-invalid", "whatHappened narrative exceeded sentence limit");
   }
 
   const factsById = new Map(context.factPacket.facts.map((fact) => [fact.id, fact]));
@@ -1261,40 +1796,40 @@ function validateWhatHappenedNarrative(
   const sentenceTexts: string[] = [];
   const candidateSentences: LocalNarrativeJudgeCandidateSentence[] = [];
   for (const sentence of sentencesValue) {
-    if (!isPlainObject(sentence)) return { ok: false, reason: "schema-invalid", issue: "whatHappened sentences must be JSON objects" };
+    if (!isPlainObject(sentence)) return cardLevelFailure("schema-invalid", "whatHappened sentences must be JSON objects");
     const sentenceExtraKey = Object.keys(sentence).find((key) => !WHAT_HAPPENED_SENTENCE_FIELDS.has(key));
-    if (sentenceExtraKey) return { ok: false, reason: "schema-invalid", issue: "whatHappened sentence included unsupported fields" };
+    if (sentenceExtraKey) return cardLevelFailure("schema-invalid", "whatHappened sentence included unsupported fields");
 
     const text = sentence["text"];
-    if (typeof text !== "string") return { ok: false, reason: "schema-invalid", issue: "whatHappened sentence text must be a string" };
+    if (typeof text !== "string") return cardLevelFailure("schema-invalid", "whatHappened sentence text must be a string");
     const normalized = text.replace(/\s+/g, " ").trim();
 
     const factIds = sentence["factIds"];
     if (!Array.isArray(factIds) || factIds.length === 0) {
-      return { ok: false, reason: "schema-invalid", issue: "whatHappened sentence must cite one or more factIds" };
+      return cardLevelFailure("schema-invalid", "whatHappened sentence must cite one or more factIds");
     }
     if (factIds.length > MAX_FACT_IDS_PER_NARRATIVE_SENTENCE) {
-      return { ok: false, reason: "schema-invalid", issue: "whatHappened sentence cited too many factIds" };
+      return cardLevelFailure("schema-invalid", "whatHappened sentence cited too many factIds");
     }
     const seenFactIds = new Set<string>();
     const normalizedFactIds: LocalDiagnosisSupportFactId[] = [];
     for (const factId of factIds) {
-      if (typeof factId !== "string") return { ok: false, reason: "schema-invalid", issue: "whatHappened factIds must be strings" };
-      if (seenFactIds.has(factId)) return { ok: false, reason: "schema-invalid", issue: "whatHappened sentence repeated a factId" };
+      if (typeof factId !== "string") return cardLevelFailure("schema-invalid", "whatHappened factIds must be strings");
+      if (seenFactIds.has(factId)) return cardLevelFailure("schema-invalid", "whatHappened sentence repeated a factId");
       seenFactIds.add(factId);
       if (!knownFactIds.has(factId as LocalDiagnosisSupportFactId)) {
-        return { ok: false, reason: "unsupported-facts", issue: "whatHappened cited an unknown factId" };
+        return cardLevelFailure("unsupported-facts", "whatHappened cited an unknown factId");
       }
       normalizedFactIds.push(factId as LocalDiagnosisSupportFactId);
     }
 
     if (!normalized || UNKNOWN_VALUES.has(normalized.toLowerCase())) continue;
-    if (narrativeSentenceCount(normalized) > 1) return { ok: false, reason: "schema-invalid", issue: "whatHappened sentence object contained multiple sentences" };
+    if (narrativeSentenceCount(normalized) > 1) return cardLevelFailure("schema-invalid", "whatHappened sentence object contained multiple sentences");
     if (containsUnsafeOutput(normalized) || containsWhatHappenedImperativeActionAdvice(normalized)) {
-      return { ok: false, reason: "unsafe-output", issue: "whatHappened narrative included unsafe or non-display content" };
+      return cardLevelFailure("unsafe-output", "whatHappened narrative included unsafe or non-display content");
     }
     if (containsUnsupportedConcreteMutationClaim(normalized, support)) {
-      return { ok: false, reason: "unsupported-facts", issue: "whatHappened narrative included unsupported concrete mutation claims" };
+      return cardLevelFailure("unsupported-facts", "whatHappened narrative included unsupported concrete mutation claims");
     }
     sentenceTexts.push(normalized);
     candidateSentences.push({
@@ -1312,10 +1847,10 @@ function validateWhatHappenedNarrative(
   if (sentenceTexts.length === 0) return { ok: true, value: null };
   const combined = sentenceTexts.join(" ");
   if (combined.length > RESPONSE_FIELD_LIMITS.whatHappened) {
-    return { ok: false, reason: "schema-invalid", issue: "whatHappened narrative exceeded length limit" };
+    return cardLevelFailure("schema-invalid", "whatHappened narrative exceeded length limit");
   }
   if (narrativeSentenceCount(combined) > WHAT_HAPPENED_MAX_SENTENCES) {
-    return { ok: false, reason: "schema-invalid", issue: "whatHappened narrative exceeded sentence limit" };
+    return cardLevelFailure("schema-invalid", "whatHappened narrative exceeded sentence limit");
   }
   if (isDuplicateDisplayText(combined, [context.factPacket.deterministic.headline, context.factPacket.deterministic.whatHappened])) {
     return { ok: true, value: null };
@@ -1416,6 +1951,16 @@ function hasUnsupportedFacts(value: string, support: Set<string>): boolean {
     if (!support.has(token)) return true;
   }
   return false;
+}
+
+function hasUnsupportedConcreteFacts(value: string, support: Set<string>): boolean {
+  if (containsUnsupportedConcreteMutationClaim(value, support)) return true;
+  for (const numberToken of numberTokens(value)) {
+    if (!support.has(numberToken)) return true;
+  }
+  const unsupportedTokens = contentTokens(value).filter((token) => !support.has(token));
+  if (unsupportedTokens.some((token) => UNSUPPORTED_CONCRETE_TOKENS.has(token))) return true;
+  return unsupportedTokens.length > MAX_UNSUPPORTED_PARAPHRASE_TOKENS;
 }
 
 function contentTokens(value: string): string[] {

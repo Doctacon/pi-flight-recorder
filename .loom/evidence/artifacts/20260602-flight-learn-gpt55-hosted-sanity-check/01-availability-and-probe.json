@@ -1,0 +1,31 @@
+{
+  "availability": {
+    "command": "pi --list-models gpt-5.5",
+    "requiredProvider": "openai-codex",
+    "requestedModel": "gpt-5.5",
+    "status": 0,
+    "timedOut": false,
+    "latencyMs": 1762,
+    "modelAvailable": true,
+    "matchedRows": [
+      "openai-codex  gpt-5.5  272K     128K     yes       yes"
+    ],
+    "stdoutBytes": 0,
+    "stderrBytes": 116,
+    "rawOutputPersisted": false
+  },
+  "probe": {
+    "commandShape": "pi --provider openai-codex --model gpt-5.5 --no-tools --no-extensions --no-skills --no-context-files --no-session --system-prompt '' -p @<tempfile>",
+    "status": 0,
+    "signal": null,
+    "timedOut": false,
+    "ok": true,
+    "expectedTinyJsonReturned": true,
+    "latencyMs": 5810,
+    "stdoutBytes": 12,
+    "stderrBytes": 0,
+    "tempPromptDeleted": true,
+    "rawPromptPersisted": false,
+    "rawOutputPersisted": false
+  }
+}

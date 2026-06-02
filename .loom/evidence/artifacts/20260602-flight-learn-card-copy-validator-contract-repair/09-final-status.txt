@@ -1,0 +1,16 @@
+Scoped status after implementation/evidence:
+ M src/flight-learn-local-diagnosis-model.test.ts
+ M src/flight-learn-local-diagnosis-model.ts
+?? .loom/evidence/20260602-flight-learn-card-copy-validator-contract-repair.md
+?? .loom/evidence/artifacts/20260602-flight-learn-card-copy-validator-contract-repair/
+?? .loom/tickets/20260602-flight-learn-card-copy-validator-contract-repair.md
+
+Validation summary:
+- Focused tests: passed (36 tests).
+- Typecheck: passed.
+- Build: passed.
+- Full tests: passed (156 tests).
+- Scoped diff check: passed.
+- Privacy scan: passed (0 findings).
+
+Ticket status: review pending audit.

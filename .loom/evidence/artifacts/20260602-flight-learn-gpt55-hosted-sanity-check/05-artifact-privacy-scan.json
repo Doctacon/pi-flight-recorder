@@ -1,0 +1,6 @@
+{
+  "pass": true,
+  "scannedFiles": 42,
+  "findings": [],
+  "policy": "raw prompts/model outputs/logs are omitted; policy labels are not treated as secret material"
+}

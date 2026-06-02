@@ -1,0 +1,5 @@
+$ npm run typecheck
+
+> pi-flight-recorder@0.1.0 typecheck
+> tsc --noEmit
+

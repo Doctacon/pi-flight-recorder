@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ticket": "ticket:20260602-flight-learn-card-copy-validator-diagnostics",
+  "privacy": {
+    "rawFixtureTextPersisted": false,
+    "rawModelOutputPersisted": false,
+    "rawPromptPersisted": false,
+    "privatePathOrSecretPersisted": false,
+    "diagnosticPayloadPolicy": "field/rule/category/count/length/hash metadata only"
+  },
+  "productBehavior": {
+    "diagnosticPathCalledByBuildFlightLearnDiagnosisViewWithLocalPolish": false,
+    "focusedTestComparesProductEquivalentToValidator": true,
+    "focusedTestExercisesProductFallbackUnchanged": true
+  },
+  "cases": [
+    {
+      "caseId": "multi-field-after-hard-failure",
+      "fieldOutcomes": [
+        { "field": "headline", "outcome": "rejected", "diagnosticKind": "hard-rejection", "reason": "unsafe-output", "ruleId": "unsafe.route-or-action-advice", "productFirstFailure": true },
+        { "field": "whatHappened", "outcome": "accepted", "diagnosticKind": "accepted", "ruleId": null },
+        { "field": "expectedBehavior", "outcome": "rejected", "diagnosticKind": "soft-rejection", "reason": "unsupported-facts", "ruleId": "expected.unsupported-facts" },
+        { "field": "whyThisWasFlagged", "outcome": "rejected", "diagnosticKind": "soft-rejection", "reason": "unsupported-facts", "ruleId": "fact-field.unsupported-facts" },
+        { "field": "evidenceSummary", "outcome": "rejected", "diagnosticKind": "hard-rejection", "reason": "unsafe-output", "ruleId": "unsafe.generated-evidence-claim" }
+      ]
+    },
+    { "caseId": "unsupported-facts", "field": "headline", "outcome": "rejected", "diagnosticKind": "soft-rejection", "reason": "unsupported-facts", "ruleId": "field.unsupported-facts" },
+    { "caseId": "route-action-advice", "field": "headline", "outcome": "rejected", "diagnosticKind": "hard-rejection", "reason": "unsafe-output", "ruleId": "unsafe.route-or-action-advice" },
+    { "caseId": "mutation-instruction", "field": "headline", "outcome": "rejected", "diagnosticKind": "hard-rejection", "reason": "unsafe-output", "ruleId": "unsafe.mutation-instruction" },
+    { "caseId": "generated-evidence-claim", "field": "evidenceSummary", "outcome": "rejected", "diagnosticKind": "hard-rejection", "reason": "unsafe-output", "ruleId": "unsafe.generated-evidence-claim" },
+    { "caseId": "expected-known-unsupported", "field": "expectedBehavior", "outcome": "rejected", "diagnosticKind": "soft-rejection", "reason": "unsupported-facts", "ruleId": "expected.unsupported-facts" },
+    { "caseId": "expected-unknown-missing-support", "field": "expectedBehavior", "outcome": "rejected", "diagnosticKind": "soft-rejection", "reason": "unsupported-facts", "ruleId": "expected.missing-support-facts" },
+    { "caseId": "duplicate-narrative", "field": "whatHappened", "outcome": "omitted", "diagnosticKind": "omitted", "ruleId": "what-happened.duplicate-display-text-omitted" },
+    { "caseId": "empty-low-information", "field": "headline", "outcome": "omitted", "diagnosticKind": "omitted", "ruleId": "field.unknown-value-omitted" },
+    { "caseId": "raw-path-like-output", "field": "headline", "outcome": "rejected", "diagnosticKind": "hard-rejection", "reason": "unsafe-output", "ruleId": "unsafe.raw-path" },
+    { "caseId": "secret-looking-output", "field": "headline", "outcome": "rejected", "diagnosticKind": "hard-rejection", "reason": "unsafe-output", "ruleId": "unsafe.secret" },
+    { "caseId": "prompt-like-output", "field": "headline", "outcome": "rejected", "diagnosticKind": "hard-rejection", "reason": "unsafe-output", "ruleId": "unsafe.prompt-or-full-prompt" },
+    { "caseId": "transcript-like-output", "field": "headline", "outcome": "rejected", "diagnosticKind": "hard-rejection", "reason": "unsafe-output", "ruleId": "unsafe.transcript" },
+    { "caseId": "safe-paraphrase", "field": "whatHappened", "outcome": "accepted", "diagnosticKind": "accepted", "ruleId": null },
+    { "caseId": "unsupported-token-novelty", "field": "headline", "outcome": "rejected", "diagnosticKind": "soft-rejection", "reason": "unsupported-facts", "ruleId": "field.unsupported-facts" }
+  ],
+  "aggregate": {
+    "totalSyntheticCategories": 15,
+    "hardRejectionCategories": 7,
+    "softRejectionCategories": 5,
+    "omissionCategories": 2,
+    "acceptedCategories": 1,
+    "productEquivalentMatchesValidatorInFocusedTests": true,
+    "productFallbackBehaviorExercised": true
+  }
+}

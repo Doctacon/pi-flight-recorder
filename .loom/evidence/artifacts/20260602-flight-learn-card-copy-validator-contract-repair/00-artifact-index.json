@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "ticket": "ticket:20260602-flight-learn-card-copy-validator-contract-repair",
+  "artifacts": [
+    { "path": "01-focused-tests.txt", "description": "Focused local diagnosis model contract tests." },
+    { "path": "02-typecheck.txt", "description": "TypeScript no-emit validation." },
+    { "path": "03-build.txt", "description": "Build validation." },
+    { "path": "04-full-tests.txt", "description": "Full Vitest suite." },
+    { "path": "05-diff-check.txt", "description": "Scoped git diff whitespace check." },
+    { "path": "06-source-diff-summary.txt", "description": "Scoped relative-path source diff summary." },
+    { "path": "07-contract-taxonomy.json", "description": "Privacy-safe validator behavior taxonomy for the repair." },
+    { "path": "08-privacy-scan.json", "description": "Privacy scan result over ticket, dossier, and artifacts." },
+    { "path": "09-final-status.txt", "description": "Scoped final status snapshot." }
+  ],
+  "nonClaims": [
+    "No hosted provider call was made.",
+    "No local model/runtime replay was run by this ticket.",
+    "No model download, dependency change, runtime install, telemetry, or non-loopback endpoint was added.",
+    "This repair does not unblock operator comprehension validation until a separate local/open runtime replay ticket passes."
+  ]
+}

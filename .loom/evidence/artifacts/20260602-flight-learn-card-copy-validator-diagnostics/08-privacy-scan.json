@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "pathsScanned": [
+    ".loom/evidence/20260602-flight-learn-card-copy-validator-diagnostics.md",
+    ".loom/tickets/20260602-flight-learn-card-copy-validator-diagnostics.md",
+    ".loom/evidence/artifacts/20260602-flight-learn-card-copy-validator-diagnostics"
+  ],
+  "filesScanned": 12,
+  "findingCount": 0,
+  "findings": [],
+  "passed": true
+}

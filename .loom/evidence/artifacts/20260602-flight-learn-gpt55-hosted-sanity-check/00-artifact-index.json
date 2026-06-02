@@ -1,0 +1,171 @@
+{
+  "generatedAt": "2026-06-02T16:35:24.206Z",
+  "ticket": "ticket:20260602-flight-learn-gpt55-hosted-sanity-check",
+  "provider": "openai-codex",
+  "model": "gpt-5.5",
+  "corpus": {
+    "totalCases": 8,
+    "cases": [
+      {
+        "caseId": "case-01-repeated-workflow",
+        "title": "Repeated workflow setup friction",
+        "coverage": [
+          "repeated-workflow",
+          "expected-known",
+          "evidence-summary"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-02-validation-build",
+        "title": "Validation/build trust issue",
+        "coverage": [
+          "validation-build",
+          "expected-known"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-03-stale-edit",
+        "title": "Stale exact-text edit",
+        "coverage": [
+          "stale-edit",
+          "expected-known"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-04-low-information",
+        "title": "Low information candidate",
+        "coverage": [
+          "low-information",
+          "expected-unknown"
+        ],
+        "evidenceRefCount": 0
+      },
+      {
+        "caseId": "case-05-safety-adversarial",
+        "title": "Safety/adversarial rejection",
+        "coverage": [
+          "safety-adversarial",
+          "fallback",
+          "unsafe-rejection"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-06-expected-known",
+        "title": "Expected behavior known",
+        "coverage": [
+          "expected-known"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-07-expected-unknown",
+        "title": "Expected behavior unknown invention rejected",
+        "coverage": [
+          "expected-unknown",
+          "fallback",
+          "unsupported-expected"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-08-evidence-summary",
+        "title": "Evidence summary case",
+        "coverage": [
+          "evidence-summary",
+          "expected-known"
+        ],
+        "evidenceRefCount": 3
+      }
+    ]
+  },
+  "artifacts": {
+    "availabilityAndProbe": "01-availability-and-probe.json",
+    "runSummary": "02-run-summary.json",
+    "currentProductSummary": "mode-current-product-5s-summary.json",
+    "relaxedValidatorSummary": "mode-relaxed-validator-summary.json",
+    "widthChecks": "03-render-line-widths.json",
+    "hiddenInternals": "04-render-contract-check.json",
+    "privacyScan": "05-artifact-privacy-scan.json",
+    "sourceSideEffectScan": "06-source-side-effect-scan.json",
+    "sessionSideEffectCheck": "07-session-side-effect-check.json",
+    "gitDiffCheck": "08-git-diff-check.txt",
+    "workspaceStatus": "09-workspace-status.txt",
+    "finalPrivacyScan": "11-final-privacy-scan.json"
+  },
+  "renderFiles": [
+    "current-product-5s-case-01-repeated-workflow-72.txt",
+    "current-product-5s-case-01-repeated-workflow-92.txt",
+    "current-product-5s-case-02-validation-build-72.txt",
+    "current-product-5s-case-02-validation-build-92.txt",
+    "current-product-5s-case-03-stale-edit-72.txt",
+    "current-product-5s-case-03-stale-edit-92.txt",
+    "current-product-5s-case-04-low-information-72.txt",
+    "current-product-5s-case-04-low-information-92.txt",
+    "current-product-5s-case-05-safety-adversarial-72.txt",
+    "current-product-5s-case-05-safety-adversarial-92.txt",
+    "current-product-5s-case-06-expected-known-72.txt",
+    "current-product-5s-case-06-expected-known-92.txt",
+    "current-product-5s-case-07-expected-unknown-72.txt",
+    "current-product-5s-case-07-expected-unknown-92.txt",
+    "current-product-5s-case-08-evidence-summary-72.txt",
+    "current-product-5s-case-08-evidence-summary-92.txt",
+    "relaxed-validator-case-01-repeated-workflow-72.txt",
+    "relaxed-validator-case-01-repeated-workflow-92.txt",
+    "relaxed-validator-case-02-validation-build-72.txt",
+    "relaxed-validator-case-02-validation-build-92.txt",
+    "relaxed-validator-case-03-stale-edit-72.txt",
+    "relaxed-validator-case-03-stale-edit-92.txt",
+    "relaxed-validator-case-04-low-information-72.txt",
+    "relaxed-validator-case-04-low-information-92.txt",
+    "relaxed-validator-case-05-safety-adversarial-72.txt",
+    "relaxed-validator-case-05-safety-adversarial-92.txt",
+    "relaxed-validator-case-06-expected-known-72.txt",
+    "relaxed-validator-case-06-expected-known-92.txt",
+    "relaxed-validator-case-07-expected-unknown-72.txt",
+    "relaxed-validator-case-07-expected-unknown-92.txt",
+    "relaxed-validator-case-08-evidence-summary-72.txt",
+    "relaxed-validator-case-08-evidence-summary-92.txt"
+  ],
+  "checks": {
+    "tempPromptDeleted": true,
+    "noSessionFilesCreated": true,
+    "sessionsBefore": {
+      "displayPath": "Pi session storage directory",
+      "exists": true,
+      "fileCount": 481,
+      "newestMtimeMs": 1780418124126,
+      "fileNamesPersisted": false
+    },
+    "sessionsAfter": {
+      "displayPath": "Pi session storage directory",
+      "exists": true,
+      "fileCount": 481,
+      "newestMtimeMs": 1780418124126,
+      "fileNamesPersisted": false
+    },
+    "sourceSideEffect": {
+      "pass": true,
+      "sourceBefore": {
+        "src/flight-learn-local-diagnosis-model.ts": "97e4569d18f86e1abb815c2d47adf2c0b688a93c18422580f21485f3e6e2d7c5",
+        "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+      },
+      "sourceAfter": {
+        "src/flight-learn-local-diagnosis-model.ts": "97e4569d18f86e1abb815c2d47adf2c0b688a93c18422580f21485f3e6e2d7c5",
+        "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+      },
+      "changedSources": []
+    },
+    "widthPass": true,
+    "hiddenInternalsPass": true
+  },
+  "processDiagnosis": {
+    "classification": "mixed",
+    "rationale": "The current 5-second path timed out for every hosted CLI call, while relaxed-validator mode produced parse/schema-compatible output that was still rejected by the current validator/safety gate."
+  },
+  "gateDisposition": "keep-downstream-comprehension-validation-blocked",
+  "rawPromptOrOutputPolicy": "Raw prompts, raw hosted model outputs, and raw provider logs are omitted from persisted artifacts."
+}

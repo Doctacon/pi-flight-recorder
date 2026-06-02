@@ -1,0 +1,13 @@
+{
+  "pass": true,
+  "scannedFiles": 97,
+  "forbiddenPatternCount": 0,
+  "findings": [],
+  "scope": [
+    "replay artifact directory files",
+    "replay evidence dossier",
+    "replay ticket",
+    "downstream comprehension ticket"
+  ],
+  "note": "Scanner checks for concrete private paths/session paths/secrets/transcript markers; final replay had no model display text persisted."
+}

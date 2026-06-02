@@ -1,0 +1,5 @@
+ M .loom/tickets/20260531-flight-learn-llm-card-copy-comprehension-validation.md
+ M src/flight-learn-local-diagnosis-model.ts
+?? .loom/evidence/20260602-flight-learn-card-copy-repaired-local-replay.md
+?? .loom/evidence/artifacts/20260602-flight-learn-card-copy-repaired-local-replay/
+?? .loom/tickets/20260602-flight-learn-card-copy-repaired-local-replay.md

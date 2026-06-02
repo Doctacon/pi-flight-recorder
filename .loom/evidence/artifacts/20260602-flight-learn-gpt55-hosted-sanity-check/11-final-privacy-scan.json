@@ -1,0 +1,6 @@
+{
+  "pass": true,
+  "scannedFiles": 48,
+  "findings": [],
+  "policy": "raw prompts/model outputs/provider logs omitted; policy labels and command-shape descriptions are allowed"
+}

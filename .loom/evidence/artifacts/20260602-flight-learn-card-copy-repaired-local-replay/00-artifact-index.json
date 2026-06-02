@@ -1,0 +1,226 @@
+{
+  "generatedAt": "2026-06-02T18:11:03.454Z",
+  "ticket": "ticket:20260602-flight-learn-card-copy-repaired-local-replay",
+  "corpus": {
+    "totalCases": 8,
+    "cases": [
+      {
+        "caseId": "case-01-repeated-workflow",
+        "title": "Repeated workflow setup friction",
+        "coverage": [
+          "repeated-workflow",
+          "expected-known",
+          "evidence-summary"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-02-validation-build",
+        "title": "Validation/build trust issue",
+        "coverage": [
+          "validation-build",
+          "expected-known"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-03-stale-edit",
+        "title": "Stale exact-text edit",
+        "coverage": [
+          "stale-edit",
+          "expected-known"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-04-low-information",
+        "title": "Low information candidate",
+        "coverage": [
+          "low-information",
+          "expected-unknown"
+        ],
+        "evidenceRefCount": 0
+      },
+      {
+        "caseId": "case-05-safety-adversarial",
+        "title": "Safety/adversarial rejection",
+        "coverage": [
+          "safety-adversarial",
+          "fallback",
+          "unsafe-rejection"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-06-expected-known",
+        "title": "Expected behavior known",
+        "coverage": [
+          "expected-known"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-07-expected-unknown",
+        "title": "Expected behavior unknown invention rejected",
+        "coverage": [
+          "expected-unknown",
+          "fallback",
+          "unsupported-expected"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-08-evidence-summary",
+        "title": "Evidence summary case",
+        "coverage": [
+          "evidence-summary",
+          "expected-known"
+        ],
+        "evidenceRefCount": 3
+      }
+    ]
+  },
+  "candidates": [
+    {
+      "candidateId": "smollm2-1-7b-q4-k-m",
+      "label": "SmolLM2 1.7B Instruct Q4_K_M",
+      "sourceRepo": "HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF",
+      "sourceFile": "smollm2-1.7b-instruct-q4_k_m.gguf",
+      "upstreamModel": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+      "licenseNote": "apache-2.0 observed on HuggingFaceTB GGUF model API",
+      "cacheDisplayPath": "~/.cache/pi-flight-recorder/smollm2/smollm2-1.7b-instruct-q4_k_m.gguf",
+      "expectedSha256": "decd2598bc2c8ed08c19adc3c8fdd461ee19ed5708679d1c54ef54a5a30d4f33",
+      "priorEvidence": "evidence:20260602-flight-learn-small-model-batch-eval"
+    },
+    {
+      "candidateId": "smollm3-3b-q4-k-m",
+      "label": "SmolLM3 3B Instruct Q4_K_M",
+      "sourceRepo": "ggml-org/SmolLM3-3B-GGUF",
+      "sourceFile": "SmolLM3-Q4_K_M.gguf",
+      "upstreamModel": "HuggingFaceTB/SmolLM3-3B",
+      "licenseNote": "apache-2.0 observed on ggml-org GGUF model API and upstream SmolLM3 sources",
+      "cacheDisplayPath": "~/.cache/pi-flight-recorder/smollm3/SmolLM3-Q4_K_M.gguf",
+      "expectedSha256": "8334b850b7bd46238c16b0c550df2138f0889bf433809008cc17a8b05761863e",
+      "priorEvidence": "evidence:20260602-flight-learn-small-model-batch-eval"
+    },
+    {
+      "candidateId": "qwen3-1-7b-q4-k-m",
+      "label": "Qwen3 1.7B Q4_K_M",
+      "sourceRepo": "bartowski/Qwen_Qwen3-1.7B-GGUF",
+      "sourceFile": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "upstreamModel": "Qwen/Qwen3-1.7B",
+      "licenseNote": "third-party GGUF; upstream Qwen3 family is Apache-2.0 per project research",
+      "cacheDisplayPath": "~/.cache/pi-flight-recorder/qwen3-1.7b/Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "expectedSha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+      "priorEvidence": "evidence:20260602-flight-learn-small-model-batch-eval"
+    },
+    {
+      "candidateId": "phi4-mini-q4-k-m",
+      "label": "Phi-4-mini-instruct Q4_K_M",
+      "sourceRepo": "unsloth/Phi-4-mini-instruct-GGUF",
+      "sourceFile": "Phi-4-mini-instruct-Q4_K_M.gguf",
+      "upstreamModel": "microsoft/Phi-4-mini-instruct",
+      "licenseNote": "mit observed on unsloth GGUF model API and upstream Microsoft model card",
+      "cacheDisplayPath": "~/.cache/pi-flight-recorder/phi4-mini/Phi-4-mini-instruct-Q4_K_M.gguf",
+      "expectedSha256": "88c00229914083cd112853aab84ed51b87bdf6b9ce42f532d8c85c7c63b1730a",
+      "priorEvidence": "evidence:20260602-flight-learn-small-model-batch-eval"
+    }
+  ],
+  "artifacts": {
+    "buildOutput": "00-build.txt",
+    "replaySummary": "01-replay-summary.json",
+    "candidateIndex": "02-candidate-report-index.json",
+    "widthChecks": "03-render-line-widths.json",
+    "hiddenInternals": "04-render-contract-check.json",
+    "privacyScan": "05-artifact-privacy-scan.json",
+    "sourceSideEffect": "06-source-side-effect-scan.json",
+    "evidenceDossier": "../../20260602-flight-learn-card-copy-repaired-local-replay.md",
+    "finalPrivacyScan": "08-final-privacy-scan.json",
+    "scopedDiffCheck": "09-scoped-diff-check.txt",
+    "finalStatus": "10-final-status.txt",
+    "tempLogCleanup": "11-temp-log-cleanup-check.txt"
+  },
+  "renderFiles": [
+    "repaired-smollm2-1-7b-q4-k-m-case-01-repeated-workflow-92.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-01-repeated-workflow-72.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-02-validation-build-92.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-02-validation-build-72.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-03-stale-edit-92.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-03-stale-edit-72.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-04-low-information-92.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-04-low-information-72.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-05-safety-adversarial-92.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-05-safety-adversarial-72.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-06-expected-known-92.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-06-expected-known-72.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-07-expected-unknown-92.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-07-expected-unknown-72.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-08-evidence-summary-92.txt",
+    "repaired-smollm2-1-7b-q4-k-m-case-08-evidence-summary-72.txt",
+    "repaired-smollm3-3b-q4-k-m-case-01-repeated-workflow-92.txt",
+    "repaired-smollm3-3b-q4-k-m-case-01-repeated-workflow-72.txt",
+    "repaired-smollm3-3b-q4-k-m-case-02-validation-build-92.txt",
+    "repaired-smollm3-3b-q4-k-m-case-02-validation-build-72.txt",
+    "repaired-smollm3-3b-q4-k-m-case-03-stale-edit-92.txt",
+    "repaired-smollm3-3b-q4-k-m-case-03-stale-edit-72.txt",
+    "repaired-smollm3-3b-q4-k-m-case-04-low-information-92.txt",
+    "repaired-smollm3-3b-q4-k-m-case-04-low-information-72.txt",
+    "repaired-smollm3-3b-q4-k-m-case-05-safety-adversarial-92.txt",
+    "repaired-smollm3-3b-q4-k-m-case-05-safety-adversarial-72.txt",
+    "repaired-smollm3-3b-q4-k-m-case-06-expected-known-92.txt",
+    "repaired-smollm3-3b-q4-k-m-case-06-expected-known-72.txt",
+    "repaired-smollm3-3b-q4-k-m-case-07-expected-unknown-92.txt",
+    "repaired-smollm3-3b-q4-k-m-case-07-expected-unknown-72.txt",
+    "repaired-smollm3-3b-q4-k-m-case-08-evidence-summary-92.txt",
+    "repaired-smollm3-3b-q4-k-m-case-08-evidence-summary-72.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-01-repeated-workflow-92.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-01-repeated-workflow-72.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-02-validation-build-92.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-02-validation-build-72.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-03-stale-edit-92.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-03-stale-edit-72.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-04-low-information-92.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-04-low-information-72.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-05-safety-adversarial-92.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-05-safety-adversarial-72.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-06-expected-known-92.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-06-expected-known-72.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-07-expected-unknown-92.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-07-expected-unknown-72.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-08-evidence-summary-92.txt",
+    "repaired-qwen3-1-7b-q4-k-m-case-08-evidence-summary-72.txt",
+    "repaired-phi4-mini-q4-k-m-case-01-repeated-workflow-92.txt",
+    "repaired-phi4-mini-q4-k-m-case-01-repeated-workflow-72.txt",
+    "repaired-phi4-mini-q4-k-m-case-02-validation-build-92.txt",
+    "repaired-phi4-mini-q4-k-m-case-02-validation-build-72.txt",
+    "repaired-phi4-mini-q4-k-m-case-03-stale-edit-92.txt",
+    "repaired-phi4-mini-q4-k-m-case-03-stale-edit-72.txt",
+    "repaired-phi4-mini-q4-k-m-case-04-low-information-92.txt",
+    "repaired-phi4-mini-q4-k-m-case-04-low-information-72.txt",
+    "repaired-phi4-mini-q4-k-m-case-05-safety-adversarial-92.txt",
+    "repaired-phi4-mini-q4-k-m-case-05-safety-adversarial-72.txt",
+    "repaired-phi4-mini-q4-k-m-case-06-expected-known-92.txt",
+    "repaired-phi4-mini-q4-k-m-case-06-expected-known-72.txt",
+    "repaired-phi4-mini-q4-k-m-case-07-expected-unknown-92.txt",
+    "repaired-phi4-mini-q4-k-m-case-07-expected-unknown-72.txt",
+    "repaired-phi4-mini-q4-k-m-case-08-evidence-summary-92.txt",
+    "repaired-phi4-mini-q4-k-m-case-08-evidence-summary-72.txt"
+  ],
+  "checks": {
+    "widthPass": true,
+    "hiddenInternalsPass": true,
+    "privacyPass": true,
+    "sourceSideEffectPass": true,
+    "finalPrivacyPass": true,
+    "scopedDiffCheckPass": true,
+    "tempLogCleanupPass": true
+  },
+  "gateDisposition": "keep-downstream-comprehension-validation-blocked",
+  "stopReason": null,
+  "nonClaims": [
+    "Replay/render evidence does not prove operator comprehension.",
+    "Schema-valid output does not prove useful model-enabled card copy.",
+    "No dogfood corpus/outcome collection started.",
+    "No product source, default configuration, model integration, hosted provider, or model download occurred."
+  ]
+}

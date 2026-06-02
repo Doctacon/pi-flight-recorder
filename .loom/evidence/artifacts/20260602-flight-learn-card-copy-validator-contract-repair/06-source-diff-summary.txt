@@ -1,0 +1,10 @@
+Source diff summary (scoped, relative paths only):
+ src/flight-learn-local-diagnosis-model.test.ts | 211 +++++++-
+ src/flight-learn-local-diagnosis-model.ts      | 649 +++++++++++++++++++++++--
+ 2 files changed, 801 insertions(+), 59 deletions(-)
+
+Changed implementation seams:
+- src/flight-learn-local-diagnosis-model.ts: prompt text, diagnostic/product-equivalent semantics, hard-vs-field-local validator flow, concrete-support heuristic.
+- src/flight-learn-local-diagnosis-model.test.ts: focused coverage for field-local omission, hard unsafe fallback, source-of-truth fact IDs, safe paraphrase, prompt contract, diagnostics, and expected-behavior omission.
+
+No adapter, renderer, dependency, runtime, model, or spec changes were made by this repair run.

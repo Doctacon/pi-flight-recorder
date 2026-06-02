@@ -1,0 +1,197 @@
+{
+  "pass": true,
+  "files": [
+    {
+      "file": "current-product-5s-case-01-repeated-workflow-72.txt",
+      "width": 72,
+      "longest": 68,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-01-repeated-workflow-92.txt",
+      "width": 92,
+      "longest": 81,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-02-validation-build-72.txt",
+      "width": 72,
+      "longest": 68,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-02-validation-build-92.txt",
+      "width": 92,
+      "longest": 81,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-03-stale-edit-72.txt",
+      "width": 72,
+      "longest": 70,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-03-stale-edit-92.txt",
+      "width": 92,
+      "longest": 81,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-04-low-information-72.txt",
+      "width": 72,
+      "longest": 68,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-04-low-information-92.txt",
+      "width": 92,
+      "longest": 82,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-05-safety-adversarial-72.txt",
+      "width": 72,
+      "longest": 68,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-05-safety-adversarial-92.txt",
+      "width": 92,
+      "longest": 80,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-06-expected-known-72.txt",
+      "width": 72,
+      "longest": 68,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-06-expected-known-92.txt",
+      "width": 92,
+      "longest": 80,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-07-expected-unknown-72.txt",
+      "width": 72,
+      "longest": 68,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-07-expected-unknown-92.txt",
+      "width": 92,
+      "longest": 80,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-08-evidence-summary-72.txt",
+      "width": 72,
+      "longest": 69,
+      "pass": true
+    },
+    {
+      "file": "current-product-5s-case-08-evidence-summary-92.txt",
+      "width": 92,
+      "longest": 81,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-01-repeated-workflow-72.txt",
+      "width": 72,
+      "longest": 68,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-01-repeated-workflow-92.txt",
+      "width": 92,
+      "longest": 81,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-02-validation-build-72.txt",
+      "width": 72,
+      "longest": 68,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-02-validation-build-92.txt",
+      "width": 92,
+      "longest": 81,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-03-stale-edit-72.txt",
+      "width": 72,
+      "longest": 70,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-03-stale-edit-92.txt",
+      "width": 92,
+      "longest": 81,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-04-low-information-72.txt",
+      "width": 72,
+      "longest": 68,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-04-low-information-92.txt",
+      "width": 92,
+      "longest": 82,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-05-safety-adversarial-72.txt",
+      "width": 72,
+      "longest": 68,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-05-safety-adversarial-92.txt",
+      "width": 92,
+      "longest": 80,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-06-expected-known-72.txt",
+      "width": 72,
+      "longest": 68,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-06-expected-known-92.txt",
+      "width": 92,
+      "longest": 80,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-07-expected-unknown-72.txt",
+      "width": 72,
+      "longest": 68,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-07-expected-unknown-92.txt",
+      "width": 92,
+      "longest": 80,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-08-evidence-summary-72.txt",
+      "width": 72,
+      "longest": 69,
+      "pass": true
+    },
+    {
+      "file": "relaxed-validator-case-08-evidence-summary-92.txt",
+      "width": 92,
+      "longest": 81,
+      "pass": true
+    }
+  ]
+}

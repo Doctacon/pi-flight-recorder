@@ -1,0 +1,1 @@
+passed: scoped git diff --check produced no output

@@ -1,0 +1,5 @@
+workspace status
+ M .loom/tickets/20260531-flight-learn-llm-card-copy-comprehension-validation.md
+?? .loom/evidence/20260602-flight-learn-small-model-batch-eval.md
+?? .loom/evidence/artifacts/20260602-flight-learn-small-model-batch-eval/
+?? .loom/tickets/20260602-flight-learn-small-model-batch-eval.md

@@ -1,0 +1,4 @@
+ M .loom/tickets/20260531-flight-learn-llm-card-copy-comprehension-validation.md
+?? .loom/evidence/20260602-flight-learn-gpt55-hosted-sanity-check.md
+?? .loom/evidence/artifacts/20260602-flight-learn-gpt55-hosted-sanity-check/
+?? .loom/tickets/20260602-flight-learn-gpt55-hosted-sanity-check.md

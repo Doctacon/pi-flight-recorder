@@ -1,0 +1,12 @@
+{
+  "pass": true,
+  "sourceBefore": {
+    "src/flight-learn-local-diagnosis-model.ts": "97e4569d18f86e1abb815c2d47adf2c0b688a93c18422580f21485f3e6e2d7c5",
+    "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+  },
+  "sourceAfter": {
+    "src/flight-learn-local-diagnosis-model.ts": "97e4569d18f86e1abb815c2d47adf2c0b688a93c18422580f21485f3e6e2d7c5",
+    "src/flight-learn-inbox.ts": "e56be7012c2dce06230abb6b70c8d29d5523d7976e7d7612680ee24ce981feec"
+  },
+  "changedSources": []
+}

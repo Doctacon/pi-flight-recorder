@@ -1,0 +1,130 @@
+[
+  {
+    "candidateId": "smollm2-1-7b-q4-k-m",
+    "status": "ran",
+    "reason": null,
+    "summaryArtifact": "candidate-smollm2-1-7b-q4-k-m-summary.json",
+    "provenanceArtifact": "candidate-smollm2-1-7b-q4-k-m-provenance.json",
+    "sourceSideEffectArtifact": "candidate-smollm2-1-7b-q4-k-m-source-side-effect-scan.json",
+    "renderFiles": [
+      "repaired-smollm2-1-7b-q4-k-m-case-01-repeated-workflow-92.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-01-repeated-workflow-72.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-02-validation-build-92.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-02-validation-build-72.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-03-stale-edit-92.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-03-stale-edit-72.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-04-low-information-92.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-04-low-information-72.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-05-safety-adversarial-92.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-05-safety-adversarial-72.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-06-expected-known-92.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-06-expected-known-72.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-07-expected-unknown-92.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-07-expected-unknown-72.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-08-evidence-summary-92.txt",
+      "repaired-smollm2-1-7b-q4-k-m-case-08-evidence-summary-72.txt"
+    ],
+    "listenerCheck": {
+      "file": "listener-smollm2-1-7b-q4-k-m.txt",
+      "status": 1,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  {
+    "candidateId": "smollm3-3b-q4-k-m",
+    "status": "ran",
+    "reason": null,
+    "summaryArtifact": "candidate-smollm3-3b-q4-k-m-summary.json",
+    "provenanceArtifact": "candidate-smollm3-3b-q4-k-m-provenance.json",
+    "sourceSideEffectArtifact": "candidate-smollm3-3b-q4-k-m-source-side-effect-scan.json",
+    "renderFiles": [
+      "repaired-smollm3-3b-q4-k-m-case-01-repeated-workflow-92.txt",
+      "repaired-smollm3-3b-q4-k-m-case-01-repeated-workflow-72.txt",
+      "repaired-smollm3-3b-q4-k-m-case-02-validation-build-92.txt",
+      "repaired-smollm3-3b-q4-k-m-case-02-validation-build-72.txt",
+      "repaired-smollm3-3b-q4-k-m-case-03-stale-edit-92.txt",
+      "repaired-smollm3-3b-q4-k-m-case-03-stale-edit-72.txt",
+      "repaired-smollm3-3b-q4-k-m-case-04-low-information-92.txt",
+      "repaired-smollm3-3b-q4-k-m-case-04-low-information-72.txt",
+      "repaired-smollm3-3b-q4-k-m-case-05-safety-adversarial-92.txt",
+      "repaired-smollm3-3b-q4-k-m-case-05-safety-adversarial-72.txt",
+      "repaired-smollm3-3b-q4-k-m-case-06-expected-known-92.txt",
+      "repaired-smollm3-3b-q4-k-m-case-06-expected-known-72.txt",
+      "repaired-smollm3-3b-q4-k-m-case-07-expected-unknown-92.txt",
+      "repaired-smollm3-3b-q4-k-m-case-07-expected-unknown-72.txt",
+      "repaired-smollm3-3b-q4-k-m-case-08-evidence-summary-92.txt",
+      "repaired-smollm3-3b-q4-k-m-case-08-evidence-summary-72.txt"
+    ],
+    "listenerCheck": {
+      "file": "listener-smollm3-3b-q4-k-m.txt",
+      "status": 1,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  {
+    "candidateId": "qwen3-1-7b-q4-k-m",
+    "status": "ran",
+    "reason": null,
+    "summaryArtifact": "candidate-qwen3-1-7b-q4-k-m-summary.json",
+    "provenanceArtifact": "candidate-qwen3-1-7b-q4-k-m-provenance.json",
+    "sourceSideEffectArtifact": "candidate-qwen3-1-7b-q4-k-m-source-side-effect-scan.json",
+    "renderFiles": [
+      "repaired-qwen3-1-7b-q4-k-m-case-01-repeated-workflow-92.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-01-repeated-workflow-72.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-02-validation-build-92.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-02-validation-build-72.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-03-stale-edit-92.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-03-stale-edit-72.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-04-low-information-92.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-04-low-information-72.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-05-safety-adversarial-92.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-05-safety-adversarial-72.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-06-expected-known-92.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-06-expected-known-72.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-07-expected-unknown-92.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-07-expected-unknown-72.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-08-evidence-summary-92.txt",
+      "repaired-qwen3-1-7b-q4-k-m-case-08-evidence-summary-72.txt"
+    ],
+    "listenerCheck": {
+      "file": "listener-qwen3-1-7b-q4-k-m.txt",
+      "status": 1,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  {
+    "candidateId": "phi4-mini-q4-k-m",
+    "status": "ran",
+    "reason": null,
+    "summaryArtifact": "candidate-phi4-mini-q4-k-m-summary.json",
+    "provenanceArtifact": "candidate-phi4-mini-q4-k-m-provenance.json",
+    "sourceSideEffectArtifact": "candidate-phi4-mini-q4-k-m-source-side-effect-scan.json",
+    "renderFiles": [
+      "repaired-phi4-mini-q4-k-m-case-01-repeated-workflow-92.txt",
+      "repaired-phi4-mini-q4-k-m-case-01-repeated-workflow-72.txt",
+      "repaired-phi4-mini-q4-k-m-case-02-validation-build-92.txt",
+      "repaired-phi4-mini-q4-k-m-case-02-validation-build-72.txt",
+      "repaired-phi4-mini-q4-k-m-case-03-stale-edit-92.txt",
+      "repaired-phi4-mini-q4-k-m-case-03-stale-edit-72.txt",
+      "repaired-phi4-mini-q4-k-m-case-04-low-information-92.txt",
+      "repaired-phi4-mini-q4-k-m-case-04-low-information-72.txt",
+      "repaired-phi4-mini-q4-k-m-case-05-safety-adversarial-92.txt",
+      "repaired-phi4-mini-q4-k-m-case-05-safety-adversarial-72.txt",
+      "repaired-phi4-mini-q4-k-m-case-06-expected-known-92.txt",
+      "repaired-phi4-mini-q4-k-m-case-06-expected-known-72.txt",
+      "repaired-phi4-mini-q4-k-m-case-07-expected-unknown-92.txt",
+      "repaired-phi4-mini-q4-k-m-case-07-expected-unknown-72.txt",
+      "repaired-phi4-mini-q4-k-m-case-08-evidence-summary-92.txt",
+      "repaired-phi4-mini-q4-k-m-case-08-evidence-summary-72.txt"
+    ],
+    "listenerCheck": {
+      "file": "listener-phi4-mini-q4-k-m.txt",
+      "status": 1,
+      "stdout": "",
+      "stderr": ""
+    }
+  }
+]

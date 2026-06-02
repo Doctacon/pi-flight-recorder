@@ -1,0 +1,59 @@
+{
+  "candidateId": "qwen3-1-7b-q4-k-m",
+  "label": "Qwen3 1.7B Q4_K_M",
+  "sourceVerification": {
+    "sourceRepo": "bartowski/Qwen_Qwen3-1.7B-GGUF",
+    "sourceFile": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "sourceUrl": "https://huggingface.co/bartowski/Qwen_Qwen3-1.7B-GGUF/resolve/main/Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "upstreamModel": "Qwen/Qwen3-1.7B",
+    "apiLicense": null,
+    "apiSha": "dcb19155b962dbb6389f4691a982043a8e651022",
+    "apiGated": false,
+    "licenseNote": "third-party GGUF; upstream Qwen3 family is Apache-2.0 per project research",
+    "headStatus": 0,
+    "headStatuses": [
+      "HTTP/2 302",
+      "HTTP/1.1 200 OK"
+    ],
+    "headContentLengthBytes": 1282439584,
+    "headSizeGiB": 1.19,
+    "headEtag": "e864889bee68f907ecb7cec2a713a4fb12280600c4a291e23ae5362d92ef4bfd",
+    "under4GbLimit": true,
+    "upstreamApiLicense": "apache-2.0",
+    "upstreamApiSha": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+    "upstreamApiGated": false
+  },
+  "cache": {
+    "status": "downloaded",
+    "displayPath": "~/.cache/pi-flight-recorder/qwen3-1.7b/Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+    "sizeBytes": 1282439584,
+    "sizeGiB": 1.19,
+    "sha256": "72c5c3cb38fa32d5256e2fe30d03e7a64c6c79e668ad84057e3bd66e250b24fb",
+    "downloadedNow": true
+  },
+  "runtime": {
+    "path": "/opt/homebrew/bin/llama-server",
+    "available": true,
+    "versionStatus": 0,
+    "versionStdoutPreview": "",
+    "versionStderrPreview": "version: 9360 (6b4e4bd58) built with AppleClang 17.0.0.17000604 for Darwin arm64"
+  },
+  "baseUrl": "http://127.0.0.1:53207/",
+  "health": {
+    "ok": true,
+    "health": {
+      "status": "ok"
+    }
+  },
+  "serverLogSummary": {
+    "stdoutBytes": 0,
+    "stderrBytes": 14886,
+    "rawLogsPersisted": false,
+    "note": "Raw llama-server logs were temporary and deleted after byte-count summary without reading or persisting contents."
+  },
+  "memoryRssKb": {
+    "min": 1832816,
+    "max": 2612912,
+    "avg": 2181663
+  }
+}

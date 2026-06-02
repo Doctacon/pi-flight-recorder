@@ -1,0 +1,56 @@
+{
+  "candidateId": "smollm2-1-7b-q4-k-m",
+  "label": "SmolLM2 1.7B Instruct Q4_K_M",
+  "sourceVerification": {
+    "sourceRepo": "HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF",
+    "sourceFile": "smollm2-1.7b-instruct-q4_k_m.gguf",
+    "sourceUrl": "https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF/resolve/main/smollm2-1.7b-instruct-q4_k_m.gguf",
+    "upstreamModel": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+    "apiLicense": "apache-2.0",
+    "apiSha": "2d4a76a30b4af41ecd395c35725ac11688d4cfe4",
+    "apiGated": false,
+    "licenseNote": "apache-2.0 observed on HuggingFaceTB GGUF model API",
+    "headStatus": 0,
+    "headStatuses": [
+      "HTTP/2 302",
+      "HTTP/1.1 200 OK"
+    ],
+    "headContentLengthBytes": 1055609536,
+    "headSizeGiB": 0.98,
+    "headEtag": "697ef022637a26165cd8fdf936f4b7df15cff6c0a29430d8a9b16bfc0ee067e6",
+    "under4GbLimit": true
+  },
+  "cache": {
+    "status": "downloaded",
+    "displayPath": "~/.cache/pi-flight-recorder/smollm2/smollm2-1.7b-instruct-q4_k_m.gguf",
+    "sizeBytes": 1055609536,
+    "sizeGiB": 0.98,
+    "sha256": "decd2598bc2c8ed08c19adc3c8fdd461ee19ed5708679d1c54ef54a5a30d4f33",
+    "downloadedNow": true
+  },
+  "runtime": {
+    "path": "/opt/homebrew/bin/llama-server",
+    "available": true,
+    "versionStatus": 0,
+    "versionStdoutPreview": "",
+    "versionStderrPreview": "version: 9360 (6b4e4bd58) built with AppleClang 17.0.0.17000604 for Darwin arm64"
+  },
+  "baseUrl": "http://127.0.0.1:53246/",
+  "health": {
+    "ok": true,
+    "health": {
+      "status": "ok"
+    }
+  },
+  "serverLogSummary": {
+    "stdoutBytes": 0,
+    "stderrBytes": 15995,
+    "rawLogsPersisted": false,
+    "note": "Raw llama-server logs were temporary and deleted after byte-count summary without reading or persisting contents."
+  },
+  "memoryRssKb": {
+    "min": 1888896,
+    "max": 3220320,
+    "avg": 2590603
+  }
+}

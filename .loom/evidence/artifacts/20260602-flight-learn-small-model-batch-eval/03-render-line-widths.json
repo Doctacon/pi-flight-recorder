@@ -1,0 +1,453 @@
+{
+  "pass": true,
+  "checks": [
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-01-repeated-workflow-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-01-repeated-workflow-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-02-validation-build-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-02-validation-build-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-03-stale-edit-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-03-stale-edit-72.txt",
+      "width": 72,
+      "lineCount": 37,
+      "maxLineLength": 70,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-04-low-information-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 82,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-04-low-information-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-05-safety-adversarial-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-05-safety-adversarial-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-06-expected-known-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-06-expected-known-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-07-expected-unknown-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-07-expected-unknown-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-08-evidence-summary-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm3-3b-q4-k-m-case-08-evidence-summary-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 69,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-01-repeated-workflow-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-01-repeated-workflow-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-02-validation-build-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-02-validation-build-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-03-stale-edit-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-03-stale-edit-72.txt",
+      "width": 72,
+      "lineCount": 37,
+      "maxLineLength": 70,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-04-low-information-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 82,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-04-low-information-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-05-safety-adversarial-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-05-safety-adversarial-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-06-expected-known-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-06-expected-known-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-07-expected-unknown-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-07-expected-unknown-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-08-evidence-summary-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-qwen3-1-7b-q4-k-m-case-08-evidence-summary-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 69,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-01-repeated-workflow-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-01-repeated-workflow-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-02-validation-build-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-02-validation-build-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-03-stale-edit-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-03-stale-edit-72.txt",
+      "width": 72,
+      "lineCount": 37,
+      "maxLineLength": 70,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-04-low-information-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 82,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-04-low-information-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-05-safety-adversarial-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-05-safety-adversarial-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-06-expected-known-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-06-expected-known-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-07-expected-unknown-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-07-expected-unknown-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-08-evidence-summary-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-phi4-mini-q4-k-m-case-08-evidence-summary-72.txt",
+      "width": 72,
+      "lineCount": 35,
+      "maxLineLength": 69,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-01-repeated-workflow-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-01-repeated-workflow-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-02-validation-build-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 81,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-02-validation-build-72.txt",
+      "width": 72,
+      "lineCount": 37,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-03-stale-edit-92.txt",
+      "width": 92,
+      "lineCount": 34,
+      "maxLineLength": 88,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-03-stale-edit-72.txt",
+      "width": 72,
+      "lineCount": 34,
+      "maxLineLength": 72,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-04-low-information-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 82,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-04-low-information-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-05-safety-adversarial-92.txt",
+      "width": 92,
+      "lineCount": 34,
+      "maxLineLength": 88,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-05-safety-adversarial-72.txt",
+      "width": 72,
+      "lineCount": 34,
+      "maxLineLength": 72,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-06-expected-known-92.txt",
+      "width": 92,
+      "lineCount": 35,
+      "maxLineLength": 80,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-06-expected-known-72.txt",
+      "width": 72,
+      "lineCount": 36,
+      "maxLineLength": 68,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-07-expected-unknown-92.txt",
+      "width": 92,
+      "lineCount": 34,
+      "maxLineLength": 88,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-07-expected-unknown-72.txt",
+      "width": 72,
+      "lineCount": 34,
+      "maxLineLength": 72,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-08-evidence-summary-92.txt",
+      "width": 92,
+      "lineCount": 40,
+      "maxLineLength": 88,
+      "overLimit": []
+    },
+    {
+      "file": "real-smollm2-1-7b-q4-k-m-case-08-evidence-summary-72.txt",
+      "width": 72,
+      "lineCount": 42,
+      "maxLineLength": 72,
+      "overLimit": []
+    }
+  ]
+}

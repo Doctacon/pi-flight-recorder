@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-06-02T04:49:16.767Z",
+  "candidatesRan": 4,
+  "candidateStatuses": {
+    "smollm3-3b-q4-k-m": "ran",
+    "qwen3-1-7b-q4-k-m": "ran",
+    "phi4-mini-q4-k-m": "ran",
+    "smollm2-1-7b-q4-k-m": "ran"
+  },
+  "candidateSafeProductGatePassCounts": {
+    "smollm3-3b-q4-k-m": 0,
+    "qwen3-1-7b-q4-k-m": 0,
+    "phi4-mini-q4-k-m": 0,
+    "smollm2-1-7b-q4-k-m": 2
+  },
+  "candidateUnsafeAcceptedCounts": {
+    "smollm3-3b-q4-k-m": 0,
+    "qwen3-1-7b-q4-k-m": 0,
+    "phi4-mini-q4-k-m": 0,
+    "smollm2-1-7b-q4-k-m": 2
+  },
+  "gateDisposition": "keep-downstream-comprehension-validation-blocked",
+  "widthPass": true,
+  "hiddenInternalsPass": true,
+  "privacyPass": true,
+  "sourceSideEffectPass": true,
+  "artifactDir": ".loom/evidence/artifacts/20260602-flight-learn-small-model-batch-eval"
+}

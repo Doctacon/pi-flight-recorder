@@ -1,0 +1,34 @@
+Flight Learn — Issue 1 of 1
+1 pending · 2 evidence refs · ↑/↓ changes issue
+Local model phrasing; deterministic fallback available.
+
+Problem
+  [model display text omitted in Loom artifact; product-gated state recorded in metrics]
+
+What happened?
+  [model display text omitted in Loom artifact; product-gated state recorded in metrics]
+
+Why it matters
+  [model display text omitted in Loom artifact; product-gated state recorded in metrics]
+
+Expected
+  [model display text omitted in Loom artifact; product-gated state recorded in metrics]
+
+Why this was flagged
+  [model display text omitted in Loom artifact; product-gated state recorded in metrics]
+
+Evidence
+  [model display text omitted in Loom artifact; product-gated state recorded in metrics]
+
+Choose a follow-up
+▶ [1] Code legibility
+ Use when confusing source shape caused repeated mistakes
+ [2] Test/check
+ Use when a missing or weak validation check would have caught this
+ [3] Flight Rule
+ Use when Pi needs reusable guidance, still requiring approval later
+ [4] Observe
+ Keep evidence and watch recurrence without creating an artifact
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose
+Actions: e edit · v evidence · d dismiss · s skip · q quit

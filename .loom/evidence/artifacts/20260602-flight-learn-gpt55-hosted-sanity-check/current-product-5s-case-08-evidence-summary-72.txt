@@ -1,0 +1,35 @@
+Flight Learn — Issue 1 of 1
+1 pending · 3 evidence refs · ↑/↓ changes issue
+Local model unavailable (timed out); deterministic wording shown.
+
+Problem
+ Evidence summary should remain display only
+
+What happened?
+ The card needed a concise evidence summary before expansion.
+
+Why it matters
+ A safe summary can reduce scan time without replacing evidence refs.
+
+Expected
+ Evidence should remain inspectable and deterministic.
+
+Why this was flagged
+ Pi grouped this as a recurring local issue from 3 redacted evidence
+ refs. Expand evidence to inspect concise refs before routing.
+
+Evidence
+ 3 refs hidden by default — press v to inspect concise refs.
+
+Choose a follow-up
+▶ [1] Code legibility
+ Use when confusing source shape caused repeated mistakes
+ [2] Test/check
+ Use when a missing or weak validation check would have caught this
+ [3] Flight Rule
+ Use when Pi needs reusable guidance, still requiring approval later
+ [4] Observe
+ Keep evidence and watch recurrence without creating an artifact
+
+Keys: ↑/↓ issue · ←/→ follow-up · 1-9/0 jump · enter choose
+Actions: e edit · v evidence · d dismiss · s skip · q quit

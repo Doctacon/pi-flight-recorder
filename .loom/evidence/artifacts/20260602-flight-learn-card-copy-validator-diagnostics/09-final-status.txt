@@ -1,0 +1,5 @@
+ M src/flight-learn-local-diagnosis-model.test.ts
+ M src/flight-learn-local-diagnosis-model.ts
+?? .loom/evidence/20260602-flight-learn-card-copy-validator-diagnostics.md
+?? .loom/evidence/artifacts/20260602-flight-learn-card-copy-validator-diagnostics/
+?? .loom/tickets/20260602-flight-learn-card-copy-validator-diagnostics.md

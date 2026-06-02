@@ -24,6 +24,10 @@ The closure claim is: actual operator review notes over representative repaired 
 - `evidence:20260531-flight-learn-llm-card-copy-operator-feedback` - operator feedback motivating this successor validation.
 - `ticket:20260529-flight-learn-comprehension-validation` - blocked predecessor; useful as a prior packet shape but not sufficient as the go/no-go gate.
 - `ticket:20260529-flight-learn-dogfood-corpus-outcomes` - remains blocked unless this successor validation passes.
+- `evidence:20260602-flight-learn-small-model-batch-eval` - four-model under-4GB batch evaluation; negative for current downstream gate.
+- `evidence:20260602-flight-learn-gpt55-hosted-sanity-check` - hosted frontier sanity check; diagnostic only and not a local-first render pack for this validation gate.
+- `plan:20260602-flight-learn-prompt-validator-contract-repair` - successor repair plan after GPT-5.5 showed the current prompt/validator contract is implicated.
+- `ticket:20260602-flight-learn-card-copy-repaired-local-replay` - successor local/open replay gate that may reopen this ticket only if it produces enough safe real product-gated model-enabled cards.
 
 ## Scope
 
@@ -85,13 +89,9 @@ Stop conditions:
 
 ## Current State
 
-Blocked by negative runtime gate. `ticket:20260531-flight-learn-llm-card-copy-runtime-replay` is closed, but it closed as negative real-runtime evidence: Bonsai 4B Q1_0 produced 0/8 product gate passes and 8/8 deterministic fallbacks for the all-field card-copy path. Do not start this successor comprehension validation as model-enabled validation for the current Bonsai 4B path.
+Blocked by negative repaired local/open replay gate. `evidence:20260602-flight-learn-card-copy-repaired-local-replay` ran SmolLM2 1.7B Q4_K_M, SmolLM3 3B, Qwen3 1.7B, and Phi-4-mini through the repaired product path and found 0/8 product-gated model-enabled renders for every candidate, with 8/8 deterministic fallbacks due to 5s product-path timeouts. After applying the ticket's gate rule that excludes the intentional safety/adversarial case from the five required model-enabled renders, no candidate reached the threshold. Unsafe/privacy accepted output count was 0, and privacy/source/listener checks passed.
 
-The operator selected the repair prompt/model path first, shaped as `plan:20260602-flight-learn-model-enabled-comprehension-repair`. That repair branch has now produced diagnostic evidence and same-model variant evidence, but the variant ticket closed as no-go for current Bonsai 4B variants and did not select a product repair. This ticket therefore remains blocked: there are still no safe real all-field model-enabled card renders for operator comprehension validation.
-
-The operator-authorized Qwen3-4B-Instruct-2507 Q4_K_M branch also failed the replay gate: `ticket:20260602-flight-learn-qwen3-4b-instruct-eval` produced 0/8 product-gated model-enabled cards and 8/8 deterministic fallbacks due to current product-path timeouts. This ticket remains blocked; Qwen did not produce the required safe real model-enabled render pack.
-
-This ticket can proceed only if a future repair/replay branch produces enough safe real model-enabled product-gated card renders and explicitly unblocks this ticket, or if the operator explicitly authorizes a different validation scope such as fallback-only / fake-provider UX validation with explicit non-claims. This ticket should not close without actual operator notes and audit.
+Historical negative gates remain useful context: Bonsai 4B, Qwen3-4B, and the pre-repair under-4GB batch did not unblock validation; hosted `gpt-5.5` remained diagnostic only. This ticket should not start operator comprehension validation unless a future audited local/open replay produces the required safe model-enabled render pack, or the operator explicitly authorizes a different validation scope such as fallback-only/fake-provider UX validation with explicit non-claims.
 
 ## Journal
 
@@ -100,3 +100,7 @@ This ticket can proceed only if a future repair/replay branch produces enough sa
 - 2026-06-02: Operator selected the repair route. Remains blocked on `plan:20260602-flight-learn-model-enabled-comprehension-repair`, specifically the repaired runtime replay gate.
 - 2026-06-02: Same-model diagnostics and variant experiments closed as evidence, but variants ended no-go and product repair remained blocked. This comprehension validation remains blocked; no safe real all-field model-enabled card render pack exists.
 - 2026-06-02: Qwen3-4B-Instruct-2507 Q4_K_M evaluation completed as negative evidence (`evidence:20260602-flight-learn-qwen3-4b-instruct-eval`): 0/8 parse-valid, 0/8 schema-valid, 0/8 product-gated model-enabled cards, 8/8 timeouts/fallbacks. Gate remains blocked; no operator comprehension validation should start from this run.
+- 2026-06-02: Under-4GB small-model batch evaluation completed as negative gate evidence (`evidence:20260602-flight-learn-small-model-batch-eval`): no candidate met the required >=5 safe real product-gated renders with zero unsafe/privacy accepted outputs. This comprehension-validation ticket remains blocked.
+- 2026-06-02: Hosted `gpt-5.5` sanity check completed as diagnostic evidence (`evidence:20260602-flight-learn-gpt55-hosted-sanity-check`): current-product-5s timed out 8/8, relaxed-validator produced 8/8 parse/schema-compatible responses but 0/8 product-gated cards due to validator rejections. This ticket remains blocked; hosted evidence alone must not start operator comprehension validation.
+- 2026-06-02: Successor `plan:20260602-flight-learn-prompt-validator-contract-repair` created with `ticket:20260602-flight-learn-card-copy-repaired-local-replay` as the next replay gate that can reopen this ticket only if the local/open repaired gate passes.
+- 2026-06-02: Repaired local/open replay completed as negative gate evidence (`evidence:20260602-flight-learn-card-copy-repaired-local-replay`): after correcting the gate to exclude the intentional safety/adversarial case and running all cached/authorized candidates, SmolLM2, SmolLM3, Qwen3 1.7B, and Phi-4-mini all produced 0/8 product-gated model-enabled renders under the 5s product path. This comprehension-validation ticket remains blocked.

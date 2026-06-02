@@ -1,0 +1,216 @@
+{
+  "generatedAt": "2026-06-02T04:49:16.767Z",
+  "ticket": "ticket:20260602-flight-learn-small-model-batch-eval",
+  "corpus": {
+    "totalCases": 8,
+    "cases": [
+      {
+        "caseId": "case-01-repeated-workflow",
+        "title": "Repeated workflow setup friction",
+        "coverage": [
+          "repeated-workflow",
+          "expected-known",
+          "evidence-summary"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-02-validation-build",
+        "title": "Validation/build trust issue",
+        "coverage": [
+          "validation-build",
+          "expected-known"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-03-stale-edit",
+        "title": "Stale exact-text edit",
+        "coverage": [
+          "stale-edit",
+          "expected-known"
+        ],
+        "evidenceRefCount": 2
+      },
+      {
+        "caseId": "case-04-low-information",
+        "title": "Low information candidate",
+        "coverage": [
+          "low-information",
+          "expected-unknown"
+        ],
+        "evidenceRefCount": 0
+      },
+      {
+        "caseId": "case-05-safety-adversarial",
+        "title": "Safety/adversarial rejection",
+        "coverage": [
+          "safety-adversarial",
+          "fallback",
+          "unsafe-rejection"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-06-expected-known",
+        "title": "Expected behavior known",
+        "coverage": [
+          "expected-known"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-07-expected-unknown",
+        "title": "Expected behavior unknown invention rejected",
+        "coverage": [
+          "expected-unknown",
+          "fallback",
+          "unsupported-expected"
+        ],
+        "evidenceRefCount": 1
+      },
+      {
+        "caseId": "case-08-evidence-summary",
+        "title": "Evidence summary case",
+        "coverage": [
+          "evidence-summary",
+          "expected-known"
+        ],
+        "evidenceRefCount": 3
+      }
+    ]
+  },
+  "candidates": [
+    {
+      "candidateId": "smollm3-3b-q4-k-m",
+      "label": "SmolLM3 3B Instruct Q4_K_M",
+      "sourceRepo": "ggml-org/SmolLM3-3B-GGUF",
+      "sourceFile": "SmolLM3-Q4_K_M.gguf",
+      "upstreamModel": "HuggingFaceTB/SmolLM3-3B",
+      "licenseNote": "apache-2.0 observed on ggml-org GGUF model API and upstream SmolLM3 sources",
+      "cacheDisplayPath": "~/.cache/pi-flight-recorder/smollm3/SmolLM3-Q4_K_M.gguf"
+    },
+    {
+      "candidateId": "qwen3-1-7b-q4-k-m",
+      "label": "Qwen3 1.7B Q4_K_M",
+      "sourceRepo": "bartowski/Qwen_Qwen3-1.7B-GGUF",
+      "sourceFile": "Qwen_Qwen3-1.7B-Q4_K_M.gguf",
+      "upstreamModel": "Qwen/Qwen3-1.7B",
+      "licenseNote": "third-party GGUF; upstream Qwen3 family is Apache-2.0 per project research",
+      "cacheDisplayPath": "~/.cache/pi-flight-recorder/qwen3-1.7b/Qwen_Qwen3-1.7B-Q4_K_M.gguf"
+    },
+    {
+      "candidateId": "phi4-mini-q4-k-m",
+      "label": "Phi-4-mini-instruct Q4_K_M",
+      "sourceRepo": "unsloth/Phi-4-mini-instruct-GGUF",
+      "sourceFile": "Phi-4-mini-instruct-Q4_K_M.gguf",
+      "upstreamModel": "microsoft/Phi-4-mini-instruct",
+      "licenseNote": "mit observed on unsloth GGUF model API and upstream Microsoft model card",
+      "cacheDisplayPath": "~/.cache/pi-flight-recorder/phi4-mini/Phi-4-mini-instruct-Q4_K_M.gguf"
+    },
+    {
+      "candidateId": "smollm2-1-7b-q4-k-m",
+      "label": "SmolLM2 1.7B Instruct Q4_K_M",
+      "sourceRepo": "HuggingFaceTB/SmolLM2-1.7B-Instruct-GGUF",
+      "sourceFile": "smollm2-1.7b-instruct-q4_k_m.gguf",
+      "upstreamModel": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+      "licenseNote": "apache-2.0 observed on HuggingFaceTB GGUF model API",
+      "cacheDisplayPath": "~/.cache/pi-flight-recorder/smollm2/smollm2-1.7b-instruct-q4_k_m.gguf"
+    }
+  ],
+  "artifacts": {
+    "batchSummary": "01-batch-summary.json",
+    "candidateIndex": "02-candidate-report-index.json",
+    "widthChecks": "03-render-line-widths.json",
+    "hiddenInternals": "04-render-contract-check.json",
+    "privacyScan": "05-artifact-privacy-scan.json",
+    "buildOutput": "00-build.txt",
+    "runOutput": "06-run-output.json",
+    "consoleOutput": "07-console-output.json",
+    "gitDiffCheck": "08-git-diff-check.txt",
+    "workspaceStatus": "09-workspace-status.txt",
+    "finalListenerCheck": "10-final-listener-check.txt",
+    "evidenceDossier": "../../20260602-flight-learn-small-model-batch-eval.md",
+    "finalPrivacyScan": "11-final-privacy-scan.json"
+  },
+  "renderFiles": [
+    "real-smollm3-3b-q4-k-m-case-01-repeated-workflow-92.txt",
+    "real-smollm3-3b-q4-k-m-case-01-repeated-workflow-72.txt",
+    "real-smollm3-3b-q4-k-m-case-02-validation-build-92.txt",
+    "real-smollm3-3b-q4-k-m-case-02-validation-build-72.txt",
+    "real-smollm3-3b-q4-k-m-case-03-stale-edit-92.txt",
+    "real-smollm3-3b-q4-k-m-case-03-stale-edit-72.txt",
+    "real-smollm3-3b-q4-k-m-case-04-low-information-92.txt",
+    "real-smollm3-3b-q4-k-m-case-04-low-information-72.txt",
+    "real-smollm3-3b-q4-k-m-case-05-safety-adversarial-92.txt",
+    "real-smollm3-3b-q4-k-m-case-05-safety-adversarial-72.txt",
+    "real-smollm3-3b-q4-k-m-case-06-expected-known-92.txt",
+    "real-smollm3-3b-q4-k-m-case-06-expected-known-72.txt",
+    "real-smollm3-3b-q4-k-m-case-07-expected-unknown-92.txt",
+    "real-smollm3-3b-q4-k-m-case-07-expected-unknown-72.txt",
+    "real-smollm3-3b-q4-k-m-case-08-evidence-summary-92.txt",
+    "real-smollm3-3b-q4-k-m-case-08-evidence-summary-72.txt",
+    "real-qwen3-1-7b-q4-k-m-case-01-repeated-workflow-92.txt",
+    "real-qwen3-1-7b-q4-k-m-case-01-repeated-workflow-72.txt",
+    "real-qwen3-1-7b-q4-k-m-case-02-validation-build-92.txt",
+    "real-qwen3-1-7b-q4-k-m-case-02-validation-build-72.txt",
+    "real-qwen3-1-7b-q4-k-m-case-03-stale-edit-92.txt",
+    "real-qwen3-1-7b-q4-k-m-case-03-stale-edit-72.txt",
+    "real-qwen3-1-7b-q4-k-m-case-04-low-information-92.txt",
+    "real-qwen3-1-7b-q4-k-m-case-04-low-information-72.txt",
+    "real-qwen3-1-7b-q4-k-m-case-05-safety-adversarial-92.txt",
+    "real-qwen3-1-7b-q4-k-m-case-05-safety-adversarial-72.txt",
+    "real-qwen3-1-7b-q4-k-m-case-06-expected-known-92.txt",
+    "real-qwen3-1-7b-q4-k-m-case-06-expected-known-72.txt",
+    "real-qwen3-1-7b-q4-k-m-case-07-expected-unknown-92.txt",
+    "real-qwen3-1-7b-q4-k-m-case-07-expected-unknown-72.txt",
+    "real-qwen3-1-7b-q4-k-m-case-08-evidence-summary-92.txt",
+    "real-qwen3-1-7b-q4-k-m-case-08-evidence-summary-72.txt",
+    "real-phi4-mini-q4-k-m-case-01-repeated-workflow-92.txt",
+    "real-phi4-mini-q4-k-m-case-01-repeated-workflow-72.txt",
+    "real-phi4-mini-q4-k-m-case-02-validation-build-92.txt",
+    "real-phi4-mini-q4-k-m-case-02-validation-build-72.txt",
+    "real-phi4-mini-q4-k-m-case-03-stale-edit-92.txt",
+    "real-phi4-mini-q4-k-m-case-03-stale-edit-72.txt",
+    "real-phi4-mini-q4-k-m-case-04-low-information-92.txt",
+    "real-phi4-mini-q4-k-m-case-04-low-information-72.txt",
+    "real-phi4-mini-q4-k-m-case-05-safety-adversarial-92.txt",
+    "real-phi4-mini-q4-k-m-case-05-safety-adversarial-72.txt",
+    "real-phi4-mini-q4-k-m-case-06-expected-known-92.txt",
+    "real-phi4-mini-q4-k-m-case-06-expected-known-72.txt",
+    "real-phi4-mini-q4-k-m-case-07-expected-unknown-92.txt",
+    "real-phi4-mini-q4-k-m-case-07-expected-unknown-72.txt",
+    "real-phi4-mini-q4-k-m-case-08-evidence-summary-92.txt",
+    "real-phi4-mini-q4-k-m-case-08-evidence-summary-72.txt",
+    "real-smollm2-1-7b-q4-k-m-case-01-repeated-workflow-92.txt",
+    "real-smollm2-1-7b-q4-k-m-case-01-repeated-workflow-72.txt",
+    "real-smollm2-1-7b-q4-k-m-case-02-validation-build-92.txt",
+    "real-smollm2-1-7b-q4-k-m-case-02-validation-build-72.txt",
+    "real-smollm2-1-7b-q4-k-m-case-03-stale-edit-92.txt",
+    "real-smollm2-1-7b-q4-k-m-case-03-stale-edit-72.txt",
+    "real-smollm2-1-7b-q4-k-m-case-04-low-information-92.txt",
+    "real-smollm2-1-7b-q4-k-m-case-04-low-information-72.txt",
+    "real-smollm2-1-7b-q4-k-m-case-05-safety-adversarial-92.txt",
+    "real-smollm2-1-7b-q4-k-m-case-05-safety-adversarial-72.txt",
+    "real-smollm2-1-7b-q4-k-m-case-06-expected-known-92.txt",
+    "real-smollm2-1-7b-q4-k-m-case-06-expected-known-72.txt",
+    "real-smollm2-1-7b-q4-k-m-case-07-expected-unknown-92.txt",
+    "real-smollm2-1-7b-q4-k-m-case-07-expected-unknown-72.txt",
+    "real-smollm2-1-7b-q4-k-m-case-08-evidence-summary-92.txt",
+    "real-smollm2-1-7b-q4-k-m-case-08-evidence-summary-72.txt"
+  ],
+  "checks": {
+    "widthPass": true,
+    "hiddenInternalsPass": true,
+    "privacyPass": true,
+    "sourceSideEffectPass": true,
+    "finalPrivacyPass": true
+  },
+  "gateDisposition": "keep-downstream-comprehension-validation-blocked",
+  "nonClaims": [
+    "Replay/render evidence does not prove operator comprehension.",
+    "Schema-valid output does not prove useful model-enabled card copy.",
+    "No dogfood corpus/outcome collection started.",
+    "No product source, default configuration, or model integration occurred."
+  ]
+}

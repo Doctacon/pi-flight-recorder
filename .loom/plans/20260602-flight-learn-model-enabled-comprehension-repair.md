@@ -2,7 +2,8 @@
 
 ID: plan:20260602-flight-learn-model-enabled-comprehension-repair
 Type: Plan
-Status: open
+Status: cancelled
+Superseded By: plan:20260602-flight-learn-prompt-validator-contract-repair
 Created: 2026-06-02
 Updated: 2026-06-02
 Risk: high - this plan repairs the local-model comprehension path that gates whether `/flight-learn` can collect trustworthy human routing labels without weakening privacy or source-of-truth boundaries.
@@ -156,10 +157,13 @@ The project knows whether repaired Bonsai card copy produces enough real product
 
 ## Current State
 
-Open. The operator selected the repair path for model-enabled comprehension after the previous runtime replay and audit showed the current Bonsai 4B all-field card-copy path produced no product-gated model-enabled cards. No implementation has started for this plan. The next executable ticket is `ticket:20260602-flight-learn-card-copy-failure-diagnostics`.
+Cancelled as a same-model Bonsai-focused repair branch and superseded by `plan:20260602-flight-learn-prompt-validator-contract-repair`. This plan completed its useful diagnostic/variant work, but the Bonsai same-model variants closed no-go, product repair remained blocked, the under-4GB local batch found no current-path passing model, and the hosted `gpt-5.5` sanity check implicated the prompt/validator contract itself rather than only model choice.
 
-`ticket:20260531-flight-learn-llm-card-copy-comprehension-validation` remains blocked until this plan's repaired runtime replay provides enough safe real model-enabled cards or the operator explicitly rescopes validation.
+Do not start the blocked product repair or repaired runtime replay tickets from this plan unless a future operator decision explicitly revives this exact Bonsai same-model branch. Continue through the successor prompt/validator contract repair plan instead.
+
+`ticket:20260531-flight-learn-llm-card-copy-comprehension-validation` remains blocked until the successor plan's repaired local/open replay provides enough safe real model-enabled cards or the operator explicitly rescopes validation.
 
 ## Journal
 
 - 2026-06-02: Created plan with Status `open` after the operator asked to shape the repair for model-enabled comprehension, not implement it. Child tickets created for diagnostics, artifact-local variants, product repair, and repaired runtime replay/gate reconciliation.
+- 2026-06-02: Cancelled/superseded by `plan:20260602-flight-learn-prompt-validator-contract-repair` after same-model Bonsai variants closed no-go, additional local models failed the current gate, and hosted `gpt-5.5` diagnostic evidence showed the prompt/validator contract itself is the next repair target.

@@ -1,0 +1,15 @@
+Scoped source diff summary for ticket:20260602-flight-learn-card-copy-validator-diagnostics
+
+ src/flight-learn-local-diagnosis-model.test.ts | 114 ++++++
+ src/flight-learn-local-diagnosis-model.ts      | 481 +++++++++++++++++++++++++
+ 2 files changed, 595 insertions(+)
+
+Changed source files:
+src/flight-learn-local-diagnosis-model.test.ts
+src/flight-learn-local-diagnosis-model.ts
+
+Exported diagnostic symbol check:
+src/flight-learn-local-diagnosis-model.ts:1226:export function diagnoseLocalDiagnosisPolishResponse(rawResponse: string, context: LocalDiagnosisPolishValidationContext): LocalDiagnosisPolishResponseDiagnostics {
+src/flight-learn-local-diagnosis-model.test.ts:7:  diagnoseLocalDiagnosisPolishResponse,
+src/flight-learn-local-diagnosis-model.test.ts:137:  return diagnoseLocalDiagnosisPolishResponse(response, validationContext(input));
+src/flight-learn-local-diagnosis-model.test.ts:158:    const diagnostic = diagnoseLocalDiagnosisPolishResponse(response, context);

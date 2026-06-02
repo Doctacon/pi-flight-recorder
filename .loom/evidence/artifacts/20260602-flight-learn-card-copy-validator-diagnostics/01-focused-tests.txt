@@ -1,0 +1,13 @@
+
+> pi-flight-recorder@0.1.0 test
+> vitest run src/flight-learn-local-diagnosis-model.test.ts
+
+
+ RUN  v4.1.7 <repo>
+
+
+ Test Files  1 passed (1)
+      Tests  32 passed (32)
+   Start at  10:08:22
+   Duration  340ms (transform 100ms, setup 0ms, import 123ms, tests 87ms, environment 0ms)
+

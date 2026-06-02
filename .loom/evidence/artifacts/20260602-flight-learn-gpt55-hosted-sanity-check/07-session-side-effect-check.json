@@ -1,0 +1,18 @@
+{
+  "pass": true,
+  "sessionsBefore": {
+    "displayPath": "Pi session storage directory",
+    "exists": true,
+    "fileCount": 481,
+    "newestMtimeMs": 1780418124126,
+    "fileNamesPersisted": false
+  },
+  "sessionsAfter": {
+    "displayPath": "Pi session storage directory",
+    "exists": true,
+    "fileCount": 481,
+    "newestMtimeMs": 1780418124126,
+    "fileNamesPersisted": false
+  },
+  "fileNamesPersisted": false
+}

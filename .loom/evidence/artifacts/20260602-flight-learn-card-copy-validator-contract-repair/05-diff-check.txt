@@ -1,0 +1,1 @@
+$ git diff --check -- src/flight-learn-local-diagnosis-model.ts src/flight-learn-local-diagnosis-model.test.ts .loom/tickets/20260602-flight-learn-card-copy-validator-contract-repair.md .loom/evidence/20260602-flight-learn-card-copy-validator-contract-repair.md .loom/evidence/artifacts/20260602-flight-learn-card-copy-validator-contract-repair

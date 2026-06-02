@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "ticket": "ticket:20260602-flight-learn-card-copy-validator-contract-repair",
+  "privacy": {
+    "rawModelOutputPersisted": false,
+    "rawPromptPersisted": false,
+    "rawLocalPathPersisted": false,
+    "secretPersisted": false,
+    "privateTranscriptPersisted": false
+  },
+  "productValidatorSemantics": {
+    "responseLevelFailuresCardLevel": [
+      "malformed-json",
+      "non-object-response",
+      "extra-top-level-key",
+      "schema-version-invalid"
+    ],
+    "fieldLevelCardFailures": [
+      "privacy-or-secret-output",
+      "raw-path-or-session-path-output",
+      "raw-command-output",
+      "prompt-or-transcript-output",
+      "route-or-action-advice",
+      "artifact-source-loom-rule-skill-prompt-mutation-instruction",
+      "generated-evidence-claim",
+      "classifier-ranking-or-internal-provenance-leakage",
+      "field-schema-invalid",
+      "unknown-fact-id-source-of-truth-violation",
+      "core-field-concrete-unsupported-fact",
+      "what-happened-unsupported-concrete-mutation-claim"
+    ],
+    "fieldLocalOmissions": [
+      "unknown-or-empty-display-field",
+      "duplicate-what-happened",
+      "expected-behavior-missing-support",
+      "expected-behavior-negation-mismatch",
+      "expected-behavior-unsupported-facts",
+      "optional-why-flagged-missing-support-kind",
+      "optional-evidence-summary-non-evidence-fact",
+      "optional-fact-cited-field-unsupported-concrete-fact"
+    ],
+    "minimumAcceptance": "at least one accepted core field: headline, whatHappened, whyItMatters, or expectedBehavior",
+    "unsafePrecedence": "any unsafe field failure rejects the whole card even when earlier fields are field-local failures or accepted"
+  },
+  "focusedTestCoverage": {
+    "focusedTestFile": "src/flight-learn-local-diagnosis-model.test.ts",
+    "testCount": 36,
+    "coveredBehaviors": [
+      "safe core copy renders while unsupported optional fields are omitted",
+      "optional generated-evidence claim still fails closed at card level",
+      "safe paraphrase with limited new connective wording passes",
+      "concrete unsupported container/rebuild fact fails",
+      "unknown fact IDs remain card-level source-of-truth failures even when core copy is safe",
+      "invented expected behavior is omitted when safe core copy remains",
+      "expected behavior alone still needs expected-behavior support",
+      "reader-facing words such as problem, signal, issue are not rejected by themselves",
+      "internal fact-packet/json/delta/headline/provenance wording remains rejected",
+      "privacy-safe diagnostics match product-equivalent decisions"
+    ]
+  }
+}

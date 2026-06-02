@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "ticket": "ticket:20260602-flight-learn-card-copy-validator-diagnostics",
+  "artifactDirectory": ".loom/evidence/artifacts/20260602-flight-learn-card-copy-validator-diagnostics/",
+  "artifacts": [
+    { "path": "01-focused-tests.txt", "description": "Focused validator/diagnostic test run for src/flight-learn-local-diagnosis-model.test.ts." },
+    { "path": "02-typecheck.txt", "description": "TypeScript no-emit validation." },
+    { "path": "03-build.txt", "description": "Build validation via npm run build." },
+    { "path": "04-full-tests.txt", "description": "Full Vitest suite." },
+    { "path": "05-diff-check.txt", "description": "Final scoped git diff whitespace check." },
+    { "path": "06-source-diff-summary.txt", "description": "Source-only diff summary for the diagnostic implementation." },
+    { "path": "07-diagnostic-taxonomy.json", "description": "Privacy-safe synthetic rejection taxonomy; no raw fixture text or model output." },
+    { "path": "08-privacy-scan.json", "description": "Privacy scan over evidence dossier, artifact directory, and ticket." },
+    { "path": "09-final-status.txt", "description": "Final scoped git status for allowed writes." }
+  ],
+  "nonClaims": [
+    "No hosted model calls were made.",
+    "No local model runtime was started.",
+    "No model downloads, dependency changes, runtime installs, or network calls were used.",
+    "No product validation semantics were intentionally changed."
+  ]
+}
