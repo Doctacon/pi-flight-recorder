@@ -1,0 +1,30 @@
+{
+  "pass": true,
+  "model": "PrismML Bonsai 1.7B GGUF Q1_0",
+  "modelSha256": "3d7c6c90dd98717a203adb22d5eacd2581850e40aa5327e144b97766cae5f7e3",
+  "modelSizeBytes": 248302272,
+  "runtime": "llama.cpp llama-server loopback",
+  "loopbackOnly": true,
+  "hostedProviderUsed": false,
+  "modelDownloads": false,
+  "runtimeInstallsOrUpgrades": false,
+  "timeoutMs": 5000,
+  "maxOutputTokens": 256,
+  "latencyMs": 1138,
+  "usedLocalModel": true,
+  "displayState": "validated",
+  "fallbackReason": null,
+  "validationIssue": null,
+  "hardSafetyDisplayScanPass": true,
+  "displayedFields": {
+    "headline": "A validation command failed repeatedly in this project.",
+    "whatHappened": "The validation command failed repeatedly in this project.",
+    "whyItMatters": "That can make the pass or fail result untrustworthy.",
+    "expectedBehavior": "Run validation from a fresh project shell after reinstalling the package.",
+    "whyThisWasFlagged": null,
+    "evidenceSummary": null
+  },
+  "rawPromptPersisted": false,
+  "rawModelOutputPersisted": false,
+  "rawServerLogPersisted": false
+}

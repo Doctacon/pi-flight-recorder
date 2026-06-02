@@ -349,62 +349,14 @@ function assertGeneratorSchema(body: Record<string, unknown>): void {
   expect(properties).toHaveProperty("headline");
   expect(properties).toHaveProperty("whyItMatters");
   expect(properties).toHaveProperty("expectedBehavior");
-  expect(properties).toHaveProperty("whyThisWasFlagged");
-  expect(properties).toHaveProperty("evidenceSummary");
+  expect(properties).not.toHaveProperty("whyThisWasFlagged");
+  expect(properties).not.toHaveProperty("evidenceSummary");
 
-  const whyFlagged = objectProperty(properties, "whyThisWasFlagged");
-  expect(whyFlagged["additionalProperties"]).toBe(false);
-  expect(whyFlagged["required"]).toEqual(["text", "factIds"]);
-  expect(objectProperty(propertiesOf(whyFlagged), "text")["maxLength"]).toBe(360);
-  const whyFlaggedFactIds = objectProperty(propertiesOf(whyFlagged), "factIds");
-  expect(whyFlaggedFactIds["minItems"]).toBe(1);
-  expect(whyFlaggedFactIds["maxItems"]).toBe(8);
-  expect(objectProperty(whyFlaggedFactIds, "items")["pattern"]).toBe("^F[0-9]+$");
-
-  const evidenceSummary = objectProperty(properties, "evidenceSummary");
-  expect(evidenceSummary["additionalProperties"]).toBe(false);
-  expect(evidenceSummary["required"]).toEqual(["text", "factIds"]);
-  expect(objectProperty(propertiesOf(evidenceSummary), "text")["maxLength"]).toBe(360);
-  const evidenceSummaryFactIds = objectProperty(propertiesOf(evidenceSummary), "factIds");
-  expect(evidenceSummaryFactIds["minItems"]).toBe(1);
-  expect(evidenceSummaryFactIds["maxItems"]).toBe(8);
-  expect(objectProperty(evidenceSummaryFactIds, "items")["pattern"]).toBe("^F[0-9]+$");
-
-  const whatHappened = objectProperty(properties, "whatHappened");
-  expect(whatHappened["additionalProperties"]).toBe(false);
-  expect(whatHappened["required"]).toEqual(["sentences"]);
-  const sentences = objectProperty(propertiesOf(whatHappened), "sentences");
-  expect(sentences["minItems"]).toBe(1);
-  expect(sentences["maxItems"]).toBe(4);
-  const sentenceItem = objectProperty(sentences, "items");
-  expect(sentenceItem["additionalProperties"]).toBe(false);
-  expect(sentenceItem["required"]).toEqual(["text", "factIds"]);
-  const sentenceProperties = propertiesOf(sentenceItem);
-  expect(objectProperty(sentenceProperties, "text")["type"]).toBe("string");
-  const factIds = objectProperty(sentenceProperties, "factIds");
-  expect(factIds["minItems"]).toBe(1);
-  expect(factIds["maxItems"]).toBe(8);
-  expect(objectProperty(factIds, "items")["pattern"]).toBe("^F[0-9]+$");
-}
-
-function assertJudgeSchema(body: Record<string, unknown>): void {
-  const responseFormat = body["response_format"] as { json_schema?: { name?: unknown } };
-  const schema = responseFormatJsonSchema(body);
-  expect(responseFormat.json_schema?.name).toBe("flight_learn_narrative_judge_v1");
-  expect(schema["additionalProperties"]).toBe(false);
-  expect(schema["required"]).toEqual(["schemaVersion", "overallVerdict", "sentences"]);
-  const properties = propertiesOf(schema);
-  expect(objectProperty(properties, "schemaVersion")["enum"]).toEqual([1]);
-  expect(objectProperty(properties, "overallVerdict")["enum"]).toEqual(["accept", "reject", "uncertain"]);
-  expect(objectProperty(properties, "failClosedReason")["enum"]).toEqual(["unsupported-facts", "unsafe-output", "action-advice", "low-information", "not-useful", "schema-invalid", "judge-uncertain"]);
-  const sentences = objectProperty(properties, "sentences");
-  const sentenceItem = objectProperty(sentences, "items");
-  expect(sentenceItem["additionalProperties"]).toBe(false);
-  expect(sentenceItem["required"]).toEqual(["index", "verdict", "supportedFactIds", "unsupportedClaims", "reason", "confidence"]);
-  const sentenceProperties = propertiesOf(sentenceItem);
-  expect(objectProperty(sentenceProperties, "verdict")["enum"]).toEqual(["supported", "supported-cautious-connection", "partially-supported", "unsupported", "unsafe", "action-advice", "not-useful", "uncertain"]);
-  expect(objectProperty(sentenceProperties, "confidence")["enum"]).toEqual(["low", "medium", "high"]);
-  expect(objectProperty(objectProperty(sentenceProperties, "supportedFactIds"), "items")["pattern"]).toBe("^F[0-9]+$");
+  expect(objectProperty(properties, "headline")["type"]).toBe("string");
+  expect(objectProperty(properties, "whatHappened")["type"]).toBe("string");
+  expect(objectProperty(properties, "whyItMatters")["type"]).toBe("string");
+  expect(objectProperty(properties, "headline")["maxLength"]).toBe(120);
+  expect(objectProperty(properties, "whatHappened")["maxLength"]).toBe(520);
 }
 
 async function runAdapterChildProcessWithStartupProxyEnv(baseUrl: string, proxyBaseUrl: string): Promise<{ exitCode: number | null; stdout: string; stderr: string }> {
@@ -533,14 +485,14 @@ describe("llama.cpp local diagnosis polish adapter", () => {
     expect(messages[0]).toMatchObject({ role: "user" });
     const content = (messages[0] as { content?: unknown }).content;
     expect(typeof content).toBe("string");
-    expect(content).toContain("Fact packet JSON");
-    expect(content).toContain("Return only a JSON object");
+    expect(content).toContain("Redacted facts JSON");
+    expect(content).toContain("Return JSON only");
     expect(content).toContain("/Users/<user>");
     expect(content).not.toContain("/Users/alice");
     expect(content).not.toContain("API_KEY");
   });
 
-  it("configures an explicit loopback narrative judge provider for fact-cited narrative output", async () => {
+  it("does not invoke the legacy narrative judge for hard-safety-only card copy", async () => {
     const generator = await startLoopbackHttpServer((_request, response) => writeJson(response, polishedEnvelope(validNarrativePolishJson())));
     const judge = await startLoopbackHttpServer((_request, response) => writeJson(response, polishedEnvelope(validJudgeJson())));
 
@@ -568,27 +520,20 @@ describe("llama.cpp local diagnosis polish adapter", () => {
     expect(result.fallbackReason).toBeNull();
     expect(result.view.whatHappened).toBe("The repeated validation pattern came from an old shell after the package changed, which makes this a validation-trust issue.");
     expect(generator.requests).toHaveLength(1);
-    expect(judge.requests).toHaveLength(1);
+    expect(judge.requests).toHaveLength(0);
 
     const generatorBody = JSON.parse(generator.requests[0]!.body) as Record<string, unknown>;
     expect(generatorBody["model"]).toBe("bonsai-4b-q1_0");
     expect(generatorBody["max_tokens"]).toBe(128);
-
-    const judgeBody = JSON.parse(judge.requests[0]!.body) as Record<string, unknown>;
-    expect(judgeBody["model"]).toBe("bonsai-4b-q1_0");
-    expect(judgeBody["max_tokens"]).toBe(256);
     assertGeneratorSchema(generatorBody);
-    assertJudgeSchema(judgeBody);
-    expect(judgeBody).not.toHaveProperty("headers");
-    expect(judgeBody).not.toHaveProperty("apiKey");
 
-    const messages = judgeBody["messages"];
+    const messages = generatorBody["messages"];
     expect(Array.isArray(messages)).toBe(true);
-    if (!Array.isArray(messages)) throw new Error("expected judge messages array");
+    if (!Array.isArray(messages)) throw new Error("expected generator messages array");
     const content = (messages[0] as { content?: unknown }).content;
     expect(typeof content).toBe("string");
-    expect(content).toContain("veto-only");
-    expect(content).toContain("Judge request JSON");
+    expect(content).toContain("Return JSON only");
+    expect(content).toContain("Redacted facts JSON");
     expect(content).toContain("F2");
     expect(content).toContain("/Users/<user>");
     expect(content).not.toContain("/Users/alice");

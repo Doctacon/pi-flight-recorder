@@ -41,7 +41,7 @@ export class LlamaCppLocalDiagnosisAdapterError extends Error {
   }
 }
 
-const DEFAULT_MAX_OUTPUT_TOKENS = 192;
+const DEFAULT_MAX_OUTPUT_TOKENS = 256;
 const MIN_MAX_OUTPUT_TOKENS = 16;
 const MAX_MAX_OUTPUT_TOKENS = 512;
 const MAX_RESPONSE_BYTES = 16 * 1024;
@@ -79,55 +79,11 @@ const LOCAL_DIAGNOSIS_POLISH_RESPONSE_SCHEMA: JsonSchema = {
   properties: {
     schemaVersion: { type: "integer", enum: [2] },
     headline: { type: "string", minLength: 1, maxLength: 120 },
-    whatHappened: {
-      type: "object",
-      additionalProperties: false,
-      required: ["sentences"],
-      properties: {
-        sentences: {
-          type: "array",
-          minItems: 1,
-          maxItems: 4,
-          items: {
-            type: "object",
-            additionalProperties: false,
-            required: ["text", "factIds"],
-            properties: {
-              text: { type: "string", minLength: 1, maxLength: 220 },
-              factIds: {
-                type: "array",
-                minItems: 1,
-                maxItems: 8,
-                items: { type: "string", pattern: "^F[0-9]+$" },
-              },
-            },
-          },
-        },
-      },
-    },
+    whatHappened: { type: "string", minLength: 1, maxLength: 520 },
     whyItMatters: { type: "string", minLength: 1, maxLength: 300 },
     expectedBehavior: { type: ["string", "null"], maxLength: 320 },
-    whyThisWasFlagged: factCitedDisplayFieldSchema(360),
-    evidenceSummary: factCitedDisplayFieldSchema(360),
   },
 };
-
-function factCitedDisplayFieldSchema(maxTextLength: number): JsonSchema {
-  return {
-    type: "object",
-    additionalProperties: false,
-    required: ["text", "factIds"],
-    properties: {
-      text: { type: "string", minLength: 1, maxLength: maxTextLength },
-      factIds: {
-        type: "array",
-        minItems: 1,
-        maxItems: 8,
-        items: { type: "string", pattern: "^F[0-9]+$" },
-      },
-    },
-  };
-}
 
 const LOCAL_NARRATIVE_JUDGE_RESPONSE_SCHEMA: JsonSchema = {
   type: "object",

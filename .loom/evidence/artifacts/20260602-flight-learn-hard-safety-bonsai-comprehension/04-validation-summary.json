@@ -1,0 +1,10 @@
+{
+  "typecheck": { "command": "npm run typecheck", "result": "pass" },
+  "focusedTests": { "command": "npm test -- src/flight-learn-local-diagnosis-model.test.ts src/flight-learn-llama-cpp-adapter.test.ts", "result": "pass", "testFiles": 2, "tests": 25 },
+  "fullTests": { "command": "npm test", "result": "pass", "testFiles": 21, "tests": 132 },
+  "build": { "command": "npm run build", "result": "pass" },
+  "notes": [
+    "Commands were run in the parent session; this artifact records pass/fail summary without raw terminal logs.",
+    "No broad model evaluation matrix was run."
+  ]
+}

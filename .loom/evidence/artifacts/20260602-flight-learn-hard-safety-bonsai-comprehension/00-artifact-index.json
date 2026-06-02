@@ -1,0 +1,16 @@
+{
+  "ticket": "ticket:20260602-flight-learn-hard-safety-bonsai-comprehension",
+  "artifacts": {
+    "bonsaiSmokeSummary": "01-bonsai-1.7b-smoke-summary.json",
+    "listenerCleanup": "02-listener-cleanup.txt",
+    "diffCheck": "03-diff-check.txt",
+    "validationSummary": "04-validation-summary.json",
+    "privacyScan": "05-privacy-scan.json"
+  },
+  "nonClaims": [
+    "No broad model replay matrix was run.",
+    "No hosted provider was used.",
+    "No model or runtime was downloaded or installed.",
+    "The smoke validates hard display safety and integration shape, not operator comprehension or global model quality."
+  ]
+}

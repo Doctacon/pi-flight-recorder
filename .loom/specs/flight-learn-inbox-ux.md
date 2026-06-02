@@ -121,9 +121,9 @@ The UI should preserve all existing safety boundaries: candidate generation can 
 - REQ-039: A local LLM draft explanation MUST be visually and semantically distinct from an accepted narrative. The card should label it with language such as `Local LLM draft — facts below are source of truth`, and should not imply verifier/judge acceptance.
 - REQ-040: A local LLM draft explanation MUST NOT persist as stored delta truth, update artifact candidates, rank routes, create rules/docs/source/Loom records, feed classifier labels, or change any routing/storage side effect. It may only help the operator read the current card.
 - REQ-041: The stricter accepted-narrative path remains available as an upgrade when verifier/judge acceptance succeeds, but it MUST NOT block draft comprehension when the operator has explicitly opted into local model reading help and hard draft display gates pass.
-- REQ-042: When the explicitly enabled local-model path is available and the relevant card-copy fields pass hard gates, the primary human-readable focused-card copy MUST prefer local-LLM-authored display text from bounded redacted facts for these field jobs: `Problem`, `What happened?`, `Why it matters`, `Expected`, `Why this was flagged`, and optional collapsed `Evidence summary`.
+- REQ-042: When the explicitly enabled local-model path is available and the relevant card-copy fields pass hard gates, the primary human-readable focused-card copy SHOULD prefer local-LLM-authored display text from bounded redacted facts for core comprehension fields: `Problem`, `What happened?`, `Why it matters`, and `Expected`. `Why this was flagged` and collapsed `Evidence summary` may remain deterministic unless a safe model field is explicitly available.
 - REQ-043: Local LLM card copy MUST NOT mean generated evidence. Evidence remains deterministic source material. Model text may summarize bounded redacted evidence for comprehension, but raw/redacted evidence refs remain the inspectable source of truth.
-- REQ-044: The local card-copy response contract MUST separate field jobs and support references for generated fields. It should distinguish at least headline/problem, what-happened narrative, impact, expected-behavior wording, flag rationale, and evidence summary so downstream rendering does not reuse detector/provenance/debug strings as reader-facing copy.
+- REQ-044: The local card-copy response contract MUST separate core field jobs for generated display text. It should distinguish at least headline/problem, what-happened narrative, impact, and expected-behavior wording. Support references, flag rationale, and evidence summary are optional implementation details, not required product-gate proof.
 - REQ-045: `Raw clue`, raw commands, raw paths, detector names, confidence scores, cluster IDs, record IDs, storage/source labels, and similar provenance/debug details MUST NOT appear as default primary sections in the focused card. They may be available behind explicit evidence/debug expansion when redacted and safe.
 - REQ-046: The visible `Evidence` section MUST stay collapsed by default. In the collapsed state it SHOULD show count/availability and MAY show a safe local-LLM evidence summary; raw/redacted refs appear only after explicit operator expansion.
 - REQ-047: `Expected` copy MUST NOT invent intended behavior. If expected behavior is unknown, local-model and deterministic fallback copy must say that Pi does not know the intended behavior yet and keep the edit affordance visible.
@@ -134,6 +134,8 @@ The UI should preserve all existing safety boundaries: candidate generation can 
 - REQ-052: Validator rejection diagnostics MUST be privacy-safe and reviewable. Evidence may record field name, rejection category, rule identifier, top-level key presence, length, hashes, and sanitized/redacted excerpts when explicitly safe, but it MUST NOT persist raw private sessions, raw prompts, raw model output, raw local paths, secrets, stack traces, transcripts, or provider logs.
 - REQ-053: Hosted frontier-model checks MAY be used as explicitly authorized diagnostics for the prompt/validator process, but hosted success or failure MUST NOT become product integration evidence, local-first validation evidence, or a reason to weaken local/open-source boundaries.
 - REQ-054: A repaired model-enabled path MUST be replayed with an explicitly authorized local/open model runtime before operator comprehension validation or corpus/outcome collection resumes. Schema validity, hosted diagnostics, fake-provider success, and fallback renders remain insufficient.
+- REQ-055: The operator-selected product gate for local card-copy comprehension is hard display safety, not semantic proof. Once output is parseable enough to extract bounded display fields, `/flight-learn` MUST reject the model card only for hard privacy/safety/action-advice failures: raw local/session paths, secrets, prompt/transcript/stack traces/raw commands, route/action advice, artifact/rule/source/Loom/skill/prompt mutation instructions, classifier/ranking claims, or generated-evidence claims. Unsupported-token, citation, duplicate, low-information, or field-quality concerns SHOULD omit that field or fall back for that field rather than fail the whole card.
+- REQ-056: The first local/open model path for this hard-safety-only comprehension layer SHOULD return to PrismML Bonsai GGUF, starting with the cached/authorized Bonsai 1.7B Q1_0 model through loopback `llama.cpp`. Bonsai validation should use a short comprehension-copy prompt and realistic local timeout guidance, not the prior all-field proof-oriented validator/replay matrix.
 
 ## Scenarios
 
@@ -273,9 +275,10 @@ Exercises: REQ-042, REQ-043, REQ-044, REQ-045, REQ-046
 
 GIVEN the operator explicitly enables the local-model path
 AND a pending delta has bounded redacted facts, detector signals, and evidence summaries
-AND the local model returns schema-compatible card-copy fields that pass hard display gates
+AND the local model returns schema-compatible core card-copy fields that pass hard display gates
 WHEN `/flight-learn` renders the focused card
-THEN `Problem`, `What happened?`, `Why it matters`, `Expected`, `Why this was flagged`, and the collapsed evidence summary read as local-LLM-authored comprehension copy
+THEN `Problem`, `What happened?`, `Why it matters`, and `Expected` may read as local-LLM-authored comprehension copy
+AND `Why this was flagged` and collapsed evidence summary may remain deterministic if that avoids raw evidence echo or over-constraining the model
 AND the card does not show `Raw clue`, detector labels, confidence scores, cluster IDs, raw commands, raw paths, or record IDs as default primary sections
 AND raw/redacted evidence remains hidden behind explicit expansion.
 
@@ -326,12 +329,23 @@ AND deterministic fallback renders without storage/routing/artifact/source/Loom/
 
 ### SCN-018: Hosted frontier output diagnoses the validator but does not unblock product validation
 
-Exercises: REQ-052, REQ-053, REQ-054
+Exercises: REQ-052, REQ-053, REQ-054, REQ-055
 
 GIVEN the operator explicitly authorizes a hosted frontier-model diagnostic over synthetic/redacted cases
 WHEN the hosted model produces schema-compatible output that the current validator rejects
 THEN the evidence may diagnose prompt/validator mismatch in privacy-safe aggregate terms
-AND downstream local-model comprehension validation remains blocked until an explicitly authorized local/open runtime replay produces enough safe product-gated model-enabled cards.
+AND downstream local-model comprehension validation remains blocked until an explicitly authorized local/open runtime path produces hard-safety-passing model-enabled cards under the operator-selected hard-safety-only product gate.
+
+### SCN-019: Hard-safety-only Bonsai comprehension copy renders
+
+Exercises: REQ-055, REQ-056
+
+GIVEN the operator explicitly enables the local-model path against cached PrismML Bonsai 1.7B Q1_0 on loopback `llama.cpp`
+AND the model returns parseable JSON with bounded display strings
+WHEN `/flight-learn` validates the model response
+THEN safe paraphrase and useful comprehension wording may render even without fact IDs or strict semantic proof
+AND unsupported/citation/quality concerns do not erase safe useful fields
+AND hard privacy leaks, action advice, mutation instructions, classifier/ranking claims, or generated-evidence claims still force deterministic fallback for the card.
 
 ## Evidence Plan
 
@@ -347,7 +361,7 @@ AND downstream local-model comprehension validation remains blocked until an exp
 - REQ-033 through REQ-036 / SCN-011: comprehension validation should include rendered model-enabled and fallback cards plus operator-facing review notes that answer whether the card can be understood and routed without first decoding raw evidence. Evidence should distinguish schema/verifier success from comprehension success and should block corpus/outcome collection if the operator cannot confidently explain the card.
 - REQ-037 through REQ-041 / SCN-012: local draft comprehension evidence should include tests and render artifacts for a draft explanation that passes hard display gates but is not judge-accepted, plus rejected draft cases for raw path/session/secret/prompt/route/mutation/overlong/unknown-fact content. Evidence must prove draft display has no storage/routing/artifact/source/Loom/classifier side effects.
 - REQ-042 through REQ-048 / SCN-013 through SCN-015: local LLM card-copy evidence should include fake-provider tests for all primary explanation fields, field-specific support/gate failures, render artifacts proving `Raw clue`/detector/provenance details are absent from the default reading path, collapsed evidence-summary renders, deterministic fallback renders, privacy scans, and operator comprehension notes. Real local-runtime claims require an explicitly authorized local runtime smoke or a recorded blocker.
-- REQ-049 through REQ-054 / SCN-016 through SCN-018: prompt/validator repair evidence should include privacy-safe rejection traces, tests that separate hard card-level unsafe failures from field-local non-safety omissions, examples of safe paraphrase accepted without brittle token-whitelist failure, explicit generated-evidence/route/mutation/privacy rejection tests, hosted-diagnostic non-claims, and a local/open runtime replay gate before any comprehension-validation unblock.
+- REQ-049 through REQ-056 / SCN-016 through SCN-019: prompt/validator evidence should prioritize the operator-selected hard display safety gate. Required proof is narrow: safe paraphrase renders, malformed/unavailable output falls back, hard privacy/action/mutation/generated-evidence/classifier failures fail closed, and the local/open Bonsai path can be smoke-checked without downloads/hosted calls. Broad replay matrices, hosted diagnostics, and strict semantic support proof are not required for this gate and should not be used as the product comprehension metric.
 - Visual UX claim: before strong release claims, capture at least one real interactive Pi TUI screenshot or ANSI log showing the custom inbox with representative data.
 
 ## Open Questions
@@ -357,7 +371,7 @@ AND downstream local-model comprehension validation remains blocked until an exp
 - Should route recommendations be ranked? Recommendation: route cards can group likely/default-safe choices, but avoid classifier-like ranking language until routed/outcome corpus exists.
 - Should the split-pane layout be polished further or replaced? Recommendation: replace it for the primary review path. The current screenshots show that the split-pane shape itself creates the cognitive-load problem; further border/copy tweaks are likely incremental.
 - Which local model runtime should optional diagnosis polish use? Recommendation: research local/open-source options first and choose a small explicit runtime adapter with deterministic fallback, no automatic model downloads, and no hosted/network dependency.
-- How permissive should the support validator be for narrative `What happened?` text? Answered for the current repair branch by REQ-049 through REQ-054: keep hard safety/privacy/action/mutation/generated-evidence gates strict, but avoid treating every new explanatory token as an unsupported-fact failure.
+- How permissive should the support validator be for narrative `What happened?` text? Answered by REQ-055: the product gate is now hard display safety only. Semantic support proof, citation fidelity, and unsupported-token checks may inform diagnostics or field omission, but they should not block otherwise safe comprehension copy.
 
 ## Quality Bar
 

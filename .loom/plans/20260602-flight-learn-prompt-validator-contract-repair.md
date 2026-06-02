@@ -2,7 +2,7 @@
 
 ID: plan:20260602-flight-learn-prompt-validator-contract-repair
 Type: Plan
-Status: blocked
+Status: completed
 Created: 2026-06-02
 Updated: 2026-06-02
 Risk: high - this plan changes the contract that decides whether model-authored `/flight-learn` card copy is safe to show, and mistakes can either hide useful comprehension help or accept unsafe/generated-evidence text.
@@ -145,11 +145,14 @@ Active. The governing spec was amended with REQ-049 through REQ-054 and SCN-016 
 
 Milestones 1 and 2 are complete: `ticket:20260602-flight-learn-card-copy-validator-diagnostics` and `ticket:20260602-flight-learn-card-copy-validator-contract-repair` both closed with clear audits. Milestone 3 completed negatively: `ticket:20260602-flight-learn-card-copy-repaired-local-replay` closed with clear audit as negative repaired local/open replay evidence. All four cached/authorized local-open candidates timed out 8/8 under the current 5s product path, yielding 0 product-gated model-enabled cards.
 
-The plan is now blocked by an operator/product decision. There is no remaining runnable child ticket under current authority. Downstream comprehension validation remains blocked. Continuing would require a newly shaped direction such as a shorter-prompt experiment, longer timeout/product envelope, different local runtime/model authorization, evidence-summary-only path, or fallback-only validation rescope.
+The operator/product decision arrived after the negative replay: stop using the overbuilt semantic/support gate as the product comprehension metric, validate only hard display safety/privacy/action-advice failures, and return to the original PrismML Bonsai path. Successor ticket `ticket:20260602-flight-learn-hard-safety-bonsai-comprehension` implemented that pivot and recorded a passing cached Bonsai 1.7B Q1_0 loopback smoke under the hard-safety-only gate.
+
+This plan is completed as a redirected repair branch. Downstream operator comprehension validation is still not automatically open as a corpus-quality claim; the next product move is to use the simplified Bonsai-backed path in the focused card and collect actual operator comprehension feedback only when the operator wants that validation scope.
 
 ## Journal
 
 - 2026-06-02: Created plan after hosted `gpt-5.5` sanity check and small-model batch showed the current prompt/validator contract, not just model choice, is the next repair target. Added child tickets for validator diagnostics, contract repair, and repaired local replay; linked existing comprehension-validation ticket as the downstream gate.
 - 2026-06-02: First child ticket `ticket:20260602-flight-learn-card-copy-validator-diagnostics` closed with clear audit; plan moved to active and successor contract-repair ticket was unblocked.
 - 2026-06-02: Contract repair child ticket closed with clear audit; repaired local/open replay ticket was unblocked as the next gate.
-- 2026-06-02: Repaired local/open replay child ticket closed with clear audit as negative gate evidence: all cached/authorized candidates timed out under the current 5s product path. Plan moved to blocked because any further progress requires new operator/product authority.
+- 2026-06-02: Repaired local/open replay child ticket closed with clear audit as negative gate evidence: all cached/authorized candidates timed out under the current 5s product path. Plan moved to blocked because any further progress required new operator/product authority.
+- 2026-06-02: Operator redirected the branch: only hard display safety/privacy/action-advice failures matter for model-enabled comprehension, and the project should return to PrismML Bonsai. Added and completed `ticket:20260602-flight-learn-hard-safety-bonsai-comprehension`; plan completed as redirected.

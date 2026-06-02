@@ -711,7 +711,7 @@ describe("Pi extension wrapper", () => {
       expect(output).toContain("A validation check failed repeatedly in this project.");
       expect(output).toContain("Pi saw the same validation-failure pattern twice in recent sessions.");
       expect(chatServer.requests).toHaveLength(1);
-      expect(chatServer.requests[0]).toContain("Fact packet JSON");
+      expect(chatServer.requests[0]).toContain("Redacted facts JSON");
       expect(chatServer.requests[0]).toContain("/Users/<user>");
       expect(chatServer.requests[0]).not.toContain("/Users/alice");
 
@@ -738,7 +738,7 @@ describe("Pi extension wrapper", () => {
     }
   });
 
-  it("uses explicitly configured local narrative judge for accepted what-happened wording without persisting it", async () => {
+  it("ignores the legacy local narrative judge while showing hard-safety-validated card copy without persisting it", async () => {
     const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-learn-local-judge-data-"));
     const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
     extension({ registerCommand: (name, command) => commands.set(name, command) });
@@ -810,14 +810,11 @@ describe("Pi extension wrapper", () => {
       await commands.get("flight-learn")?.handler(`--data-dir ${dataDir} --local-model-polish --local-model-url ${generatorServer.baseUrl} --local-narrative-judge-url ${judgeServer.baseUrl} --local-narrative-judge-max-output-tokens 256`, ctx);
 
       const output = rendered[0]?.join("\n") ?? "";
-      expect(output).toContain("Local model narrative accepted by local judge; deterministic fallback available.");
+      expect(output).toContain("Local model phrasing; deterministic fallback available.");
       expect(output).toContain("A validation command failed repeatedly in this project.");
       expect(output).toContain("The accepted local narrative ties the repeated validation check to an old shell");
       expect(generatorServer.requests).toHaveLength(1);
-      expect(judgeServer.requests).toHaveLength(1);
-      expect(judgeServer.requests[0]).toContain("veto-only");
-      expect(judgeServer.requests[0]).toContain("Judge request JSON");
-      expect(judgeServer.requests[0]).not.toContain("/Users/alice");
+      expect(judgeServer.requests).toHaveLength(0);
 
       const check = new FlightRecorderStore(defaultDatabasePath(dataDir));
       try {
@@ -900,10 +897,10 @@ describe("Pi extension wrapper", () => {
       await commands.get("flight-learn")?.handler(`--data-dir ${dataDir} --local-model-polish --local-model-url ${generatorServer.baseUrl}`, ctx);
 
       const output = rendered[0]?.join("\n") ?? "";
-      expect(output).toContain("Local LLM draft — facts below are source of truth; not judge-accepted.");
+      expect(output).toContain("Local model phrasing; deterministic fallback available.");
       expect(output).toContain("The validation check was rerun from an old shell after the package changed.");
-      expect(output).toContain("Source facts");
-      expect(output).toContain("Problem: A validation command failed repeatedly in this project.");
+      expect(output).toContain("Problem");
+      expect(output).toContain("A validation command failed repeatedly in this project.");
       expect(output).not.toContain("accepted by local judge");
       expect(generatorServer.requests).toHaveLength(1);
 

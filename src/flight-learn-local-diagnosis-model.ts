@@ -230,8 +230,8 @@ export interface LocalDiagnosisPolishDisplayFields {
   evidenceSummary?: string;
 }
 
-const DEFAULT_TIMEOUT_MS = 750;
-const MAX_TIMEOUT_MS = 5_000;
+const DEFAULT_TIMEOUT_MS = 5_000;
+const MAX_TIMEOUT_MS = 30_000;
 const MAX_DELTA_FIELD_CHARS = 320;
 const MAX_SIGNAL_COUNT = 5;
 const MAX_SIGNAL_EXPLANATION_CHARS = 220;
@@ -395,6 +395,7 @@ const SIGNAL_TYPE_VALUES = new Set<DeltaDetectorSignal["type"]>(["manual-capture
 const EVIDENCE_SOURCE_TYPE_VALUES = new Set<DeltaEvidenceRef["sourceType"]>(["occurrence", "episode", "cluster", "proposal", "rule-candidate", "flight-rule", "session-entry", "manual"]);
 
 const UNKNOWN_VALUES = new Set(["", "unknown", "n/a", "none", "null", "undefined", "same", "unchanged", "not sure", "not known"]);
+const LOW_INFORMATION_HEADLINES = new Set(["issue", "problem", "validation failed", "test failed", "failure", "local issue"]);
 
 const SECRET_OUTPUT_PATTERNS: RegExp[] = [
   /\b(?:api[_-]?key|access[_-]?token|auth[_-]?token|token|password|passwd|secret|client[_-]?secret|authorization)\b\s*[:=]/i,
@@ -419,26 +420,11 @@ const RAW_COMMAND_OUTPUT_PATTERNS: RegExp[] = [
   /\b(?:bash|zsh|sh)\s+(?:-lc|cd)\b/i,
   /\b(?:npm|pnpm|yarn|bun)\s+(?:run\s+)?[\w:-]+\b/i,
   /\b(?:vitest|tsc|eslint|prettier)\b/i,
-  /\b(?:git|python3?|node|npx|tsx|vite|deno|make|go|cargo|pytest|uv|pip|brew|duckdb|sqlite3?|psql|mysql|redis-cli|docker|kubectl)\s+[A-Za-z0-9_./:-]+\b/i,
+  /\b(?:git|python3?|node|npx|tsx|vite|deno|cargo|pytest|uv|pip|brew|duckdb|sqlite3?|psql|mysql|redis-cli|docker|kubectl)\s+[A-Za-z0-9_./:-]+\b/i,
   /\b(?:ls|cat|grep|rg|sed|awk|curl|wget|rm|cp|mv|mkdir|touch|chmod|chown|ssh|scp|rsync|find|xargs|tar|unzip|zip)\s+(?:--?[A-Za-z0-9][\w-]*|[^\s]+)\b/i,
   /(?:^|\s)(?:&&|\|\||>|2>|\$)\s*/,
 ];
 
-const DISPLAY_ONLY_FORBIDDEN_PATTERNS: RegExp[] = [
-  /\b(?:route|routes|routed|routing)\b/i,
-  /\b(?:choose|select|press|click)\b/i,
-  /(?:^|[.!?]\s+)(?:then\s+|please\s+)*(?:add|edit|modify|change|delete|remove|fix|write|create|update)\s+(?:a\s+|an\s+|the\s+)?(?:test|tests|file|files|code|source|module|dependency|prompt|rule|ticket|artifact|candidate|loom|skill)\b/i,
-  /\b(?:you|we|they|the\s+assistant|the\s+user)\s+(?:(?:can|could|should|might|may|would|must|will)|(?:(?:need|needs|has|have)\s+to))\s+(?:then\s+|also\s+|please\s+)*(?:add|edit|modify|change|delete|remove|fix|write|create|update|route|choose|select|press|click|apply|store|save|persist|rerun|re-run|reinstall|review)\b/i,
-  /\b(?:you|we|they|the\s+user)\s+(?:(?:can|could|should|might|may|would|must|will)|(?:(?:need|needs|has|have)\s+to))\s+(?:then\s+|also\s+|please\s+)*keep\s+(?:editing|writing|changing|updating|creating|routing|reviewing|rerunning|reinstalling)\b/i,
-  /\b(?:create|apply|store|save|persist|write)\s+(?:a\s+)?(?:route|artifact|candidate|rule|ticket|loom|file|prompt|skill|source)/i,
-  /\b(?:artifact|candidate|flight\s*rule|loom\s+(?:ticket|spec|research|knowledge|record)|classifier|route\s+ranking)\b/i,
-  /\b(?:follow-up|followup)\b/i,
-  /\b(?:source files?|docs?|prompts?|skills?)\s+(?:should|must|need|needs|will)\s+(?:be\s+)?(?:changed|updated|created|written|mutated)\b/i,
-  /\b(?:fact\s+packet|bounded\s+fact\s+packet|(?:bounded|redacted)\s+packets?|packets?\b|allowed\s+keys?|json\s+(?:object|schema|response)|response\s+schema|deltas?\b|bounds?\b|analysis\s+fields?|headlines?\b|display\s+fields?|schema\s+fields?|field\s+names?|problem\s+(?:field|key|section)|whatHappened\s+(?:field|key))\b/i,
-  /\b(?:detector|reflection\s+cluster|cluster_[a-z0-9_-]+|confidence(?:\s+score)?|record\s+ids?|source\s+ids?|session\s+ids?|entry\s+ids?|fact\s+ids?|sourceType|sourceFile|sessionFile|cwd)\b/i,
-  /\b(?:generated|created|added|fabricated|invented|synthesized)\s+(?:new\s+|extra\s+)?(?:evidence|refs?|snippets?)\b/i,
-  /\b(?:new|extra|fabricated|invented|synthetic)\s+(?:evidence|refs?|snippets?)\b/i,
-];
 
 const WHAT_HAPPENED_GENERIC_IMPERATIVE_VERBS = "re-?run|run|validate|check|use(?!\\s+of\\b)|do|perform|execute|retry|inspect|verify|confirm|open|install|reinstall|fix|update|edit|write|create|route|choose|select|press|click|apply|store|save|persist";
 const WHAT_HAPPENED_IMPERATIVE_CLAUSE_PATTERN = new RegExp(`^(?:(?:and|then|please|now|next)\\s+)*(?:(?:${WHAT_HAPPENED_GENERIC_IMPERATIVE_VERBS})\\b|review\\s+(?:the|this|that|result|output|evidence|card|issue|failure|pattern)\\b|keep\\s+(?:validating|editing|writing|changing|updating|creating|routing|reviewing|rerunning|reinstalling)\\b)`, "i");
@@ -785,22 +771,18 @@ export function buildLocalDiagnosisFactPacket(input: FlightLearnDiagnosisInput, 
 }
 
 export function buildLocalDiagnosisPrompt(factPacket: LocalDiagnosisFactPacket): string {
-  const factPacketJson = JSON.stringify(factPacket);
+  const promptFacts = {
+    deterministic: factPacket.deterministic,
+    facts: factPacket.facts,
+  };
   return [
-    "You are an optional local-only phrasing helper for a Pi Flight Learn diagnosis card.",
-    "Use only the bounded redacted fact packet and its facts[] entries. Do not add facts, routes, actions, artifacts, file paths, secrets, stack traces, commands, or transcript text.",
-    "Return only a JSON object with schemaVersion: 2. Allowed keys: schemaVersion, headline, whatHappened, whyItMatters, expectedBehavior, whyThisWasFlagged, evidenceSummary. Omit any display key you cannot improve. No other top-level keys are allowed.",
-    "Field jobs: headline/Problem stays concise, conservative, and headline-shaped; whatHappened is the narrative field; whyItMatters explains impact; expectedBehavior is included only when supported by expected-behavior or delta-expectation facts, not inferred from reality, impact, signals, or evidence; whyThisWasFlagged explains why local evidence flagged this issue; evidenceSummary summarizes existing evidence facts only.",
-    "You may return one useful core field instead of all fields. Core fields are headline, whatHappened, whyItMatters, and expectedBehavior. Optional flag/evidence fields should be omitted unless you can safely improve them from cited facts.",
-    "For whatHappened, do not return a string. If you can improve it, return {\"sentences\":[{\"text\":\"...\",\"factIds\":[\"F1\"]}]}. Each sentence needs 1 or more factIds, and every factId must exactly match an id in facts[].",
-    "For whyThisWasFlagged and evidenceSummary, return {\"text\":\"...\",\"factIds\":[\"F1\"]}. evidenceSummary must summarize existing evidence facts only; do not create, imply, invent, or replace evidence refs.",
-    "If returning whatHappened, write 1-3 concise sentence objects that explain the observed sequence, recurrence, pattern, or uncertainty and are distinct from the headline. The factIds are deterministic support handles, not proof of entailment; unsupported meaning will be handled by a later local judge path.",
-    "Do not include confidence, scores, metadata, notes, rationale, route, action, status, severity, record IDs, detector names, cluster IDs, or any other non-display field.",
-    "Do not echo or summarize the fact packet structure. Do not mention internal field names such as JSON, allowed keys, delta, signals, bounds, analysis, or headline fields. You may refer generically to stored evidence when it helps.",
-    `Length limits: headline <= ${RESPONSE_FIELD_LIMITS.headline} chars; combined whatHappened text <= ${RESPONSE_FIELD_LIMITS.whatHappened} and <= ${WHAT_HAPPENED_MAX_SENTENCES} sentence objects; whyItMatters <= ${RESPONSE_FIELD_LIMITS.whyItMatters}; expectedBehavior <= ${RESPONSE_FIELD_LIMITS.expectedBehavior}; whyThisWasFlagged <= ${RESPONSE_FIELD_LIMITS.whyThisWasFlagged}; evidenceSummary <= ${RESPONSE_FIELD_LIMITS.evidenceSummary}.`,
-    "The JSON is display-only wording for the current card and must not instruct routing, ranking, storage, artifact creation, source edits, Loom records, rules, skills, or prompt changes.",
-    "Fact packet JSON:",
-    factPacketJson,
+    "You write short display-only copy for one Pi Flight Learn card.",
+    "Use only the redacted facts below. Be plain, helpful, and conservative. Do not prove citations; just explain the card clearly.",
+    "Return JSON only: {\"schemaVersion\":2,\"headline\":\"...\",\"whatHappened\":\"...\",\"whyItMatters\":\"...\",\"expectedBehavior\":\"...\"}. Omit fields you cannot improve. Use null for unknown expectedBehavior.",
+    "Hard rules: no raw paths, secrets, stack traces, commands, prompts, transcripts, routes, follow-up advice, classifier/ranking claims, generated evidence, source edits, rules, tickets, Loom records, skills, or prompt changes.",
+    `Keep fields brief: headline <= ${RESPONSE_FIELD_LIMITS.headline}; whatHappened <= ${RESPONSE_FIELD_LIMITS.whatHappened}; whyItMatters <= ${RESPONSE_FIELD_LIMITS.whyItMatters}; expectedBehavior <= ${RESPONSE_FIELD_LIMITS.expectedBehavior}.`,
+    "Redacted facts JSON:",
+    JSON.stringify(promptFacts),
   ].join("\n");
 }
 
@@ -1085,6 +1067,56 @@ function buildLocalNarrativeJudgeRequest(
   return { ...requestWithoutPromptAndSignal, prompt, signal };
 }
 
+type ParsedModelJsonObject = { ok: true; value: unknown } | { ok: false };
+
+function parseModelJsonObject(rawResponse: string): ParsedModelJsonObject {
+  const trimmed = rawResponse.trim();
+  if (!trimmed) return { ok: false };
+  try {
+    return { ok: true, value: JSON.parse(trimmed) };
+  } catch {
+    const objectText = firstBalancedJsonObject(trimmed);
+    if (objectText === null) return { ok: false };
+    try {
+      return { ok: true, value: JSON.parse(objectText) };
+    } catch {
+      return { ok: false };
+    }
+  }
+}
+
+function firstBalancedJsonObject(value: string): string | null {
+  const start = value.indexOf("{");
+  if (start === -1) return null;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let index = start; index < value.length; index += 1) {
+    const char = value.charAt(index);
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === "\\") {
+        escaped = true;
+      } else if (char === "\"") {
+        inString = false;
+      }
+      continue;
+    }
+    if (char === "\"") {
+      inString = true;
+      continue;
+    }
+    if (char === "{") depth += 1;
+    if (char === "}") {
+      depth -= 1;
+      if (depth === 0) return value.slice(start, index + 1);
+      if (depth < 0) return null;
+    }
+  }
+  return null;
+}
+
 export function validateLocalNarrativeJudgeResponse(rawResponse: string, candidate: LocalNarrativeJudgeCandidate): JudgeValidationResult {
   let parsed: unknown;
   try {
@@ -1230,14 +1262,9 @@ function judgeFailClosedResult(reason: LocalNarrativeJudgeFailClosedReason): Jud
 }
 
 export function diagnoseLocalDiagnosisPolishResponse(rawResponse: string, context: LocalDiagnosisPolishValidationContext): LocalDiagnosisPolishResponseDiagnostics {
-  let parsed: unknown;
-  let parseValid = true;
-  try {
-    parsed = JSON.parse(rawResponse.trim());
-  } catch {
-    parseValid = false;
-    parsed = undefined;
-  }
+  const parsedResult = parseModelJsonObject(rawResponse);
+  const parseValid = parsedResult.ok;
+  const parsed = parsedResult.ok ? parsedResult.value : undefined;
 
   const parsedObject = isPlainObject(parsed) ? parsed : null;
   const objectValid = parsedObject !== null;
@@ -1584,12 +1611,12 @@ function diagnoseUnsafeOutputRule(value: string): LocalDiagnosisPolishDiagnostic
   if (containsRawPathLikeOutput(value)) return "unsafe.raw-path";
   if (RAW_COMMAND_OUTPUT_PATTERNS.some((pattern) => pattern.test(value))) return "unsafe.raw-command";
   if (/\b(?:route|routes|routed|routing|choose|select|press|click)\b/i.test(value) || /\b(?:follow-up|followup)\b/i.test(value)) return "unsafe.route-or-action-advice";
+  if (/\b(?:you|we|they|the\s+assistant|the\s+user)\s+(?:(?:can|could|should|might|may|would|must|will)|(?:(?:need|needs|has|have)\s+to))\s+(?:then\s+|also\s+|please\s+)*(?:add|edit|modify|change|delete|remove|fix|write|create|update|route|choose|select|press|click|apply|store|save|persist|rerun|re-run|reinstall|review)\b/i.test(value)) return "unsafe.route-or-action-advice";
   if (/(?:^|[.!?]\s+)(?:then\s+|please\s+)*(?:add|edit|modify|change|delete|remove|fix|write|create|update)\s+(?:a\s+|an\s+|the\s+)?(?:test|tests|file|files|code|source|module|dependency|prompt|rule|ticket|artifact|candidate|loom|skill)\b/i.test(value)) return "unsafe.mutation-instruction";
   if (/\b(?:create|apply|store|save|persist|write)\s+(?:a\s+)?(?:route|artifact|candidate|rule|ticket|loom|file|prompt|skill|source)/i.test(value)) return "unsafe.mutation-instruction";
   if (/\b(?:generated|created|added|fabricated|invented|synthesized)\s+(?:new\s+|extra\s+)?(?:evidence|refs?|snippets?)\b/i.test(value) || /\b(?:new|extra|fabricated|invented|synthetic)\s+(?:evidence|refs?|snippets?)\b/i.test(value)) return "unsafe.generated-evidence-claim";
-  if (/\b(?:fact\s+packet|bounded\s+fact\s+packet|(?:bounded|redacted)\s+packets?|packets?\b|allowed\s+keys?|json\s+(?:object|schema|response)|response\s+schema|deltas?\b|bounds?\b|analysis\s+fields?|headlines?\b|display\s+fields?|schema\s+fields?|field\s+names?|problem\s+(?:field|key|section)|whatHappened\s+(?:field|key))\b/i.test(value)) return "unsafe.internal-provenance";
-  if (/\b(?:detector|reflection\s+cluster|cluster_[a-z0-9_-]+|confidence(?:\s+score)?|record\s+ids?|source\s+ids?|session\s+ids?|entry\s+ids?|fact\s+ids?|sourceType|sourceFile|sessionFile|cwd)\b/i.test(value)) return "unsafe.internal-provenance";
-  if (DISPLAY_ONLY_FORBIDDEN_PATTERNS.some((pattern) => pattern.test(value))) return "unsafe.non-display-content";
+  if (/\b(?:classifier|ranking|ranked|top-ranked|route\s+ranking)\b/i.test(value)) return "unsafe.route-or-action-advice";
+  if (/\b(?:cluster_[a-z0-9_-]+|record\s+ids?|source\s+ids?|session\s+ids?|entry\s+ids?|sourceType|sourceFile|sessionFile|cwd)\b/i.test(value)) return "unsafe.internal-provenance";
   return null;
 }
 
@@ -1626,21 +1653,12 @@ function unsupportedDiagnosticCounts(summary: { content: number; number: number 
 }
 
 export function validateLocalDiagnosisPolishResponse(rawResponse: string, context: LocalDiagnosisPolishValidationContext): LocalDiagnosisPolishValidationResult {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(rawResponse.trim());
-  } catch {
-    return { ok: false, reason: "malformed-json", issue: "provider response was not valid JSON" };
-  }
+  const parsedResult = parseModelJsonObject(rawResponse);
+  if (!parsedResult.ok) return { ok: false, reason: "malformed-json", issue: "provider response was not valid JSON" };
 
+  const parsed = parsedResult.value;
   if (!isPlainObject(parsed)) return { ok: false, reason: "schema-invalid", issue: "provider response must be a JSON object" };
 
-  const keys = Object.keys(parsed);
-  const extraKey = keys.find((key) => !TOP_LEVEL_RESPONSE_FIELDS.has(key as LocalDiagnosisTopLevelResponseField));
-  if (extraKey) return { ok: false, reason: "schema-invalid", issue: "provider response included non-display fields" };
-  if (parsed["schemaVersion"] !== 2) return { ok: false, reason: "schema-invalid", issue: "provider response must use schemaVersion 2" };
-
-  const support = buildSupportSet(context.factPacket);
   const fields: LocalDiagnosisPolishDisplayFields = {};
   let usefulCoreFields = 0;
   let narrativeCandidate: LocalNarrativeJudgeCandidate | null = null;
@@ -1651,7 +1669,7 @@ export function validateLocalDiagnosisPolishResponse(rawResponse: string, contex
   for (const key of RESPONSE_FIELDS) {
     if (!Object.prototype.hasOwnProperty.call(parsed, key)) continue;
     const value = parsed[key];
-    const normalized = validateResponseField(key, value, context, support);
+    const normalized = validateResponseField(key, value, context);
     if (!normalized.ok) {
       if (normalized.scope === "card-level") {
         if (!firstCardLevelFailure) firstCardLevelFailure = normalized;
@@ -1691,20 +1709,19 @@ function validateResponseField(
   key: ResponseFieldName,
   value: unknown,
   context: LocalDiagnosisPolishValidationContext,
-  support: Set<string>,
 ): FieldValidationResult {
-  if (key === "whatHappened") return validateWhatHappenedNarrative(value, context);
+  if (key === "whatHappened") return validateWhatHappenedNarrative(value);
   if (FACT_CITED_DISPLAY_FIELDS.has(key as FactCitedDisplayFieldName)) {
-    return validateFactCitedDisplayField(key as FactCitedDisplayFieldName, value, context);
+    return validateFactCitedDisplayField(key as FactCitedDisplayFieldName, value);
   }
   if (value === null && key === "expectedBehavior") return { ok: true, value: null };
-  if (typeof value !== "string") return cardLevelFailure("schema-invalid", "display fields must be strings");
+  if (typeof value !== "string") return fieldLocalFailure("schema-invalid", "display field was not a string");
   const normalized = value.replace(/\s+/g, " ").trim();
   if (UNKNOWN_VALUES.has(normalized.toLowerCase())) return { ok: true, value: null };
-  if (normalized.length > RESPONSE_FIELD_LIMITS[key]) return cardLevelFailure("schema-invalid", "display field exceeded length limit");
-  if (containsUnsafeOutput(normalized)) return cardLevelFailure("unsafe-output", "display field included unsafe or non-display content");
+  if (key === "headline" && LOW_INFORMATION_HEADLINES.has(normalized.toLowerCase().replace(/[.!?]+$/g, ""))) return { ok: true, value: null };
+  if (normalized.length > RESPONSE_FIELD_LIMITS[key]) return fieldLocalFailure("schema-invalid", "display field exceeded length limit");
+  if (containsUnsafeOutput(normalized)) return cardLevelFailure("unsafe-output", "display field included hard unsafe or private content");
   if (key === "expectedBehavior") return validateExpectedBehaviorField(normalized, context);
-  if (hasUnsupportedConcreteFacts(normalized, support)) return cardLevelFailure("unsupported-facts", "display field included unsupported concrete facts");
   return { ok: true, value: normalized };
 }
 
@@ -1719,9 +1736,6 @@ function validateExpectedBehaviorField(
   if (hasExpectedBehaviorNegationMismatch(normalized, expectedFacts)) {
     return fieldLocalFailure("unsupported-facts", "expected behavior contradicted expected-behavior facts");
   }
-  if (hasUnsupportedFacts(normalized, buildSupportSetFromFacts(expectedFacts))) {
-    return fieldLocalFailure("unsupported-facts", "expected behavior included unsupported facts");
-  }
   return { ok: true, value: normalized };
 }
 
@@ -1734,128 +1748,52 @@ function hasExpectedBehaviorNegationMismatch(value: string, expectedFacts: Local
 function validateFactCitedDisplayField(
   key: FactCitedDisplayFieldName,
   value: unknown,
-  context: LocalDiagnosisPolishValidationContext,
 ): FieldValidationResult {
-  if (!isPlainObject(value)) return cardLevelFailure("schema-invalid", `${key} must be a fact-cited display object`);
-  const extraKey = Object.keys(value).find((fieldKey) => !FACT_CITED_DISPLAY_RESPONSE_FIELDS.has(fieldKey));
-  if (extraKey) return cardLevelFailure("schema-invalid", `${key} included unsupported fields`);
-
-  const text = value["text"];
-  if (typeof text !== "string") return cardLevelFailure("schema-invalid", `${key} text must be a string`);
+  const text = displayTextFromStringOrTextObject(value);
+  if (text === null) return fieldLocalFailure("schema-invalid", `${key} did not contain display text`);
   const normalized = text.replace(/\s+/g, " ").trim();
-
-  const factIds = value["factIds"];
-  if (!Array.isArray(factIds) || factIds.length === 0) return cardLevelFailure("schema-invalid", `${key} must cite one or more factIds`);
-  if (factIds.length > MAX_FACT_IDS_PER_DISPLAY_FIELD) return cardLevelFailure("schema-invalid", `${key} cited too many factIds`);
-
-  const factsById = new Map(context.factPacket.facts.map((fact) => [fact.id, fact]));
-  const seenFactIds = new Set<string>();
-  const citedFacts: LocalDiagnosisSupportFact[] = [];
-  for (const factId of factIds) {
-    if (typeof factId !== "string") return cardLevelFailure("schema-invalid", `${key} factIds must be strings`);
-    if (seenFactIds.has(factId)) return cardLevelFailure("schema-invalid", `${key} repeated a factId`);
-    seenFactIds.add(factId);
-    const fact = factsById.get(factId as LocalDiagnosisSupportFactId);
-    if (!fact) return cardLevelFailure("unsupported-facts", `${key} cited an unknown factId`);
-    citedFacts.push(fact);
-  }
-
   if (!normalized || UNKNOWN_VALUES.has(normalized.toLowerCase())) return { ok: true, value: null };
-  if (normalized.length > RESPONSE_FIELD_LIMITS[key]) return cardLevelFailure("schema-invalid", `${key} exceeded length limit`);
-  if (containsUnsafeOutput(normalized)) return cardLevelFailure("unsafe-output", `${key} included unsafe or non-display content`);
-  if (key === "evidenceSummary" && citedFacts.some((fact) => fact.kind !== "evidence-summary")) {
-    return fieldLocalFailure("unsupported-facts", "evidenceSummary must cite evidence-summary facts");
-  }
-  if (key === "whyThisWasFlagged" && !citedFacts.some((fact) => WHY_FLAGGED_SUPPORT_KINDS.has(fact.kind))) {
-    return fieldLocalFailure("unsupported-facts", "whyThisWasFlagged did not cite flagging support facts");
-  }
-  if (hasUnsupportedConcreteFacts(normalized, buildSupportSetFromFacts(citedFacts))) return fieldLocalFailure("unsupported-facts", `${key} included unsupported concrete facts`);
+  if (normalized.length > RESPONSE_FIELD_LIMITS[key]) return fieldLocalFailure("schema-invalid", `${key} exceeded length limit`);
+  if (containsUnsafeOutput(normalized)) return cardLevelFailure("unsafe-output", `${key} included hard unsafe or private content`);
   return { ok: true, value: normalized };
 }
 
-function validateWhatHappenedNarrative(
-  value: unknown,
-  context: LocalDiagnosisPolishValidationContext,
-): FieldValidationResult {
-  if (!isPlainObject(value)) {
-    return cardLevelFailure("schema-invalid", "whatHappened must be a fact-cited sentence object");
+function validateWhatHappenedNarrative(value: unknown): FieldValidationResult {
+  const text = whatHappenedDisplayText(value);
+  if (text === null) return fieldLocalFailure("schema-invalid", "whatHappened did not contain display text");
+  const normalized = text.replace(/\s+/g, " ").trim();
+  if (!normalized || UNKNOWN_VALUES.has(normalized.toLowerCase())) return { ok: true, value: null };
+  if (normalized.length > RESPONSE_FIELD_LIMITS.whatHappened) {
+    return fieldLocalFailure("schema-invalid", "whatHappened narrative exceeded length limit");
   }
-  const extraKey = Object.keys(value).find((key) => !WHAT_HAPPENED_RESPONSE_FIELDS.has(key));
-  if (extraKey) return cardLevelFailure("schema-invalid", "whatHappened included unsupported fields");
+  if (narrativeSentenceCount(normalized) > WHAT_HAPPENED_MAX_SENTENCES) {
+    return fieldLocalFailure("schema-invalid", "whatHappened narrative exceeded sentence limit");
+  }
+  if (containsUnsafeOutput(normalized) || containsWhatHappenedImperativeActionAdvice(normalized)) {
+    return cardLevelFailure("unsafe-output", "whatHappened narrative included hard unsafe or private content");
+  }
+  return { ok: true, value: normalized };
+}
 
+function displayTextFromStringOrTextObject(value: unknown): string | null {
+  if (typeof value === "string") return value;
+  if (isPlainObject(value) && typeof value["text"] === "string") return value["text"];
+  return null;
+}
+
+function whatHappenedDisplayText(value: unknown): string | null {
+  if (typeof value === "string") return value;
+  if (!isPlainObject(value)) return null;
+  const directText = displayTextFromStringOrTextObject(value);
+  if (directText !== null) return directText;
   const sentencesValue = value["sentences"];
-  if (!Array.isArray(sentencesValue)) return cardLevelFailure("schema-invalid", "whatHappened must include sentences");
-  if (sentencesValue.length === 0) return { ok: true, value: null };
-  if (sentencesValue.length > WHAT_HAPPENED_MAX_SENTENCES) {
-    return cardLevelFailure("schema-invalid", "whatHappened narrative exceeded sentence limit");
-  }
-
-  const factsById = new Map(context.factPacket.facts.map((fact) => [fact.id, fact]));
-  const knownFactIds = new Set(factsById.keys());
-  const support = buildSupportSet(context.factPacket);
+  if (!Array.isArray(sentencesValue)) return null;
   const sentenceTexts: string[] = [];
-  const candidateSentences: LocalNarrativeJudgeCandidateSentence[] = [];
   for (const sentence of sentencesValue) {
-    if (!isPlainObject(sentence)) return cardLevelFailure("schema-invalid", "whatHappened sentences must be JSON objects");
-    const sentenceExtraKey = Object.keys(sentence).find((key) => !WHAT_HAPPENED_SENTENCE_FIELDS.has(key));
-    if (sentenceExtraKey) return cardLevelFailure("schema-invalid", "whatHappened sentence included unsupported fields");
-
-    const text = sentence["text"];
-    if (typeof text !== "string") return cardLevelFailure("schema-invalid", "whatHappened sentence text must be a string");
-    const normalized = text.replace(/\s+/g, " ").trim();
-
-    const factIds = sentence["factIds"];
-    if (!Array.isArray(factIds) || factIds.length === 0) {
-      return cardLevelFailure("schema-invalid", "whatHappened sentence must cite one or more factIds");
-    }
-    if (factIds.length > MAX_FACT_IDS_PER_NARRATIVE_SENTENCE) {
-      return cardLevelFailure("schema-invalid", "whatHappened sentence cited too many factIds");
-    }
-    const seenFactIds = new Set<string>();
-    const normalizedFactIds: LocalDiagnosisSupportFactId[] = [];
-    for (const factId of factIds) {
-      if (typeof factId !== "string") return cardLevelFailure("schema-invalid", "whatHappened factIds must be strings");
-      if (seenFactIds.has(factId)) return cardLevelFailure("schema-invalid", "whatHappened sentence repeated a factId");
-      seenFactIds.add(factId);
-      if (!knownFactIds.has(factId as LocalDiagnosisSupportFactId)) {
-        return cardLevelFailure("unsupported-facts", "whatHappened cited an unknown factId");
-      }
-      normalizedFactIds.push(factId as LocalDiagnosisSupportFactId);
-    }
-
-    if (!normalized || UNKNOWN_VALUES.has(normalized.toLowerCase())) continue;
-    if (narrativeSentenceCount(normalized) > 1) return cardLevelFailure("schema-invalid", "whatHappened sentence object contained multiple sentences");
-    if (containsUnsafeOutput(normalized) || containsWhatHappenedImperativeActionAdvice(normalized)) {
-      return cardLevelFailure("unsafe-output", "whatHappened narrative included unsafe or non-display content");
-    }
-    if (containsUnsupportedConcreteMutationClaim(normalized, support)) {
-      return cardLevelFailure("unsupported-facts", "whatHappened narrative included unsupported concrete mutation claims");
-    }
-    sentenceTexts.push(normalized);
-    candidateSentences.push({
-      index: candidateSentences.length,
-      text: normalized,
-      factIds: normalizedFactIds,
-      citedFacts: normalizedFactIds.map((factId) => {
-        const fact = factsById.get(factId);
-        if (!fact) throw new Error("validated fact ID was missing from fact map");
-        return cloneSupportFact(fact);
-      }),
-    });
+    const sentenceText = displayTextFromStringOrTextObject(sentence);
+    if (sentenceText !== null) sentenceTexts.push(sentenceText);
   }
-
-  if (sentenceTexts.length === 0) return { ok: true, value: null };
-  const combined = sentenceTexts.join(" ");
-  if (combined.length > RESPONSE_FIELD_LIMITS.whatHappened) {
-    return cardLevelFailure("schema-invalid", "whatHappened narrative exceeded length limit");
-  }
-  if (narrativeSentenceCount(combined) > WHAT_HAPPENED_MAX_SENTENCES) {
-    return cardLevelFailure("schema-invalid", "whatHappened narrative exceeded sentence limit");
-  }
-  if (isDuplicateDisplayText(combined, [context.factPacket.deterministic.headline, context.factPacket.deterministic.whatHappened])) {
-    return { ok: true, value: null };
-  }
-  return { ok: true, value: combined, candidate: { field: "whatHappened", text: combined, sentences: candidateSentences } };
+  return sentenceTexts.length > 0 ? sentenceTexts.join(" ") : null;
 }
 
 function containsWhatHappenedImperativeActionAdvice(value: string): boolean {
@@ -1890,12 +1828,7 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 }
 
 function containsUnsafeOutput(value: string): boolean {
-  return looksLikePrompt(value)
-    || looksLikeTranscript(value)
-    || SECRET_OUTPUT_PATTERNS.some((pattern) => pattern.test(value))
-    || containsRawPathLikeOutput(value)
-    || RAW_COMMAND_OUTPUT_PATTERNS.some((pattern) => pattern.test(value))
-    || DISPLAY_ONLY_FORBIDDEN_PATTERNS.some((pattern) => pattern.test(value));
+  return diagnoseUnsafeOutputRule(value) !== null;
 }
 
 function containsRawPathLikeOutput(value: string): boolean {
