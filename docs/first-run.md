@@ -119,6 +119,16 @@ Optional model-assisted reflection, only when requested and Pi exposes a model c
 /flight-learn reflect --model
 ```
 
+Optional local Bonsai phrasing for the learning inbox, only when requested and when you already have a local GGUF model plus `llama-server` installed:
+
+```text
+/flight-learn --bonsai
+# equivalent alias:
+/flight-learn --local-model-bonsai
+```
+
+By default this looks for `~/.cache/pi-flight-recorder/bonsai/Bonsai-1.7B-Q1_0.gguf`, starts `llama-server` on `127.0.0.1` for the command, and cleans it up afterward. It does not download or install model/runtime files. Use `--bonsai-model-path PATH` or `--llama-server-bin PATH` for custom local locations.
+
 Reflection groups repeated local failures and proposes one pattern-level next step with evidence, confidence, limits, and actions. Use `/flight-learn review` for a guided keyboard-driven review: pick a proposal, pick an action, and optionally draft/edit/approve a scoped Flight Rule.
 
 ## 7. Give feedback

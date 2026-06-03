@@ -1,0 +1,21 @@
+{
+  "ticket": "ticket:20260602-flight-learn-practical-bonsai-runtime",
+  "evidence": "evidence:20260602-flight-learn-practical-bonsai-runtime",
+  "audit": "audit:20260602-flight-learn-practical-bonsai-runtime-review",
+  "artifacts": {
+    "realBonsaiSmoke": "01-real-bonsai-command-runtime-smoke.json",
+    "listenerCleanup": "02-listener-cleanup.txt",
+    "diffCheck": "03-diff-check.txt",
+    "validationSummary": "04-validation-summary.json",
+    "privacyScan": "05-privacy-scan.json",
+    "initialRalphReview": "06-ralph-review-output.md",
+    "followupRalphReview": "07-ralph-followup-review-output.md"
+  },
+  "nonClaims": [
+    "operator comprehension validation",
+    "global Bonsai model quality",
+    "automatic model/runtime download or install",
+    "hosted provider acceptance",
+    "source/storage/routing/artifact/Loom/rule/skill/prompt/classifier authority for model output"
+  ]
+}

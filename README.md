@@ -125,6 +125,16 @@ Use `/flight-learn review` or `/flight-learn reflect --interactive` for the guid
 
 Use plain `/flight-learn` for the expectation-delta learning inbox. It prepares local delta candidates from existing signals, routes one pending delta through human review, or follows up on one artifact candidate outcome without requiring you to remember candidate IDs. It never applies source/docs/Loom/rules/skills/prompts by itself.
 
+Optional local Bonsai phrasing can be enabled for that one review command:
+
+```text
+/flight-learn --bonsai
+# equivalent alias:
+/flight-learn --local-model-bonsai
+```
+
+This uses a local PrismML Bonsai GGUF file from `~/.cache/pi-flight-recorder/bonsai/Bonsai-1.7B-Q1_0.gguf` by default and starts an operator-installed `llama-server` on loopback for the command. It does not download or install model/runtime files. Use `--bonsai-model-path PATH` or `--llama-server-bin PATH` if your local files live elsewhere. Deterministic wording remains the fallback when the model/runtime is missing, slow, or unsafe.
+
 ## Debug CLI usage
 
 The CLI is a development/debug/recovery harness, not the normal UX.

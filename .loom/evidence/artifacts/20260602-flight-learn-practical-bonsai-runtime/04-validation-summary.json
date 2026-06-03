@@ -1,0 +1,9 @@
+{
+  "typecheck": { "command": "npm run typecheck", "result": "pass" },
+  "focusedTests": { "command": "npm test -- src/flight-learn-bonsai-runtime.test.ts src/pi-extension.test.ts", "result": "pass", "testFiles": 2, "tests": 36 },
+  "fullTests": { "command": "npm test", "result": "pass", "testFiles": 22, "tests": 137 },
+  "build": { "command": "npm run build", "result": "pass" },
+  "diffCheck": { "command": "git diff --check -- <scoped files>", "result": "pass", "artifact": "03-diff-check.txt" },
+  "realBonsaiSmoke": { "command": "node --import tsx <inline synthetic smoke>", "result": "pass", "artifact": "01-real-bonsai-command-runtime-smoke.json" },
+  "listenerCleanup": { "command": "lsof -nP -iTCP:<smokePort> -sTCP:LISTEN", "result": "pass", "artifact": "02-listener-cleanup.txt" }
+}

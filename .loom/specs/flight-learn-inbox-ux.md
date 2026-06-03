@@ -136,6 +136,8 @@ The UI should preserve all existing safety boundaries: candidate generation can 
 - REQ-054: A repaired model-enabled path MUST be replayed with an explicitly authorized local/open model runtime before operator comprehension validation or corpus/outcome collection resumes. Schema validity, hosted diagnostics, fake-provider success, and fallback renders remain insufficient.
 - REQ-055: The operator-selected product gate for local card-copy comprehension is hard display safety, not semantic proof. Once output is parseable enough to extract bounded display fields, `/flight-learn` MUST reject the model card only for hard privacy/safety/action-advice failures: raw local/session paths, secrets, prompt/transcript/stack traces/raw commands, route/action advice, artifact/rule/source/Loom/skill/prompt mutation instructions, classifier/ranking claims, or generated-evidence claims. Unsupported-token, citation, duplicate, low-information, or field-quality concerns SHOULD omit that field or fall back for that field rather than fail the whole card.
 - REQ-056: The first local/open model path for this hard-safety-only comprehension layer SHOULD return to PrismML Bonsai GGUF, starting with the cached/authorized Bonsai 1.7B Q1_0 model through loopback `llama.cpp`. Bonsai validation should use a short comprehension-copy prompt and realistic local timeout guidance, not the prior all-field proof-oriented validator/replay matrix.
+- REQ-057: `/flight-learn` MAY provide an explicit practical Bonsai flag such as `--bonsai` or `--local-model-bonsai` that starts an operator-installed `llama-server` subprocess for the current command against a local PrismML Bonsai GGUF file. This remains opt-in and MUST NOT become a default model call.
+- REQ-058: The practical Bonsai flag MUST preserve local-first runtime safety: use a local model file only, bind `llama-server` to literal loopback (`127.0.0.1`) on a command-scoped port, invoke the runtime with fixed argv and no shell interpolation, clean up the spawned process after the command, and fall back deterministically on missing model/runtime/startup/timeout/invalid output. It MUST NOT download, install, update, call setup scripts, bind to LAN/public hosts, call hosted providers, persist raw server logs/prompts/model output, or give model text storage/routing/artifact/source/Loom/rule/skill/prompt/classifier authority.
 
 ## Scenarios
 
@@ -347,6 +349,18 @@ THEN safe paraphrase and useful comprehension wording may render even without fa
 AND unsupported/citation/quality concerns do not erase safe useful fields
 AND hard privacy leaks, action advice, mutation instructions, classifier/ranking claims, or generated-evidence claims still force deterministic fallback for the card.
 
+### SCN-020: Practical Bonsai flag starts and cleans up local runtime
+
+Exercises: REQ-057, REQ-058
+
+GIVEN the operator runs `/flight-learn --bonsai`
+AND a local PrismML Bonsai GGUF file and operator-installed `llama-server` binary are available
+WHEN the focused card asks for local-model phrasing
+THEN Flight Recorder starts `llama-server` with a local model path, fixed argv, no shell interpolation, literal `127.0.0.1`, and a command-scoped port
+AND uses the existing loopback adapter and hard-safety display gate for the card
+AND stops the spawned runtime when the command finishes or falls back
+AND if the model file, runtime, startup, response, or timeout fails, deterministic wording remains usable without route/storage/artifact/source/Loom/rule/skill/prompt/classifier side effects.
+
 ## Evidence Plan
 
 - REQ-001 through REQ-007 / SCN-001 through SCN-003: fake-Pi command/component tests prove `/flight-learn` opens the custom inbox for pending deltas, selection/edit/route/dismiss/skip flows store the same safe records as the old flow, and no durable artifact mutation occurs.
@@ -362,6 +376,7 @@ AND hard privacy leaks, action advice, mutation instructions, classifier/ranking
 - REQ-037 through REQ-041 / SCN-012: local draft comprehension evidence should include tests and render artifacts for a draft explanation that passes hard display gates but is not judge-accepted, plus rejected draft cases for raw path/session/secret/prompt/route/mutation/overlong/unknown-fact content. Evidence must prove draft display has no storage/routing/artifact/source/Loom/classifier side effects.
 - REQ-042 through REQ-048 / SCN-013 through SCN-015: local LLM card-copy evidence should include fake-provider tests for all primary explanation fields, field-specific support/gate failures, render artifacts proving `Raw clue`/detector/provenance details are absent from the default reading path, collapsed evidence-summary renders, deterministic fallback renders, privacy scans, and operator comprehension notes. Real local-runtime claims require an explicitly authorized local runtime smoke or a recorded blocker.
 - REQ-049 through REQ-056 / SCN-016 through SCN-019: prompt/validator evidence should prioritize the operator-selected hard display safety gate. Required proof is narrow: safe paraphrase renders, malformed/unavailable output falls back, hard privacy/action/mutation/generated-evidence/classifier failures fail closed, and the local/open Bonsai path can be smoke-checked without downloads/hosted calls. Broad replay matrices, hosted diagnostics, and strict semantic support proof are not required for this gate and should not be used as the product comprehension metric.
+- REQ-057 through REQ-058 / SCN-020: practical Bonsai evidence should prove explicit flag behavior, local GGUF model-path use, fixed no-shell `llama-server` argv, loopback-only binding, deterministic fallback for missing model/runtime/startup failure, cleanup after command completion, and no download/install/hosted/provider-key/proxy paths. A fake local runtime is sufficient for lifecycle proof; real Bonsai smoke may be recorded only if already cached/authorized and without broad replay.
 - Visual UX claim: before strong release claims, capture at least one real interactive Pi TUI screenshot or ANSI log showing the custom inbox with representative data.
 
 ## Open Questions

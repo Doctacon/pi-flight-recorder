@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -55,6 +55,53 @@ async function startLocalChatServer(content: string): Promise<TestChatServer> {
   const address = server.address();
   if (!address || typeof address === "string") throw new Error("expected local chat server port");
   return { baseUrl: `http://127.0.0.1:${address.port}`, requests, close: () => closeServer(server) };
+}
+
+async function writeFakeLlamaServer(dir: string, content: string): Promise<{ binPath: string; logPath: string }> {
+  const binPath = path.join(dir, "fake-llama-server.mjs");
+  const logPath = path.join(dir, "fake-llama-server.ndjson");
+  await writeFile(binPath, `#!/usr/bin/env node
+import { appendFileSync } from "node:fs";
+import { createServer } from "node:http";
+const logPath = ${JSON.stringify(logPath)};
+function log(event) { appendFileSync(logPath, JSON.stringify(event) + "\\n"); }
+const argv = process.argv.slice(2);
+const port = Number(argv[argv.indexOf("--port") + 1]);
+const host = argv[argv.indexOf("--host") + 1];
+log({ event: "start", argv });
+const server = createServer(async (request, response) => {
+  if (request.url === "/health") {
+    response.writeHead(200, { "content-type": "text/plain" });
+    response.end("ok");
+    return;
+  }
+  const chunks = [];
+  for await (const chunk of request) chunks.push(Buffer.from(chunk));
+  const body = Buffer.concat(chunks).toString("utf8");
+  log({ event: "request", url: request.url, body });
+  const responseBody = JSON.stringify({ choices: [{ message: { content: ${JSON.stringify(content)} } }] });
+  response.writeHead(200, { "content-type": "application/json", "content-length": Buffer.byteLength(responseBody).toString() });
+  response.end(responseBody);
+});
+function shutdown(signal) {
+  log({ event: signal });
+  server.close(() => {
+    log({ event: "exit" });
+    process.exit(0);
+  });
+  setTimeout(() => process.exit(0), 500).unref();
+}
+process.on("SIGTERM", () => shutdown("sigterm"));
+process.on("SIGINT", () => shutdown("sigint"));
+server.listen(port, host, () => log({ event: "listening", host, port }));
+`);
+  await chmod(binPath, 0o755);
+  return { binPath, logPath };
+}
+
+async function readFakeLlamaEvents(logPath: string): Promise<Array<{ event: string; argv?: string[]; url?: string; body?: string }>> {
+  const text = await readFile(logPath, "utf8");
+  return text.trim().split("\n").filter(Boolean).map((entry) => JSON.parse(entry) as { event: string; argv?: string[]; url?: string; body?: string });
 }
 
 async function makeSessionSource(): Promise<{ root: string; dataDir: string }> {
@@ -150,6 +197,7 @@ describe("Pi extension wrapper", () => {
       expect(output).toContain("Flight recorder: suggest-on-failure");
       expect(output).toContain("User-bash capture: disabled");
       expect(output).toContain("Privacy: local SQLite only by default; no model calls unless explicitly enabled");
+      expect(output).toContain("/flight-learn --bonsai");
       expect(output).toContain("/flight-learn --local-model-polish --local-model-url ...");
       const store = new FlightRecorderStore(defaultDatabasePath(getDefaultDataDir()));
       try {
@@ -736,6 +784,90 @@ describe("Pi extension wrapper", () => {
     } finally {
       await chatServer.close();
     }
+  });
+
+  it("starts practical Bonsai local runtime from --bonsai and cleans it up after rendering", async () => {
+    const dataDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-learn-bonsai-data-"));
+    const runtimeDir = await mkdtemp(path.join(tmpdir(), "pfr-pi-learn-bonsai-runtime-"));
+    const modelPath = path.join(runtimeDir, "Bonsai-1.7B-Q1_0.gguf");
+    await writeFile(modelPath, "fake model file for command-shape test");
+    const fakeServer = await writeFakeLlamaServer(runtimeDir, JSON.stringify({
+      schemaVersion: 2,
+      headline: "A validation check failed repeatedly in this project.",
+      whatHappened: "The validation check was rerun from an old shell after the package changed.",
+      whyItMatters: "That makes the validation result hard to trust.",
+      expectedBehavior: "Run validation from a fresh project shell.",
+    }));
+    const commands = new Map<string, { handler: (args: string, ctx: any) => Promise<void> }>();
+    extension({ registerCommand: (name, command) => commands.set(name, command) });
+    let deltaId = "";
+    const store = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    try {
+      const delta = store.createExpectationDelta({
+        source: "detector",
+        summary: "Repeated failure pattern: bash cd /Users/alice/project && npm test",
+        expectation: "Validation should run from a fresh shell.",
+        reality: "The validation check was rerun from an old shell after the package changed.",
+        impact: "That makes the validation result hard to trust.",
+        severity: "medium",
+        cwd: "/Users/alice/project",
+        evidenceRefs: [{ sourceType: "manual", sourceId: null, sourceFile: null, sessionFile: null, cwd: "/Users/alice/project", entryId: null, timestamp: null, snippet: "npm test failed twice", note: "manual" }],
+      });
+      deltaId = delta.id;
+      store.recordDeltaDetectorSignal({ deltaId, type: "failed-validation", explanation: "Validation failed twice from the same stale shell pattern.", confidence: 0.74, evidenceRefs: delta.evidenceRefs });
+    } finally {
+      store.close();
+    }
+
+    const rendered: string[][] = [];
+    const ctx = {
+      cwd: "/repo",
+      ui: {
+        notify: () => undefined,
+        custom: async (factory: any) => {
+          let result: unknown;
+          const component = factory({ requestRender: () => undefined }, { fg: (_color: string, value: string) => value, bold: (value: string) => value }, {}, (value: unknown) => {
+            result = value;
+          });
+          rendered.push(component.render(112));
+          component.handleInput?.("2");
+          component.handleInput?.("\r");
+          return result;
+        },
+        editor: (message: string) => {
+          if (message.includes("Why this follow-up?")) return "A validation check follow-up should preserve the local evidence.";
+          throw new Error("only follow-up reason editor should run after custom route selection");
+        },
+      },
+      sessionManager: { getCwd: () => "/repo", getSessionFile: () => null },
+    };
+
+    await commands.get("flight-learn")?.handler(`--data-dir ${dataDir} --bonsai --bonsai-model-path ${modelPath} --llama-server-bin ${fakeServer.binPath} --bonsai-startup-timeout-ms 1000 --local-model-timeout-ms 1000 --local-model-max-output-tokens 128`, ctx);
+
+    const output = rendered[0]?.join("\n") ?? "";
+    expect(output).toContain("Local model phrasing; deterministic fallback available.");
+    expect(output).toContain("The validation check was rerun from an old shell after the package changed.");
+
+    const check = new FlightRecorderStore(defaultDatabasePath(dataDir));
+    try {
+      const candidate = check.listArtifactCandidates({ deltaId })[0];
+      expect(check.getExpectationDelta(deltaId)?.status).toBe("routed");
+      expect(candidate?.artifactType).toBe("test-check");
+      expect(candidate?.proposedDraft).not.toContain("A validation check failed repeatedly in this project");
+      expect(check.count("rule_candidates")).toBe(0);
+      expect(check.count("flight_rules")).toBe(0);
+    } finally {
+      check.close();
+    }
+
+    const events = await readFakeLlamaEvents(fakeServer.logPath);
+    const start = events.find((event) => event.event === "start");
+    expect(start?.argv).toEqual(expect.arrayContaining(["-m", modelPath, "--host", "127.0.0.1", "--port", "-c", "2048"]));
+    expect(start?.argv).not.toContain("0.0.0.0");
+    expect(start?.argv).not.toContain("-hf");
+    expect(events.some((event) => event.event === "request" && event.url === "/v1/chat/completions")).toBe(true);
+    expect(events.some((event) => event.event === "sigterm")).toBe(true);
+    expect(events.some((event) => event.event === "exit")).toBe(true);
   });
 
   it("ignores the legacy local narrative judge while showing hard-safety-validated card copy without persisting it", async () => {

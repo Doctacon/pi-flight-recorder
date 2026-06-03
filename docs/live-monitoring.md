@@ -112,6 +112,8 @@ For the newer expectation-delta learning loop, prefer:
 
 `/flight-learn reflect --model` is explicit. It uses bounded redacted snippets only when Pi exposes a model provider; otherwise deterministic local reflection is used and labeled.
 
+`/flight-learn --bonsai` is also explicit (`--local-model-bonsai` is an equivalent alias). It asks the inbox for display-only local phrasing using a local PrismML Bonsai GGUF file and an operator-installed `llama-server` on `127.0.0.1` for that command. It does not download or install model/runtime files, and deterministic wording remains the fallback when the local runtime is missing, slow, or unsafe.
+
 ## Feedback
 
 ```text
@@ -149,7 +151,7 @@ Automated tests and local smoke cover live occurrence capture, quiet buffering, 
 
 - All capture, search, clustering, and local reflection are local SQLite by default.
 - Stored live occurrence text redacts obvious secrets and user-home/session-file paths before persistence.
-- No network/model calls happen automatically.
+- No network/model calls happen automatically. `/flight-learn --bonsai` is an explicit local-only model call and still requires a local model file plus installed `llama-server`; it does not download or install anything.
 - Raw Pi sessions remain the source of truth.
 - `user_bash` is registered but not wrapped. Pi exposes it before execution, and result capture would require replacing shell semantics.
 - Suggestions/reflections are heuristic evidence pointers, not autonomous fixes.

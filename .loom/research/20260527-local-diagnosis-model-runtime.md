@@ -4,15 +4,17 @@ ID: research:20260527-local-diagnosis-model-runtime
 Type: Research
 Status: completed
 Created: 2026-05-27
-Updated: 2026-05-27
+Updated: 2026-06-02
 
 ## Summary
 
 This research evaluated local/open-source runtime options for optional `/flight-learn` diagnosis phrasing. The operator-preferred PrismML Bonsai 1-bit line remains the best first model family because the inspected model cards report Apache-2.0 licensing, GGUF/`llama.cpp` support, and unusually small parameter memory.
 
-Recommendation: implement the first real-runtime adapter as an **explicitly configured external `llama.cpp` server on loopback only**, using Bonsai **1.7B GGUF Q1_0** as the first validation target and Bonsai 4B/8B only as quality fallbacks. The adapter should not install `llama.cpp`, start a server, download weights, call hosted providers, accept non-loopback URLs, or become required for `/flight-learn`. The prompt/response contract remains model-agnostic and deterministic fallback remains the oracle.
+Recommendation at the time: implement the first real-runtime adapter as an **explicitly configured external `llama.cpp` server on loopback only**, using Bonsai **1.7B GGUF Q1_0** as the first validation target and Bonsai 4B/8B only as quality fallbacks. The adapter should not install `llama.cpp`, start a server, download weights, call hosted providers, accept non-loopback URLs, or become required for `/flight-learn`. The prompt/response contract remains model-agnostic and deterministic fallback remains the oracle.
 
-No runtime/model installation or inference was authorized for this research. This record is sufficient to proceed to fake-provider contract tests and a loopback `llama.cpp` adapter ticket, but it does **not** prove Bonsai output quality, JSON reliability, latency, or local runtime behavior.
+Freshness note, 2026-06-02: a later operator decision narrowed and superseded only the "do not start a server" recommendation for an explicit practical Bonsai flag. `ticket:20260602-flight-learn-practical-bonsai-runtime` may start an operator-installed `llama-server` for the current `/flight-learn --bonsai` command against a local GGUF file, while preserving this research record's no-download, no-install, no-hosted, loopback-only, deterministic-fallback, and display-only boundaries.
+
+No runtime/model installation or inference was authorized for this research. This record was sufficient to proceed to fake-provider contract tests and a loopback `llama.cpp` adapter ticket, but it did **not** prove Bonsai output quality, JSON reliability, latency, or local runtime behavior.
 
 ## Question
 

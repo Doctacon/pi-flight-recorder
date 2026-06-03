@@ -2,6 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { buildArtifactCandidateDraft } from "./artifact-drafts.js";
 import { formatDeltaOutcomeSummary, recordArtifactCandidateOutcomeWithStore, recordDeltaRecurrenceWithStore, summarizeDeltaOutcomes } from "./delta-outcomes.js";
 import { askFlightLearnDeltaInbox, type FlightLearnDeltaInboxItem, type FlightLearnDeltaInboxResult } from "./flight-learn-inbox.js";
+import { startBonsaiLocalDiagnosisRuntime, type BonsaiLocalDiagnosisRuntimeConfig, type BonsaiLocalDiagnosisRuntimeLease } from "./flight-learn-bonsai-runtime.js";
 import { createLlamaCppLocalDiagnosisPolishOptions, type LlamaCppLocalDiagnosisPolishConfig, type LlamaCppLocalNarrativeJudgeConfig } from "./flight-learn-llama-cpp-adapter.js";
 import { buildFlightLearnDiagnosisViewWithLocalPolish, type LocalDiagnosisPolishOptions } from "./flight-learn-local-diagnosis-model.js";
 import { formatFlightRule, formatRuleCandidate, formatRuleInjectionBlock, formatRulesMarkdown } from "./flight-rules.js";
@@ -351,7 +352,8 @@ function flightLearnHelp(): string {
   return [
     "Flight Learn commands:",
     "- /flight-learn                           Guided learning inbox",
-    "- /flight-learn --local-model-polish --local-model-url http://127.0.0.1:PORT [--local-narrative-judge-url http://127.0.0.1:PORT]",
+    "- /flight-learn --bonsai                 Use cached local PrismML Bonsai via llama-server (alias: --local-model-bonsai)",
+    "- /flight-learn --local-model-polish --local-model-url http://127.0.0.1:PORT",
     "- /flight-learn seen <error text>          Search prior local fixes",
     "- /flight-learn reflect [--model]          Reflect on repeated local failures",
     "- /flight-learn review                     Guided reflection/rule review",
@@ -467,7 +469,7 @@ async function handleFlightStatus(argsText: string, ctx: PiCommandContext, state
       `User-bash capture: disabled (Pi user_bash is pre-execution; command semantics are not wrapped).`,
       `Errors: ${state.lastBootstrapError ?? (watchStatus?.state === "watched-by-another-process" ? null : watchStatus?.lastError) ?? "none"}`,
       `Recent feedback: ${recentFeedback.map((item) => `${item.action}:${item.targetType}/${item.targetId}`).join(", ") || "none"}`,
-      "Privacy: local SQLite only by default; no model calls unless explicitly enabled by `/flight-learn reflect --model`, model reflection settings, or `/flight-learn --local-model-polish --local-model-url ...` with optional `--local-narrative-judge-url ...`.",
+      "Privacy: local SQLite only by default; no model calls unless explicitly enabled by `/flight-learn reflect --model`, model reflection settings, `/flight-learn --bonsai`, or `/flight-learn --local-model-polish --local-model-url ...`.",
     ];
     notify(ctx, lines.join("\n"), state.lastBootstrapError ? "warning" : "info");
   } finally {
@@ -803,37 +805,70 @@ function storeDeltaRoute(store: FlightRecorderStore, delta: ExpectationDelta, ar
   return store.acceptArtifactCandidate(candidate.id) ?? candidate;
 }
 
-function localDiagnosisPolishOptionsFromArgs(args: string[]): LocalDiagnosisPolishOptions {
-  if (!args.includes("--local-model-polish")) return { enabled: false };
-  const config: LlamaCppLocalDiagnosisPolishConfig = {
-    enabled: true,
-    kind: "llama-cpp-server",
-    baseUrl: readOption(args, "--local-model-url") ?? "",
-  };
-  const model = readOption(args, "--local-model-name");
-  const timeoutMs = parseNumber(readOption(args, "--local-model-timeout-ms"));
-  const maxOutputTokens = parseNumber(readOption(args, "--local-model-max-output-tokens"));
-  if (model) config.model = model;
-  if (timeoutMs !== undefined) config.timeoutMs = timeoutMs;
-  if (maxOutputTokens !== undefined) config.maxOutputTokens = maxOutputTokens;
+type LocalDiagnosisPolishLease = Pick<BonsaiLocalDiagnosisRuntimeLease, "options" | "cleanup">;
 
-  const judgeUrl = readOption(args, "--local-narrative-judge-url");
-  if (judgeUrl) {
-    const judgeConfig: LlamaCppLocalNarrativeJudgeConfig = {
+function disabledLocalDiagnosisPolishLease(): LocalDiagnosisPolishLease {
+  return { options: { enabled: false }, cleanup: async () => undefined };
+}
+
+function bonsaiLocalModelRequested(args: string[]): boolean {
+  return args.includes("--bonsai") || args.includes("--local-model-bonsai");
+}
+
+async function localDiagnosisPolishOptionsFromArgs(args: string[]): Promise<LocalDiagnosisPolishLease> {
+  const manualUrl = readOption(args, "--local-model-url");
+  if (!args.includes("--local-model-polish") && !bonsaiLocalModelRequested(args)) return disabledLocalDiagnosisPolishLease();
+
+  if (manualUrl) {
+    const config: LlamaCppLocalDiagnosisPolishConfig = {
       enabled: true,
       kind: "llama-cpp-server",
-      baseUrl: judgeUrl,
+      baseUrl: manualUrl,
     };
-    const judgeModel = readOption(args, "--local-narrative-judge-model-name");
-    const judgeTimeoutMs = parseNumber(readOption(args, "--local-narrative-judge-timeout-ms"));
-    const judgeMaxOutputTokens = parseNumber(readOption(args, "--local-narrative-judge-max-output-tokens"));
-    if (judgeModel) judgeConfig.model = judgeModel;
-    if (judgeTimeoutMs !== undefined) judgeConfig.timeoutMs = judgeTimeoutMs;
-    if (judgeMaxOutputTokens !== undefined) judgeConfig.maxOutputTokens = judgeMaxOutputTokens;
-    config.judge = judgeConfig;
+    const model = readOption(args, "--local-model-name");
+    const timeoutMs = parseNumber(readOption(args, "--local-model-timeout-ms"));
+    const maxOutputTokens = parseNumber(readOption(args, "--local-model-max-output-tokens"));
+    if (model) config.model = model;
+    if (timeoutMs !== undefined) config.timeoutMs = timeoutMs;
+    if (maxOutputTokens !== undefined) config.maxOutputTokens = maxOutputTokens;
+
+    const judgeUrl = readOption(args, "--local-narrative-judge-url");
+    if (judgeUrl) {
+      const judgeConfig: LlamaCppLocalNarrativeJudgeConfig = {
+        enabled: true,
+        kind: "llama-cpp-server",
+        baseUrl: judgeUrl,
+      };
+      const judgeModel = readOption(args, "--local-narrative-judge-model-name");
+      const judgeTimeoutMs = parseNumber(readOption(args, "--local-narrative-judge-timeout-ms"));
+      const judgeMaxOutputTokens = parseNumber(readOption(args, "--local-narrative-judge-max-output-tokens"));
+      if (judgeModel) judgeConfig.model = judgeModel;
+      if (judgeTimeoutMs !== undefined) judgeConfig.timeoutMs = judgeTimeoutMs;
+      if (judgeMaxOutputTokens !== undefined) judgeConfig.maxOutputTokens = judgeMaxOutputTokens;
+      config.judge = judgeConfig;
+    }
+
+    return { options: createLlamaCppLocalDiagnosisPolishOptions(config), cleanup: async () => undefined };
   }
 
-  return createLlamaCppLocalDiagnosisPolishOptions(config);
+  if (bonsaiLocalModelRequested(args)) {
+    const config: BonsaiLocalDiagnosisRuntimeConfig = { enabled: true };
+    const modelPath = readOption(args, "--bonsai-model-path");
+    const llamaServerPath = readOption(args, "--llama-server-bin") ?? readOption(args, "--llama-server");
+    const timeoutMs = parseNumber(readOption(args, "--local-model-timeout-ms"));
+    const maxOutputTokens = parseNumber(readOption(args, "--local-model-max-output-tokens"));
+    const startupTimeoutMs = parseNumber(readOption(args, "--bonsai-startup-timeout-ms"));
+    const contextTokens = parseNumber(readOption(args, "--bonsai-context-tokens"));
+    if (modelPath) config.modelPath = modelPath;
+    if (llamaServerPath) config.llamaServerPath = llamaServerPath;
+    if (timeoutMs !== undefined) config.timeoutMs = timeoutMs;
+    if (maxOutputTokens !== undefined) config.maxOutputTokens = maxOutputTokens;
+    if (startupTimeoutMs !== undefined) config.startupTimeoutMs = startupTimeoutMs;
+    if (contextTokens !== undefined) config.contextTokens = contextTokens;
+    return startBonsaiLocalDiagnosisRuntime(config);
+  }
+
+  return { options: createLlamaCppLocalDiagnosisPolishOptions({ enabled: true, kind: "llama-cpp-server", baseUrl: "" }), cleanup: async () => undefined };
 }
 
 async function deltaInboxItems(store: FlightRecorderStore, deltas: ExpectationDelta[], localDiagnosisPolish: LocalDiagnosisPolishOptions = { enabled: false }): Promise<FlightLearnDeltaInboxItem[]> {
@@ -921,7 +956,12 @@ async function handleFlightDeltaReview(argsText: string, ctx: PiCommandContext, 
       notify(ctx, explicitDeltaId ? `No expectation delta found for ${explicitDeltaId}.` : "No pending expectation delta candidates are ready for review.", "warning");
       return;
     }
-    if (await maybeHandleDeltaInbox(store, deltas, ctx, localDiagnosisPolishOptionsFromArgs(args))) return;
+    const localDiagnosisPolish = ctx.ui?.custom ? await localDiagnosisPolishOptionsFromArgs(args) : disabledLocalDiagnosisPolishLease();
+    try {
+      if (await maybeHandleDeltaInbox(store, deltas, ctx, localDiagnosisPolish.options)) return;
+    } finally {
+      await localDiagnosisPolish.cleanup();
+    }
     let delta = deltas[0]!;
     if (!explicitDeltaId || deltas.length > 1) {
       const choice = await askReviewChoice(ctx, "Choose an expectation delta", deltas.map((item, index) => ({ value: item.id, label: deltaChoiceLabel(item, index) })));
